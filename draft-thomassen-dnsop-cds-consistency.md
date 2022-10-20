@@ -189,19 +189,19 @@ To retrieve a Child's CDS/CDNSKEY RRset for DNSSEC delegation trust
 maintenance, the Parental Agent, knowing both the Child zone name and
 its NS hostnames, MUST ascertain that queries are made against all of
 the nameservers listed in the Child's delegation from the Parent, and
-ensure that each key referenced in any of the non-empty answers is also
-referenced in all other non-empty answers.
+ensure that each key referenced in any of the received answers is also
+referenced in all other received responses.
 
 In other words, CDS/CDNSKEY records at the Child zone apex MUST be
 fetched directly from each of the authoritative servers as determined by
 the delegation's NS record set, with DNSSEC validation enforced.
 When a key is referenced in a CDS or CDNSKEY record set returned by
 one nameserver, but is missing from a least one other nameserver's
-non-empty answer, the CDS/CDNSKEY state MUST be considered inconsistent.
+answer, the CDS/CDNSKEY state MUST be considered inconsistent.
 
-Consistency is only REQUIRED across non-empty answers: Nameservers that
-provide valid proof of non-existence or do not respond SHOULD be
-disregarded.
+Consistency is only REQUIRED across received responses:
+Nameservers that appear to be unavailable SHOULD be disregarded as if
+they were not part of the NS record set.
 
 If an inconsistent CDS/CDNSKEY state is encountered, the Parental Agent
 MUST take no action.
@@ -226,12 +226,13 @@ RRset.
 When retrieving CYSNC record sets, the Parental Agent MUST ascertain
 that queries are made against all of the nameservers listed in the
 Child's delegation from the Parent, and ensure that the CSYNC record
-sets are equal across all non-empty answers.
+sets are equal across all received responses.
 Otherwise, the CSYNC state MUST be considered inconsistent.
 
-For CSYNC queries, consistency is only REQUIRED across non-empty
-answers: Nameservers that provide valid proof of non-existence or do not
-respond SHOULD be disregarded.
+For CSYNC queries, consistency is only REQUIRED across received
+responses:
+Nameservers that appear to be unavailable SHOULD be disregarded as if
+they were not part of the NS record set.
 (This is like for CDS/CDNSKEY queries above.)
 
 ## Querying for Data Records (e.g. NS)
@@ -242,11 +243,12 @@ listed in the Child's delegation from the Parent, and ensure that all
 answers received are equal.
 Otherwise, the CSYNC state MUST be considered inconsistent.
 
-Unlike for CSYNC queries, answers MUST be all non-empty and equal, or
-all empty.
-Unresponsive nameservers SHOULD be disregarded.
+Answers MUST be all non-empty and equal, or all empty.
 If both an empty and a non-empty answer is received for a data record
-query, the state MUST be considered inconsistent.
+query, the CSYNC state MUST be considered inconsistent.
+
+Nameservers that appear to be unavailable SHOULD be disregarded as if
+they were not part of the NS record set.
 
 # Security Considerations
 
@@ -267,6 +269,9 @@ there is consensus across operators.
 # Change History (to be removed before publication)
 
 * draft-thomassen-dnsop-cds-consistency-02
+
+> Don't ignore DoE responses from individual nameservers (instead,
+  require consistency across all responses received)
 
 * draft-thomassen-dnsop-cds-consistency-01
 

@@ -4,9 +4,9 @@
 
 DNSOP Working Group                                         P. Thomassen
 Internet-Draft                         Secure Systems Engineering, deSEC
-Updates: 7344, 7477 (if approved)                        20 October 2022
+Updates: 7344, 7477 (if approved)                        24 October 2022
 Intended status: Standards Track                                        
-Expires: 23 April 2023
+Expires: 27 April 2023
 
 
            Consistency for CDS/CDNSKEY and CSYNC is Mandatory
@@ -44,7 +44,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 23 April 2023.
+   This Internet-Draft will expire on 27 April 2023.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Thomassen                 Expires 23 April 2023                 [Page 1]
+Thomassen                 Expires 27 April 2023                 [Page 1]
 
 Internet-Draft               cds-consistency                October 2022
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Thomassen                 Expires 23 April 2023                 [Page 2]
+Thomassen                 Expires 27 April 2023                 [Page 2]
 
 Internet-Draft               cds-consistency                October 2022
 
@@ -165,7 +165,7 @@ Internet-Draft               cds-consistency                October 2022
 
 
 
-Thomassen                 Expires 23 April 2023                 [Page 3]
+Thomassen                 Expires 27 April 2023                 [Page 3]
 
 Internet-Draft               cds-consistency                October 2022
 
@@ -221,7 +221,7 @@ Internet-Draft               cds-consistency                October 2022
 
 
 
-Thomassen                 Expires 23 April 2023                 [Page 4]
+Thomassen                 Expires 27 April 2023                 [Page 4]
 
 Internet-Draft               cds-consistency                October 2022
 
@@ -254,20 +254,19 @@ Internet-Draft               cds-consistency                October 2022
    maintenance, the Parental Agent, knowing both the Child zone name and
    its NS hostnames, MUST ascertain that queries are made against all of
    the nameservers listed in the Child's delegation from the Parent, and
-   ensure that each key referenced in any of the non-empty answers is
-   also referenced in all other non-empty answers.
+   ensure that each key referenced in any of the received answers is
+   also referenced in all other received responses.
 
    In other words, CDS/CDNSKEY records at the Child zone apex MUST be
    fetched directly from each of the authoritative servers as determined
    by the delegation's NS record set, with DNSSEC validation enforced.
    When a key is referenced in a CDS or CDNSKEY record set returned by
    one nameserver, but is missing from a least one other nameserver's
-   non-empty answer, the CDS/CDNSKEY state MUST be considered
-   inconsistent.
+   answer, the CDS/CDNSKEY state MUST be considered inconsistent.
 
-   Consistency is only REQUIRED across non-empty answers: Nameservers
-   that provide valid proof of non-existence or do not respond SHOULD be
-   disregarded.
+   Consistency is only REQUIRED across received responses: Nameservers
+   that appear to be unavailable SHOULD be disregarded as if they were
+   not part of the NS record set.
 
    If an inconsistent CDS/CDNSKEY state is encountered, the Parental
    Agent MUST take no action.  Specifically, it MUST NOT delete or alter
@@ -277,7 +276,8 @@ Internet-Draft               cds-consistency                October 2022
 
 
 
-Thomassen                 Expires 23 April 2023                 [Page 5]
+
+Thomassen                 Expires 27 April 2023                 [Page 5]
 
 Internet-Draft               cds-consistency                October 2022
 
@@ -298,13 +298,13 @@ Internet-Draft               cds-consistency                October 2022
    When retrieving CYSNC record sets, the Parental Agent MUST ascertain
    that queries are made against all of the nameservers listed in the
    Child's delegation from the Parent, and ensure that the CSYNC record
-   sets are equal across all non-empty answers.  Otherwise, the CSYNC
+   sets are equal across all received responses.  Otherwise, the CSYNC
    state MUST be considered inconsistent.
 
-   For CSYNC queries, consistency is only REQUIRED across non-empty
-   answers: Nameservers that provide valid proof of non-existence or do
-   not respond SHOULD be disregarded.  (This is like for CDS/CDNSKEY
-   queries above.)
+   For CSYNC queries, consistency is only REQUIRED across received
+   responses: Nameservers that appear to be unavailable SHOULD be
+   disregarded as if they were not part of the NS record set.  (This is
+   like for CDS/CDNSKEY queries above.)
 
 4.2.  Querying for Data Records (e.g.  NS)
 
@@ -314,10 +314,12 @@ Internet-Draft               cds-consistency                October 2022
    answers received are equal.  Otherwise, the CSYNC state MUST be
    considered inconsistent.
 
-   Unlike for CSYNC queries, answers MUST be all non-empty and equal, or
-   all empty.  Unresponsive nameservers SHOULD be disregarded.  If both
-   an empty and a non-empty answer is received for a data record query,
-   the state MUST be considered inconsistent.
+   Answers MUST be all non-empty and equal, or all empty.  If both an
+   empty and a non-empty answer is received for a data record query, the
+   CSYNC state MUST be considered inconsistent.
+
+   Nameservers that appear to be unavailable SHOULD be disregarded as if
+   they were not part of the NS record set.
 
 5.  Security Considerations
 
@@ -328,15 +330,16 @@ Internet-Draft               cds-consistency                October 2022
    remove another operator's trust anchor or nameservers from the
    delegation.
 
-   As a consequence, the delegation's records can only be modified when
-   there is consensus across operators.
 
 
 
-Thomassen                 Expires 23 April 2023                 [Page 6]
+Thomassen                 Expires 27 April 2023                 [Page 6]
 
 Internet-Draft               cds-consistency                October 2022
 
+
+   As a consequence, the delegation's records can only be modified when
+   there is consensus across operators.
 
 6.  Normative References
 
@@ -386,10 +389,7 @@ Internet-Draft               cds-consistency                October 2022
 
 
 
-
-
-
-Thomassen                 Expires 23 April 2023                 [Page 7]
+Thomassen                 Expires 27 April 2023                 [Page 7]
 
 Internet-Draft               cds-consistency                October 2022
 
@@ -397,6 +397,9 @@ Internet-Draft               cds-consistency                October 2022
 Appendix A.  Change History (to be removed before publication)
 
    *  draft-thomassen-dnsop-cds-consistency-02
+
+   |  Don't ignore DoE responses from individual nameservers (instead,
+   |  require consistency across all responses received)
 
    *  draft-thomassen-dnsop-cds-consistency-01
 
@@ -442,7 +445,4 @@ Author's Address
 
 
 
-
-
-
-Thomassen                 Expires 23 April 2023                 [Page 8]
+Thomassen                 Expires 27 April 2023                 [Page 8]

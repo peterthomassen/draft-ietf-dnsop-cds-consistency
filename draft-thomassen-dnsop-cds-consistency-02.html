@@ -1187,7 +1187,7 @@ li > p:last-of-type {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Thomassen</td>
-<td class="center">Expires 23 April 2023</td>
+<td class="center">Expires 27 April 2023</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1203,12 +1203,12 @@ li > p:last-of-type {
 <a href="https://www.rfc-editor.org/rfc/rfc7344" class="eref">7344</a>, <a href="https://www.rfc-editor.org/rfc/rfc7477" class="eref">7477</a> (if approved)</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-10-20" class="published">20 October 2022</time>
+<time datetime="2022-10-24" class="published">24 October 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2023-04-23">23 April 2023</time></dd>
+<dd class="expires"><time datetime="2023-04-27">27 April 2023</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1254,7 +1254,7 @@ taking any action based on these records.<a href="#section-abstract-2" class="pi
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 23 April 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 27 April 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1497,17 +1497,17 @@ DNSSEC validation fails for all answers served by the old provider.<a href="#sec
 maintenance, the Parental Agent, knowing both the Child zone name and
 its NS hostnames, MUST ascertain that queries are made against all of
 the nameservers listed in the Child's delegation from the Parent, and
-ensure that each key referenced in any of the non-empty answers is also
-referenced in all other non-empty answers.<a href="#section-3-2" class="pilcrow">¶</a></p>
+ensure that each key referenced in any of the received answers is also
+referenced in all other received responses.<a href="#section-3-2" class="pilcrow">¶</a></p>
 <p id="section-3-3">In other words, CDS/CDNSKEY records at the Child zone apex MUST be
 fetched directly from each of the authoritative servers as determined by
 the delegation's NS record set, with DNSSEC validation enforced.
 When a key is referenced in a CDS or CDNSKEY record set returned by
 one nameserver, but is missing from a least one other nameserver's
-non-empty answer, the CDS/CDNSKEY state MUST be considered inconsistent.<a href="#section-3-3" class="pilcrow">¶</a></p>
-<p id="section-3-4">Consistency is only REQUIRED across non-empty answers: Nameservers that
-provide valid proof of non-existence or do not respond SHOULD be
-disregarded.<a href="#section-3-4" class="pilcrow">¶</a></p>
+answer, the CDS/CDNSKEY state MUST be considered inconsistent.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-4">Consistency is only REQUIRED across received responses:
+Nameservers that appear to be unavailable SHOULD be disregarded as if
+they were not part of the NS record set.<a href="#section-3-4" class="pilcrow">¶</a></p>
 <p id="section-3-5">If an inconsistent CDS/CDNSKEY state is encountered, the Parental Agent
 MUST take no action.
 Specifically, it MUST NOT delete or alter the existing DS RRset.<a href="#section-3-5" class="pilcrow">¶</a></p>
@@ -1535,11 +1535,12 @@ RRset.<a href="#section-4-2" class="pilcrow">¶</a></p>
 <p id="section-4.1-1">When retrieving CYSNC record sets, the Parental Agent MUST ascertain
 that queries are made against all of the nameservers listed in the
 Child's delegation from the Parent, and ensure that the CSYNC record
-sets are equal across all non-empty answers.
+sets are equal across all received responses.
 Otherwise, the CSYNC state MUST be considered inconsistent.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
-<p id="section-4.1-2">For CSYNC queries, consistency is only REQUIRED across non-empty
-answers: Nameservers that provide valid proof of non-existence or do not
-respond SHOULD be disregarded.
+<p id="section-4.1-2">For CSYNC queries, consistency is only REQUIRED across received
+responses:
+Nameservers that appear to be unavailable SHOULD be disregarded as if
+they were not part of the NS record set.
 (This is like for CDS/CDNSKEY queries above.)<a href="#section-4.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1553,11 +1554,11 @@ ascertain that all queries are made against all of the nameservers
 listed in the Child's delegation from the Parent, and ensure that all
 answers received are equal.
 Otherwise, the CSYNC state MUST be considered inconsistent.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
-<p id="section-4.2-2">Unlike for CSYNC queries, answers MUST be all non-empty and equal, or
-all empty.
-Unresponsive nameservers SHOULD be disregarded.
+<p id="section-4.2-2">Answers MUST be all non-empty and equal, or all empty.
 If both an empty and a non-empty answer is received for a data record
-query, the state MUST be considered inconsistent.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+query, the CSYNC state MUST be considered inconsistent.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.2-3">Nameservers that appear to be unavailable SHOULD be disregarded as if
+they were not part of the NS record set.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1626,25 +1627,29 @@ there is consensus across operators.<a href="#section-5-2" class="pilcrow">¶</a
 <a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-change-history-to-be-remove" class="section-name selfRef">Change History (to be removed before publication)</a>
       </h2>
 <ul class="normal">
-<li class="normal" id="appendix-A-1.1">
-          <p id="appendix-A-1.1.1">draft-thomassen-dnsop-cds-consistency-02<a href="#appendix-A-1.1.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="appendix-A-1.2">
-          <p id="appendix-A-1.2.1">draft-thomassen-dnsop-cds-consistency-01<a href="#appendix-A-1.2.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-A-1.1">draft-thomassen-dnsop-cds-consistency-02<a href="#appendix-A-1.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-A-2">
-        <p id="appendix-A-2.1">Allow for nameservers that don't respond or provide DoE (i.e. require
-  consistency only among the non-empty answers received)<a href="#appendix-A-2.1" class="pilcrow">¶</a></p>
-<p id="appendix-A-2.2">Define similar requirements for CSYNC.<a href="#appendix-A-2.2" class="pilcrow">¶</a></p>
-<p id="appendix-A-2.3">Editorial changes.<a href="#appendix-A-2.3" class="pilcrow">¶</a></p>
+        <p id="appendix-A-2.1">Don't ignore DoE responses from individual nameservers (instead,
+  require consistency across all responses received)<a href="#appendix-A-2.1" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="normal">
-<li class="normal" id="appendix-A-3.1">draft-thomassen-dnsop-cds-consistency-00<a href="#appendix-A-3.1" class="pilcrow">¶</a>
+<li class="normal" id="appendix-A-3.1">draft-thomassen-dnsop-cds-consistency-01<a href="#appendix-A-3.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-A-4">
-        <p id="appendix-A-4.1">Initial public draft.<a href="#appendix-A-4.1" class="pilcrow">¶</a></p>
+        <p id="appendix-A-4.1">Allow for nameservers that don't respond or provide DoE (i.e. require
+  consistency only among the non-empty answers received)<a href="#appendix-A-4.1" class="pilcrow">¶</a></p>
+<p id="appendix-A-4.2">Define similar requirements for CSYNC.<a href="#appendix-A-4.2" class="pilcrow">¶</a></p>
+<p id="appendix-A-4.3">Editorial changes.<a href="#appendix-A-4.3" class="pilcrow">¶</a></p>
+</blockquote>
+<ul class="normal">
+<li class="normal" id="appendix-A-5.1">draft-thomassen-dnsop-cds-consistency-00<a href="#appendix-A-5.1" class="pilcrow">¶</a>
+</li>
+      </ul>
+<blockquote id="appendix-A-6">
+        <p id="appendix-A-6.1">Initial public draft.<a href="#appendix-A-6.1" class="pilcrow">¶</a></p>
 </blockquote>
 </section>
 </div>
