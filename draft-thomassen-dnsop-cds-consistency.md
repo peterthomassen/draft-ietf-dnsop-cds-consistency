@@ -266,6 +266,8 @@ there is consensus across operators.
 
 # Change History (to be removed before publication)
 
+* draft-thomassen-dnsop-cds-consistency-02
+
 * draft-thomassen-dnsop-cds-consistency-01
 
 > Allow for nameservers that don't respond or provide DoE (i.e. require
