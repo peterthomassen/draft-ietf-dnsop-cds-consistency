@@ -80,7 +80,7 @@ Table of Contents
    4.  Performing a Poll-based CSYNC Update  . . . . . . . . . . . .   6
      4.1.  Querying for CSYNC  . . . . . . . . . . . . . . . . . . .   6
      4.2.  Querying for Data Records (e.g.  NS)  . . . . . . . . . .   6
-   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
+   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
    6.  Normative References  . . . . . . . . . . . . . . . . . . . .   7
    Appendix A.  Change History (to be removed before publication)  .   8
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   8
@@ -282,6 +282,11 @@ Thomassen                  Expires 6 May 2023                   [Page 5]
 Internet-Draft               cds-consistency               November 2022
 
 
+   To accommodate transient inconsistencies (e.g. replication delays),
+   the Parental Agent MAY retry the full process, repeating all queries.
+   A schedule with exponential back-off is RECOMMENDED (such as after 5,
+   10, 20, 40, ... minutes).
+
 4.  Performing a Poll-based CSYNC Update
 
    A CSYNC-based update consists of (1) polling the CSYNC record to
@@ -292,6 +297,11 @@ Internet-Draft               cds-consistency               November 2022
    If an inconsistent CSYNC state is encountered in the process, the
    Parental Agent MUST take no action.  Specifically, it MUST NOT delete
    or alter any existing NS or other data RRset.
+
+   To accommodate transient inconsistencies (e.g. replication delays),
+   the Parental Agent MAY retry the full process, repeating all queries.
+   A schedule with exponential back-off is RECOMMENDED (such as after 5,
+   10, 20, 40, ... minutes).
 
 4.1.  Querying for CSYNC
 
@@ -321,6 +331,13 @@ Internet-Draft               cds-consistency               November 2022
    Nameservers that appear to be unavailable SHOULD be disregarded as if
    they were not part of the NS record set.
 
+
+
+Thomassen                  Expires 6 May 2023                   [Page 6]
+
+Internet-Draft               cds-consistency               November 2022
+
+
 5.  Security Considerations
 
    The level of rigor mandated by this document is needed to prevent
@@ -329,14 +346,6 @@ Internet-Draft               cds-consistency               November 2022
    example, that an operator in a multi-homed setup cannot unilaterally
    remove another operator's trust anchor or nameservers from the
    delegation.
-
-
-
-
-Thomassen                  Expires 6 May 2023                   [Page 6]
-
-Internet-Draft               cds-consistency               November 2022
-
 
    As a consequence, the delegation's records can only be modified when
    there is consensus across operators.
@@ -377,6 +386,14 @@ Internet-Draft               cds-consistency               November 2022
               RFC 7477, DOI 10.17487/RFC7477, March 2015,
               <https://www.rfc-editor.org/info/rfc7477>.
 
+
+
+
+Thomassen                  Expires 6 May 2023                   [Page 7]
+
+Internet-Draft               cds-consistency               November 2022
+
+
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
@@ -386,17 +403,11 @@ Internet-Draft               cds-consistency               November 2022
               DOI 10.17487/RFC8901, September 2020,
               <https://www.rfc-editor.org/info/rfc8901>.
 
-
-
-
-Thomassen                  Expires 6 May 2023                   [Page 7]
-
-Internet-Draft               cds-consistency               November 2022
-
-
 Appendix A.  Change History (to be removed before publication)
 
    *  draft-thomassen-dnsop-cds-consistency-03
+
+   |  Retry mechanism to resolve inconsistencies
 
    *  draft-thomassen-dnsop-cds-consistency-02
 
@@ -423,17 +434,6 @@ Author's Address
    Berlin
    Germany
    Email: peter.thomassen@securesystems.de
-
-
-
-
-
-
-
-
-
-
-
 
 
 

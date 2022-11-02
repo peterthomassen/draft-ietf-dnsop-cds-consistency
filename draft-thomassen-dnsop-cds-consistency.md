@@ -207,6 +207,11 @@ If an inconsistent CDS/CDNSKEY state is encountered, the Parental Agent
 MUST take no action.
 Specifically, it MUST NOT delete or alter the existing DS RRset.
 
+To accommodate transient inconsistencies (e.g. replication delays), the
+Parental Agent MAY retry the full process, repeating all queries.
+A schedule with exponential back-off is RECOMMENDED (such as after 5,
+10, 20, 40, ... minutes).
+
 
 # Performing a Poll-based CSYNC Update
 
@@ -220,6 +225,11 @@ If an inconsistent CSYNC state is encountered in the process, the
 Parental Agent MUST take no action.
 Specifically, it MUST NOT delete or alter any existing NS or other data
 RRset.
+
+To accommodate transient inconsistencies (e.g. replication delays), the
+Parental Agent MAY retry the full process, repeating all queries.
+A schedule with exponential back-off is RECOMMENDED (such as after 5,
+10, 20, 40, ... minutes).
 
 ## Querying for CSYNC
 
@@ -269,6 +279,8 @@ there is consensus across operators.
 # Change History (to be removed before publication)
 
 * draft-thomassen-dnsop-cds-consistency-03
+
+> Retry mechanism to resolve inconsistencies
 
 * draft-thomassen-dnsop-cds-consistency-02
 

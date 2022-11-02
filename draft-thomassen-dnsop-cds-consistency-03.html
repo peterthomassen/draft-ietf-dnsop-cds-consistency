@@ -1511,6 +1511,10 @@ they were not part of the NS record set.<a href="#section-3-4" class="pilcrow">�
 <p id="section-3-5">If an inconsistent CDS/CDNSKEY state is encountered, the Parental Agent
 MUST take no action.
 Specifically, it MUST NOT delete or alter the existing DS RRset.<a href="#section-3-5" class="pilcrow">¶</a></p>
+<p id="section-3-6">To accommodate transient inconsistencies (e.g. replication delays), the
+Parental Agent MAY retry the full process, repeating all queries.
+A schedule with exponential back-off is RECOMMENDED (such as after 5,
+10, 20, 40, ... minutes).<a href="#section-3-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="performing-a-poll-based-csync-update">
@@ -1527,6 +1531,10 @@ Both steps are described separately below.<a href="#section-4-1" class="pilcrow"
 Parental Agent MUST take no action.
 Specifically, it MUST NOT delete or alter any existing NS or other data
 RRset.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-3">To accommodate transient inconsistencies (e.g. replication delays), the
+Parental Agent MAY retry the full process, repeating all queries.
+A schedule with exponential back-off is RECOMMENDED (such as after 5,
+10, 20, 40, ... minutes).<a href="#section-4-3" class="pilcrow">¶</a></p>
 <div id="querying-for-csync">
 <section id="section-4.1">
         <h3 id="name-querying-for-csync">
@@ -1627,33 +1635,36 @@ there is consensus across operators.<a href="#section-5-2" class="pilcrow">¶</a
 <a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-change-history-to-be-remove" class="section-name selfRef">Change History (to be removed before publication)</a>
       </h2>
 <ul class="normal">
-<li class="normal" id="appendix-A-1.1">
-          <p id="appendix-A-1.1.1">draft-thomassen-dnsop-cds-consistency-03<a href="#appendix-A-1.1.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="appendix-A-1.2">
-          <p id="appendix-A-1.2.1">draft-thomassen-dnsop-cds-consistency-02<a href="#appendix-A-1.2.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-A-1.1">draft-thomassen-dnsop-cds-consistency-03<a href="#appendix-A-1.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-A-2">
-        <p id="appendix-A-2.1">Don't ignore DoE responses from individual nameservers (instead,
-  require consistency across all responses received)<a href="#appendix-A-2.1" class="pilcrow">¶</a></p>
+        <p id="appendix-A-2.1">Retry mechanism to resolve inconsistencies<a href="#appendix-A-2.1" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="normal">
-<li class="normal" id="appendix-A-3.1">draft-thomassen-dnsop-cds-consistency-01<a href="#appendix-A-3.1" class="pilcrow">¶</a>
+<li class="normal" id="appendix-A-3.1">draft-thomassen-dnsop-cds-consistency-02<a href="#appendix-A-3.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-A-4">
-        <p id="appendix-A-4.1">Allow for nameservers that don't respond or provide DoE (i.e. require
-  consistency only among the non-empty answers received)<a href="#appendix-A-4.1" class="pilcrow">¶</a></p>
-<p id="appendix-A-4.2">Define similar requirements for CSYNC.<a href="#appendix-A-4.2" class="pilcrow">¶</a></p>
-<p id="appendix-A-4.3">Editorial changes.<a href="#appendix-A-4.3" class="pilcrow">¶</a></p>
+        <p id="appendix-A-4.1">Don't ignore DoE responses from individual nameservers (instead,
+  require consistency across all responses received)<a href="#appendix-A-4.1" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="normal">
-<li class="normal" id="appendix-A-5.1">draft-thomassen-dnsop-cds-consistency-00<a href="#appendix-A-5.1" class="pilcrow">¶</a>
+<li class="normal" id="appendix-A-5.1">draft-thomassen-dnsop-cds-consistency-01<a href="#appendix-A-5.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-A-6">
-        <p id="appendix-A-6.1">Initial public draft.<a href="#appendix-A-6.1" class="pilcrow">¶</a></p>
+        <p id="appendix-A-6.1">Allow for nameservers that don't respond or provide DoE (i.e. require
+  consistency only among the non-empty answers received)<a href="#appendix-A-6.1" class="pilcrow">¶</a></p>
+<p id="appendix-A-6.2">Define similar requirements for CSYNC.<a href="#appendix-A-6.2" class="pilcrow">¶</a></p>
+<p id="appendix-A-6.3">Editorial changes.<a href="#appendix-A-6.3" class="pilcrow">¶</a></p>
+</blockquote>
+<ul class="normal">
+<li class="normal" id="appendix-A-7.1">draft-thomassen-dnsop-cds-consistency-00<a href="#appendix-A-7.1" class="pilcrow">¶</a>
+</li>
+      </ul>
+<blockquote id="appendix-A-8">
+        <p id="appendix-A-8.1">Initial public draft.<a href="#appendix-A-8.1" class="pilcrow">¶</a></p>
 </blockquote>
 </section>
 </div>
