@@ -268,6 +268,8 @@ there is consensus across operators.
 
 # Change History (to be removed before publication)
 
+* draft-thomassen-dnsop-cds-consistency-03
+
 * draft-thomassen-dnsop-cds-consistency-02
 
 > Don't ignore DoE responses from individual nameservers (instead,
