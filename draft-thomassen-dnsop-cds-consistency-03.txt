@@ -72,7 +72,7 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Requirements Notation . . . . . . . . . . . . . . . . . .   3
      1.2.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
-   2.  Failure Scenarios . . . . . . . . . . . . . . . . . . . . . .   4
+   2.  Failure Scenarios . . . . . . . . . . . . . . . . . . . . . .   3
      2.1.  Multi-Homing (Permanent Multi-Signer) . . . . . . . . . .   4
        2.1.1.  DS Breakage . . . . . . . . . . . . . . . . . . . . .   4
        2.1.2.  NS Breakage . . . . . . . . . . . . . . . . . . . . .   4
@@ -95,17 +95,17 @@ Table of Contents
    update the delegation's DS and NS records.
 
    A common method for discovering these signals is to periodically
-   query them from the child zone ("polling"), as described in
-   Section 6.1 of [RFC7344] (CDS/CDNSKEY) and Section 3.1 of [RFC7477]
-   (CSYNC).
+   query them from the child zone ("polling").  For CSYNC, this is
+   described in [RFC7477] Section 3.1 which advocates limiting polling
+   queries to just one authoritative nameserver.  The corresponding
+   Section 6.1 of [RFC7344] (CDS/CDNSKEY) contains no such provision for
+   how specifically polling of these records should be done.
 
-
-
-
-
-
-
-
+   Implementations are thus likely to retrieve records from just one
+   authoritative server, typically by directing queries towards a
+   trusted validating resolver.  This may be fine if all authoritative
+   nameservers are controlled by the same entity (typically the Child
+   DNS Operator).  However, it poses a problem in conjunction with the
 
 
 
@@ -114,20 +114,9 @@ Thomassen               Expires 5 September 2023                [Page 2]
 Internet-Draft               cds-consistency                  March 2023
 
 
-   While [RFC7344] does specify acceptance rules (Section 4.1) for CDS/
-   CDNSKEY records that have been retrieved, it does not mention how
-   specifically the poll queries should be done.  For CSYNC, [RFC7477]
-   leaves it up to the parent to decide from how many nameservers the
-   records are retrieved (Section 4.2).  A naive implementation would
-   thus be likely to retrieve records from just one authoritative
-   server, possibly by directing queries towards a trusted validating
-   resolver.
-
-   This may be fine if all authoritative nameservers are controlled by
-   the same entity (typically the Child DNS Operator).  However, it
-   poses a problem in conjunction with the multi-signer scenarios laid
-   out in [RFC8901], both when deployed temporarily (during a provider
-   change) or permanently (in a multi-homing setup).
+   multi-signer scenarios laid out in [RFC8901], both when deployed
+   temporarily (during a provider change) or permanently (in a multi-
+   homing setup).
 
    CDS/CDNSKEY/CSYNC records retrieved "naively" from one nameserver
    only may be entirely inconsistent with those of other authoritative
@@ -162,6 +151,17 @@ Internet-Draft               cds-consistency                  March 2023
 
    The terminology in this document is as defined in [RFC7344].
 
+2.  Failure Scenarios
+
+   The following scenarios are examples of how things can go wrong when
+   consistency is not enforced by the parent during CDS/CDNSKEY/CSYNC
+   processing.  Other scenarios that cause similar (or perhaps even
+   more) harm may exist.
+
+
+
+
+
 
 
 
@@ -169,13 +169,6 @@ Thomassen               Expires 5 September 2023                [Page 3]
 
 Internet-Draft               cds-consistency                  March 2023
 
-
-2.  Failure Scenarios
-
-   The following scenarios are examples of how things can go wrong when
-   consistency is not enforced by the parent during CDS/CDNSKEY/CSYNC
-   processing.  Other scenarios that cause similar (or perhaps even
-   more) harm may exist.
 
    The common feature of these scenarios is that if one DNS provider
    makes a mistake and the parent is not careful, DNS resolution and/or
@@ -218,6 +211,13 @@ Internet-Draft               cds-consistency                  March 2023
    CDS/CDNSKEY records in their copy of the zone.  Once the parent
    detects the updated CDS/CDNSKEY record set at the old provider, the
    delegation's DS record set is updated.  Then, after waiting for cache
+   expiration, the new provider's NS hostnames can be added to the
+   zone's NS record set, so that queries start balancing across both
+   providers.  (To conclude the hand-over, the old provider is removed
+   by inverting these steps with swapped roles.)
+
+
+
 
 
 
@@ -225,11 +225,6 @@ Thomassen               Expires 5 September 2023                [Page 4]
 
 Internet-Draft               cds-consistency                  March 2023
 
-
-   expiration, the new provider's NS hostnames can be added to the
-   zone's NS record set, so that queries start balancing across both
-   providers.  (To conclude the hand-over, the old provider is removed
-   by inverting these steps with swapped roles.)
 
    The multi-signer phase of this process breaks when the new provider
    fails to include the old provider's keys in the DNSKEY and CDS/
@@ -248,9 +243,10 @@ Internet-Draft               cds-consistency                  March 2023
 
 3.  Polling Requirements
 
-   This section defines the consistency requirements for poll-based
-   updates.  Common ones are listed first, with type-specific criteria
-   for polling consistency described in each subsection.
+   This section defines consistency requirements for poll-based updates,
+   updating [RFC7344] Section 4.1 and [RFC7477] Sections 3.1 and 4.2.
+   Common ones are listed first, with type-specific criteria for polling
+   consistency described in each subsection.
 
    In all cases, consistency is REQUIRED across received responses only.
    Nameservers that appear to be unavailable SHOULD be disregarded as if
@@ -275,6 +271,10 @@ Internet-Draft               cds-consistency                  March 2023
    ensure that each key referenced in any of the received answers is
    also referenced in all other received responses.
 
+   In other words, CDS/CDNSKEY records at the Child zone apex MUST be
+   fetched directly from each of the authoritative servers as determined
+   by the delegation's NS record set, with DNSSEC validation enforced.
+
 
 
 Thomassen               Expires 5 September 2023                [Page 5]
@@ -282,9 +282,6 @@ Thomassen               Expires 5 September 2023                [Page 5]
 Internet-Draft               cds-consistency                  March 2023
 
 
-   In other words, CDS/CDNSKEY records at the Child zone apex MUST be
-   fetched directly from each of the authoritative servers as determined
-   by the delegation's NS record set, with DNSSEC validation enforced.
    When a key is referenced in a CDS or CDNSKEY record set returned by
    one nameserver, but is missing from a least one other nameserver's
    answer, the CDS/CDNSKEY polling state MUST be considered
@@ -333,6 +330,9 @@ Internet-Draft               cds-consistency                  March 2023
 
 
 
+
+
+
 Thomassen               Expires 5 September 2023                [Page 6]
 
 Internet-Draft               cds-consistency                  March 2023
@@ -375,6 +375,8 @@ Appendix A.  Change History (to be removed before publication)
 
    *  draft-thomassen-dnsop-cds-consistency-03
 
+   |  Say what is being updated
+   |  
    |  Editorial changes.
    |  
    |  Retry mechanism to resolve inconsistencies
@@ -384,8 +386,6 @@ Appendix A.  Change History (to be removed before publication)
    |  Don't ignore DoE responses from individual nameservers (instead,
    |  require consistency across all responses received)
 
-   *  draft-thomassen-dnsop-cds-consistency-01
-
 
 
 
@@ -393,6 +393,8 @@ Thomassen               Expires 5 September 2023                [Page 7]
 
 Internet-Draft               cds-consistency                  March 2023
 
+
+   *  draft-thomassen-dnsop-cds-consistency-01
 
    |  Allow for nameservers that don't respond or provide DoE (i.e.
    |  require consistency only among the non-empty answers received)
@@ -412,8 +414,6 @@ Author's Address
    Berlin
    Germany
    Email: peter.thomassen@securesystems.de
-
-
 
 
 

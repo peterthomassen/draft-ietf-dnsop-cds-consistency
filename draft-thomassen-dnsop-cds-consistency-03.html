@@ -1353,39 +1353,38 @@ update of the delegation's NS records.
 Parent-side entities (e.g. Registries, Registrars) can use these records
 to update the delegation's DS and NS records.<a href="#section-1-1" class="pilcrow">¶</a></p>
 <p id="section-1-2">A common method for discovering these signals is to periodically query
-them from the child zone ("polling"), as described in Section 6.1 of
-<span>[<a href="#RFC7344" class="xref">RFC7344</a>]</span> (CDS/CDNSKEY) and Section 3.1 of <span>[<a href="#RFC7477" class="xref">RFC7477</a>]</span> (CSYNC).<a href="#section-1-2" class="pilcrow">¶</a></p>
-<p id="section-1-3">While <span>[<a href="#RFC7344" class="xref">RFC7344</a>]</span> does specify acceptance rules (Section 4.1) for
-CDS/CDNSKEY records that have been retrieved, it does not mention how
-specifically the poll queries should be done.
-For CSYNC, <span>[<a href="#RFC7477" class="xref">RFC7477</a>]</span> leaves it up to the parent to decide from how
-many nameservers the records are retrieved (Section 4.2).
-A naive implementation would thus be likely to retrieve records from
-just one authoritative server, possibly by directing queries towards a
-trusted validating resolver.<a href="#section-1-3" class="pilcrow">¶</a></p>
-<p id="section-1-4">This may be fine if all authoritative nameservers are controlled by the
+them from the child zone ("polling").
+For CSYNC, this is described in <span>[<a href="#RFC7477" class="xref">RFC7477</a>]</span> Section 3.1 which advocates
+limiting polling queries to just one authoritative nameserver.
+The corresponding Section 6.1 of <span>[<a href="#RFC7344" class="xref">RFC7344</a>]</span> (CDS/CDNSKEY) contains no
+such provision for how specifically polling of these records should be
+done.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">Implementations are thus likely to retrieve records from just one
+authoritative server, typically by directing queries towards a trusted
+validating resolver.
+This may be fine if all authoritative nameservers are controlled by the
 same entity (typically the Child DNS Operator).
 However, it poses a problem in conjunction with the multi-signer
 scenarios laid out in <span>[<a href="#RFC8901" class="xref">RFC8901</a>]</span>, both when deployed temporarily
-(during a provider change) or permanently (in a multi-homing setup).<a href="#section-1-4" class="pilcrow">¶</a></p>
-<p id="section-1-5">CDS/CDNSKEY/CSYNC records retrieved "naively" from one nameserver only
+(during a provider change) or permanently (in a multi-homing setup).<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">CDS/CDNSKEY/CSYNC records retrieved "naively" from one nameserver only
 may be entirely inconsistent with those of other authoritative servers.
 When several providers are configured and no consistency check is done,
 a single provider could (accidentally or maliciously) roll the DS or NS
 record set at the parent and, for example, remove the other provider's
 trust anchors and/or nameservers from the delegation.
-More detailed examples are given in <a href="#scenarios" class="xref">Section 2</a>.<a href="#section-1-5" class="pilcrow">¶</a></p>
-<p id="section-1-6">Whether in a permanent multi-homing setup or during provider change:
+More detailed examples are given in <a href="#scenarios" class="xref">Section 2</a>.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5">Whether in a permanent multi-homing setup or during provider change:
 A single provider should not be in the position to remove the other
-providers' records from the delegation.<a href="#section-1-6" class="pilcrow">¶</a></p>
-<p id="section-1-7">To address this issue, this document specifies that if polling is used,
+providers' records from the delegation.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-6">To address this issue, this document specifies that if polling is used,
 parent-side entities MUST ensure that the updates indicated by
 CDS/CDNSKEY and CSYNC record sets are consistent across all of the
 child's authoritative nameservers, before taking any action based on
-these records.<a href="#section-1-7" class="pilcrow">¶</a></p>
-<p id="section-1-8">Readers are expected to be familiar with DNSSEC, including <span>[<a href="#RFC4033" class="xref">RFC4033</a>]</span>,
+these records.<a href="#section-1-6" class="pilcrow">¶</a></p>
+<p id="section-1-7">Readers are expected to be familiar with DNSSEC, including <span>[<a href="#RFC4033" class="xref">RFC4033</a>]</span>,
 <span>[<a href="#RFC4034" class="xref">RFC4034</a>]</span>, <span>[<a href="#RFC4035" class="xref">RFC4035</a>]</span>, <span>[<a href="#RFC6781" class="xref">RFC6781</a>]</span>, <span>[<a href="#RFC7344" class="xref">RFC7344</a>]</span>, <span>[<a href="#RFC7477" class="xref">RFC7477</a>]</span>, and
-<span>[<a href="#RFC8901" class="xref">RFC8901</a>]</span>.<a href="#section-1-8" class="pilcrow">¶</a></p>
+<span>[<a href="#RFC8901" class="xref">RFC8901</a>]</span>.<a href="#section-1-7" class="pilcrow">¶</a></p>
 <div id="requirements-notation">
 <section id="section-1.1">
         <h3 id="name-requirements-notation">
@@ -1500,8 +1499,8 @@ DNSSEC validation fails for all answers served by the old provider.<a href="#sec
       <h2 id="name-polling-requirements">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-polling-requirements" class="section-name selfRef">Polling Requirements</a>
       </h2>
-<p id="section-3-1">This section defines the consistency requirements for poll-based
-updates.
+<p id="section-3-1">This section defines consistency requirements for poll-based updates,
+updating <span>[<a href="#RFC7344" class="xref">RFC7344</a>]</span> Section 4.1 and <span>[<a href="#RFC7477" class="xref">RFC7477</a>]</span> Sections 3.1 and 4.2.
 Common ones are listed first, with type-specific criteria for polling
 consistency described in each subsection.<a href="#section-3-1" class="pilcrow">¶</a></p>
 <p id="section-3-2">In all cases, consistency is REQUIRED across received responses only.
@@ -1624,8 +1623,9 @@ there is consensus across operators.<a href="#section-4-2" class="pilcrow">¶</a
 </li>
       </ul>
 <blockquote id="appendix-A-2">
-        <p id="appendix-A-2.1">Editorial changes.<a href="#appendix-A-2.1" class="pilcrow">¶</a></p>
-<p id="appendix-A-2.2">Retry mechanism to resolve inconsistencies<a href="#appendix-A-2.2" class="pilcrow">¶</a></p>
+        <p id="appendix-A-2.1">Say what is being updated<a href="#appendix-A-2.1" class="pilcrow">¶</a></p>
+<p id="appendix-A-2.2">Editorial changes.<a href="#appendix-A-2.2" class="pilcrow">¶</a></p>
+<p id="appendix-A-2.3">Retry mechanism to resolve inconsistencies<a href="#appendix-A-2.3" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="normal">
 <li class="normal" id="appendix-A-3.1">draft-thomassen-dnsop-cds-consistency-02<a href="#appendix-A-3.1" class="pilcrow">¶</a>

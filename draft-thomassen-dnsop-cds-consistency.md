@@ -58,18 +58,16 @@ Parent-side entities (e.g. Registries, Registrars) can use these records
 to update the delegation's DS and NS records.
 
 A common method for discovering these signals is to periodically query
-them from the child zone ("polling"), as described in Section 6.1 of
-[@!RFC7344] (CDS/CDNSKEY) and Section 3.1 of [@!RFC7477] (CSYNC).
+them from the child zone ("polling").
+For CSYNC, this is described in [@!RFC7477] Section 3.1 which advocates
+limiting polling queries to just one authoritative nameserver.
+The corresponding Section 6.1 of [@!RFC7344] (CDS/CDNSKEY) contains no
+such provision for how specifically polling of these records should be
+done.
 
-While [@!RFC7344] does specify acceptance rules (Section 4.1) for
-CDS/CDNSKEY records that have been retrieved, it does not mention how
-specifically the poll queries should be done.
-For CSYNC, [@!RFC7477] leaves it up to the parent to decide from how
-many nameservers the records are retrieved (Section 4.2).
-A naive implementation would thus be likely to retrieve records from
-just one authoritative server, possibly by directing queries towards a
-trusted validating resolver.
-
+Implementations are thus likely to retrieve records from just one
+authoritative server, typically by directing queries towards a trusted
+validating resolver.
 This may be fine if all authoritative nameservers are controlled by the
 same entity (typically the Child DNS Operator).
 However, it poses a problem in conjunction with the multi-signer
@@ -187,8 +185,8 @@ DNSSEC validation fails for all answers served by the old provider.
 
 # Polling Requirements
 
-This section defines the consistency requirements for poll-based
-updates.
+This section defines consistency requirements for poll-based updates,
+updating [@!RFC7344] Section 4.1 and [@!RFC7477] Sections 3.1 and 4.2.
 Common ones are listed first, with type-specific criteria for polling
 consistency described in each subsection.
 
@@ -262,6 +260,8 @@ there is consensus across operators.
 # Change History (to be removed before publication)
 
 * draft-thomassen-dnsop-cds-consistency-03
+
+> Say what is being updated
 
 > Editorial changes.
 
