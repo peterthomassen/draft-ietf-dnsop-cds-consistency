@@ -71,7 +71,7 @@ just one authoritative server, possibly by directing queries towards a
 trusted validating resolver.
 
 This may be fine if all authoritative nameservers are controlled by the
-same entity (typically the DNS operator).
+same entity (typically the Child DNS Operator).
 However, it poses a problem in conjunction with the multi-signer
 scenarios laid out in [@!RFC8901], both when deployed temporarily
 (during a provider change) or permanently (in a multi-homing setup).
@@ -108,6 +108,10 @@ The key words "**MUST**", "**MUST NOT**", "**REQUIRED**",
 BCP 14 [@!RFC2119] [@!RFC8174] when, and only when, they appear in all
 capitals, as shown here.
 
+## Terminology
+
+The terminology in this document is as defined in [@!RFC7344].
+
 
 {#scenarios}
 # Failure Scenarios
@@ -121,7 +125,7 @@ exist.
 The common feature of these scenarios is that if one DNS provider makes
 a mistake and the parent is not careful, DNS resolution and/or
 validation will break down, undermining the very guarantees of operator
-independence that DNSSEC multi-signer models are intended to provide.
+independence that DNS multi-homing setups are intended to provide.
 
 ## Multi-Homing (Permanent Multi-Signer)
 
@@ -133,7 +137,7 @@ records that only include its own keys.
 
 When the parent happens to retrieve the records from a nameserver
 controlled by this provider, the other providers' DS records would be
-removed from the parent.
+removed from the delegation.
 As a result, the zone is broken at least for some queries.
 
 ### NS Breakage
@@ -146,14 +150,14 @@ an otherwise flawed NS record set.
 
 If the parent then observes a CSYNC signal and fetches the flawed NS
 record set without ensuring consistency across nameservers, the
-delegation may be updated so that resolution is broken, or the
-multi-homing setup is silently reduced to a single-provider setup.
+delegation may be updated in a way that breaks resolution or silently
+reduces the multi-homing setup to a single-provider setup.
 
 ## Provider Change (Temporary Multi-Signer)
 
-Transferring a domain from one (signing) DNS provider to another,
-without going insecure, necessitates a brief period during which the
-domain is operated in multi-signer mode:
+Transferring DNS service for a domain name from one (signing) DNS
+provider to another, without going insecure, necessitates a brief period
+during which the domain is operated in multi-signer mode:
 First, the providers include each other's signing keys as DNSKEY and
 CDS/CDNSKEY records in their copy of the zone.
 Once the parent detects the updated CDS/CDNSKEY record set at the old
@@ -168,8 +172,8 @@ The multi-signer phase of this process breaks when the new provider
 fails to include the old provider's keys in the DNSKEY and CDS/CDNSKEY
 record sets.
 One obvious consequence of that is that whenever the resolver happens to
-retrieve the DNKSEY record set from the new provider, the old provider's
-RRSIGs do no longer validate, causing to SERVFAIL responses.
+retrieve the DNSKEY record set from the new provider, the old provider's
+RRSIGs do no longer validate, causing responses to SERVFAIL.
 
 However, an even worse consequence can occur when the parent performs
 their next CDS/CDNSKEY scan:
@@ -181,9 +185,29 @@ The new DS record set authenticates the new provider's DNSKEYs only, and
 DNSSEC validation fails for all answers served by the old provider.
 
 
-# Performing a Poll-based CDS or CDNSKEY Update
+# Polling Requirements
 
-The terminology in this section is as defined in [@!RFC7344].
+This section defines the consistency requirements for poll-based
+updates.
+Common ones are listed first, with type-specific criteria for polling
+consistency described in each subsection.
+
+In all cases, consistency is REQUIRED across received responses only.
+Nameservers that appear to be unavailable SHOULD be disregarded as if
+they were not part of the NS record set.
+
+If an inconsistent polling state is encountered, the Parental Agent
+MUST take no action.
+Specifically, it MUST NOT delete or alter any existing RRset that would
+have been deleted or altered, had the polling state been consistent.
+
+To accommodate transient inconsistencies (e.g. replication delays), the
+Parental Agent MAY retry the full process, repeating all queries.
+A schedule with exponential back-off is RECOMMENDED (such as after 5,
+10, 20, 40, ... minutes).
+
+
+## CDS and CDNSKEY
 
 To retrieve a Child's CDS/CDNSKEY RRset for DNSSEC delegation trust
 maintenance, the Parental Agent, knowing both the Child zone name and
@@ -197,77 +221,36 @@ fetched directly from each of the authoritative servers as determined by
 the delegation's NS record set, with DNSSEC validation enforced.
 When a key is referenced in a CDS or CDNSKEY record set returned by
 one nameserver, but is missing from a least one other nameserver's
-answer, the CDS/CDNSKEY state MUST be considered inconsistent.
-
-Consistency is only REQUIRED across received responses:
-Nameservers that appear to be unavailable SHOULD be disregarded as if
-they were not part of the NS record set.
-
-If an inconsistent CDS/CDNSKEY state is encountered, the Parental Agent
-MUST take no action.
-Specifically, it MUST NOT delete or alter the existing DS RRset.
-
-To accommodate transient inconsistencies (e.g. replication delays), the
-Parental Agent MAY retry the full process, repeating all queries.
-A schedule with exponential back-off is RECOMMENDED (such as after 5,
-10, 20, 40, ... minutes).
+answer, the CDS/CDNSKEY polling state MUST be considered inconsistent.
 
 
-# Performing a Poll-based CSYNC Update
+## CSYNC
 
 A CSYNC-based update consists of (1) polling the CSYNC record to
 determine which data records shall be synchronized from child to parent;
 (2) querying for these data records (e.g. NS) and placing them in the
 parent zone.
-Both steps are described separately below.
+If the below conditions are not met during these steps, the CSYNC
+polling state MUST be considered inconsistent.
 
-If an inconsistent CSYNC state is encountered in the process, the
-Parental Agent MUST take no action.
-Specifically, it MUST NOT delete or alter any existing NS or other data
-RRset.
-
-To accommodate transient inconsistencies (e.g. replication delays), the
-Parental Agent MAY retry the full process, repeating all queries.
-A schedule with exponential back-off is RECOMMENDED (such as after 5,
-10, 20, 40, ... minutes).
-
-## Querying for CSYNC
-
-When retrieving CYSNC record sets, the Parental Agent MUST ascertain
+When polling the CYSNC record set, the Parental Agent MUST ascertain
 that queries are made against all of the nameservers listed in the
 Child's delegation from the Parent, and ensure that the CSYNC record
 sets are equal across all received responses.
-Otherwise, the CSYNC state MUST be considered inconsistent.
 
-For CSYNC queries, consistency is only REQUIRED across received
-responses:
-Nameservers that appear to be unavailable SHOULD be disregarded as if
-they were not part of the NS record set.
-(This is like for CDS/CDNSKEY queries above.)
-
-## Querying for Data Records (e.g. NS)
-
-When retrieving data records (e.g. NS), the Parental Agent MUST
+When retrieving data record sets (e.g. NS), the Parental Agent MUST
 ascertain that all queries are made against all of the nameservers
-listed in the Child's delegation from the Parent, and ensure that all
-answers received are equal.
-Otherwise, the CSYNC state MUST be considered inconsistent.
+listed in the Child's delegation from the Parent, and ensure that the
+record sets are all equal (including all empty).
 
-Answers MUST be all non-empty and equal, or all empty.
-If both an empty and a non-empty answer is received for a data record
-query, the CSYNC state MUST be considered inconsistent.
-
-Nameservers that appear to be unavailable SHOULD be disregarded as if
-they were not part of the NS record set.
 
 # Security Considerations
 
 The level of rigor mandated by this document is needed to prevent
-publication of a half-baked DS or NS RRsets (authorized only under an
-insufficient subset of authoritative nameservers).
-This ensures, for example, that an operator in a multi-homed setup
-cannot unilaterally remove another operator's trust anchor or
-nameservers from the delegation.
+publication of half-baked DS or delegation NS RRsets (authorized only
+under an insufficient subset of authoritative nameservers), and ensures
+that an operator in a multi-homing setup cannot unilaterally modify the
+delegation (add or remove trust anchors or nameservers).
 
 As a consequence, the delegation's records can only be modified when
 there is consensus across operators.
@@ -279,6 +262,8 @@ there is consensus across operators.
 # Change History (to be removed before publication)
 
 * draft-thomassen-dnsop-cds-consistency-03
+
+> Editorial changes.
 
 > Retry mechanism to resolve inconsistencies
 
