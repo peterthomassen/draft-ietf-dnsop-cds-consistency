@@ -81,7 +81,8 @@ Table of Contents
      3.1.  CDS and CDNSKEY . . . . . . . . . . . . . . . . . . . . .   5
      3.2.  CSYNC . . . . . . . . . . . . . . . . . . . . . . . . . .   6
    4.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
-   5.  Normative References  . . . . . . . . . . . . . . . . . . . .   6
+   5.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   6
+   6.  Normative References  . . . . . . . . . . . . . . . . . . . .   6
    Appendix A.  Change History (to be removed before publication)  .   7
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   8
 
@@ -105,7 +106,6 @@ Table of Contents
    authoritative server, typically by directing queries towards a
    trusted validating resolver.  This may be fine if all authoritative
    nameservers are controlled by the same entity (typically the Child
-   DNS Operator).  However, it poses a problem in conjunction with the
 
 
 
@@ -114,6 +114,7 @@ Thomassen               Expires 5 September 2023                [Page 2]
 Internet-Draft               cds-consistency                  March 2023
 
 
+   DNS Operator).  However, it poses a problem in conjunction with the
    multi-signer scenarios laid out in [RFC8901], both when deployed
    temporarily (during a provider change) or permanently (in a multi-
    homing setup).
@@ -157,7 +158,6 @@ Internet-Draft               cds-consistency                  March 2023
    consistency is not enforced by the parent during CDS/CDNSKEY/CSYNC
    processing.  Other scenarios that cause similar (or perhaps even
    more) harm may exist.
-
 
 
 
@@ -316,17 +316,17 @@ Internet-Draft               cds-consistency                  March 2023
    As a consequence, the delegation's records can only be modified when
    there is consensus across operators.
 
-5.  Normative References
+5.  Acknowledgments
+
+   Viktor Dukhovni
+
+6.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/info/rfc2119>.
 
-   [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
-              Rose, "DNS Security Introduction and Requirements",
-              RFC 4033, DOI 10.17487/RFC4033, March 2005,
-              <https://www.rfc-editor.org/info/rfc4033>.
 
 
 
@@ -337,6 +337,11 @@ Thomassen               Expires 5 September 2023                [Page 6]
 
 Internet-Draft               cds-consistency                  March 2023
 
+
+   [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "DNS Security Introduction and Requirements",
+              RFC 4033, DOI 10.17487/RFC4033, March 2005,
+              <https://www.rfc-editor.org/info/rfc4033>.
 
    [RFC4034]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
               Rose, "Resource Records for the DNS Security Extensions",
@@ -375,17 +380,12 @@ Appendix A.  Change History (to be removed before publication)
 
    *  draft-thomassen-dnsop-cds-consistency-03
 
+   |  Acknowledgments
+   |  
    |  Say what is being updated
    |  
    |  Editorial changes.
    |  
-   |  Retry mechanism to resolve inconsistencies
-
-   *  draft-thomassen-dnsop-cds-consistency-02
-
-   |  Don't ignore DoE responses from individual nameservers (instead,
-   |  require consistency across all responses received)
-
 
 
 
@@ -393,6 +393,13 @@ Thomassen               Expires 5 September 2023                [Page 7]
 
 Internet-Draft               cds-consistency                  March 2023
 
+
+   |  Retry mechanism to resolve inconsistencies
+
+   *  draft-thomassen-dnsop-cds-consistency-02
+
+   |  Don't ignore DoE responses from individual nameservers (instead,
+   |  require consistency across all responses received)
 
    *  draft-thomassen-dnsop-cds-consistency-01
 
@@ -414,13 +421,6 @@ Author's Address
    Berlin
    Germany
    Email: peter.thomassen@securesystems.de
-
-
-
-
-
-
-
 
 
 

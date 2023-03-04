@@ -254,12 +254,19 @@ As a consequence, the delegation's records can only be modified when
 there is consensus across operators.
 
 
+# Acknowledgments
+
+Viktor Dukhovni
+
+
 {backmatter}
 
 
 # Change History (to be removed before publication)
 
 * draft-thomassen-dnsop-cds-consistency-03
+
+> Acknowledgments
 
 > Say what is being updated
 
