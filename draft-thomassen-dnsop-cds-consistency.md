@@ -68,24 +68,31 @@ done.
 Implementations are thus likely to retrieve records from just one
 authoritative server, typically by directing queries towards a trusted
 validating resolver.
-This may be fine if all authoritative nameservers are controlled by the
-same entity (typically the Child DNS Operator).
-However, it poses a problem in conjunction with the multi-signer
-scenarios laid out in [@!RFC8901], both when deployed temporarily
-(during a provider change) or permanently (in a multi-homing setup).
+While that may be fine if all authoritative nameservers are controlled
+by the same entity (typically the Child DNS Operator), it does pose a
+problem as soon as multiple providers are involved.
+(Note that it is generally impossible for the parent to determine
+whether all authoritative nameservers are controlled by the same
+entity.)
 
-CDS/CDNSKEY/CSYNC records retrieved "naively" from one nameserver only
-may be entirely inconsistent with those of other authoritative servers.
-When several providers are configured and no consistency check is done,
-a single provider could (accidentally or maliciously) roll the DS or NS
-record set at the parent and, for example, remove the other provider's
-trust anchors and/or nameservers from the delegation.
+In such cases, CDS/CDNSKEY/CSYNC records retrieved "naively" from one
+nameserver only may be entirely inconsistent with those of other
+authoritative servers.
+When no consistency check is done, each provider may unilaterally
+trigger a roll of the DS or NS record set at the parent.
+
+As a result, adverse consequences can arise in conjunction with the
+multi-signer scenarios laid out in [@?RFC8901], both when deployed
+temporarily (during a provider change) and permanently (in a
+multi-homing setup).
+For example, a single provider may (accidentally or maliciously) cause
+another provider's trust anchors and/or nameservers to be removed from
+the delegation.
+Similar breakage can occur when the delegation has lame nameservers.
 More detailed examples are given in (#scenarios).
 
-Whether in a permanent multi-homing setup or during provider change:
 A single provider should not be in the position to remove the other
 providers' records from the delegation.
-
 To address this issue, this document specifies that if polling is used,
 parent-side entities MUST ensure that the updates indicated by
 CDS/CDNSKEY and CSYNC record sets are consistent across all of the
@@ -93,8 +100,8 @@ child's authoritative nameservers, before taking any action based on
 these records.
 
 Readers are expected to be familiar with DNSSEC, including [@!RFC4033],
-[@!RFC4034], [@!RFC4035], [@!RFC6781], [@!RFC7344], [@!RFC7477], and
-[@!RFC8901].
+[@!RFC4034], [@!RFC4035], [@?RFC6781], [@!RFC7344], [@!RFC7477], and
+[@?RFC8901].
 
 
 ## Requirements Notation
@@ -120,10 +127,45 @@ processing.
 Other scenarios that cause similar (or perhaps even more) harm may
 exist.
 
-The common feature of these scenarios is that if one DNS provider makes
-a mistake and the parent is not careful, DNS resolution and/or
+The common feature of these scenarios is that if one DNS provider steps
+out of line and the parent is not careful, DNS resolution and/or
 validation will break down, undermining the very guarantees of operator
-independence that DNS multi-homing setups are intended to provide.
+independence that multi-homing configurations are expected to provide.
+
+## Lame Delegations
+
+A delegation may include a non-existent NS hostname, for example due to
+a typo or when the nameserver's domain registration has expired.
+(Re-)registering such a non-resolvable nameserver domain allows a third
+party to run authoritative DNS service for all domains delegated to that
+NS hostname, serving responses different from those in the legitimate
+zonefile.
+
+This strategy for hijacking (at least part of the) DNS traffic and
+spoofing responses is not new, but surprisingly common [@?LAME1;@LAME2].
+It is also known that DNSSEC reduces the impact of such an attack,
+as validating resolvers will reject illegitimate responses due to lack
+of signatures consistent with the delegation's DS records.
+
+On the other hand, if the delegation is not protected by DNSSEC, the
+rogue nameserver is not only able to serve unauthorized responses
+without detection; it is even possible for the attacker to escalate the
+nameserver takeover to a full domain takeover.
+
+In particular, the rogue nameserver can publish CDS/CDNSKEY records.
+If those are processed by the parent without ensuring consistency with
+other authoritative nameservers, the delegation will be secured with
+the attacker's DNSSEC keys.
+As responses served by the remaining legitimate nameservers are not
+signed with these keys, validating resolvers will start rejecting them.
+
+Once DNSSEC is established, the attacker can use CSYNC to remove other
+nameservers from the delegation at will (and potentially add new ones
+under their control).
+This enables the attacker to position themself as the only party
+providing authoritiative DNS service for the victim domain,
+significantly augmenting the attack's impact.
+
 
 ## Multi-Homing (Permanent Multi-Signer)
 
@@ -249,9 +291,21 @@ publication of half-baked DS or delegation NS RRsets (authorized only
 under an insufficient subset of authoritative nameservers), and ensures
 that an operator in a multi-homing setup cannot unilaterally modify the
 delegation (add or remove trust anchors or nameservers).
+This applies both to intentional and unintentional multi-homing setups
+(such as in the case of lame delegation hijacking).
 
 As a consequence, the delegation's records can only be modified when
-there is consensus across operators.
+there is consensus across operators, which is expected to reflect the
+domain owners intentions.
+Both availability and integrity of the domain's DNS service benefit from
+this policy.
+
+In order to resolve situations in which consensus about child zone
+contents cannot be reached (e.g. because one of the nameserver
+providers is uncooperative), Parental Agents SHOULD continue to accept
+DS and NS update requests from the domain owner via an authenticated
+out-of-band channel (such as EPP [@!RFC5730]), irrespective of the rise
+of automated delegation maintenance.
 
 
 # Acknowledgments
@@ -262,9 +316,69 @@ Viktor Dukhovni
 {backmatter}
 
 
+
+<reference anchor="LAME1" target="http://dx.doi.org/10.1145/3419394.3423623">
+  <front>
+    <title>Unresolved Issues</title>
+    <author fullname="Gautam Akiwate" surname="Akiwate">
+      <organization>UC San Diego</organization>
+    </author>
+    <author fullname="Mattijs Jonker" surname="Jonker">
+      <organization>University of Twente</organization>
+    </author>
+    <author fullname="Raffaele Sommese" surname="Sommese">
+      <organization>University of Twente</organization>
+    </author>
+    <author fullname="Ian Foster" surname="Foster">
+      <organization>DNS Coffee</organization>
+    </author>
+    <author fullname="Geoffrey M. Voelker" surname="Voelker">
+      <organization>UC San Diego</organization>
+    </author>
+    <author fullname="Stefan Savage" surname="Savage">
+      <organization>UC San Diego</organization>
+    </author>
+    <author fullname="KC Claffy" surname="Claffy">
+      <organization>CAIDA/UC San Diego</organization>
+    </author>
+    <author>
+      <organization>ACM</organization>
+    </author>
+    <date day="27" month="October" year="2020"/>
+  </front>
+  <refcontent>Proceedings of the ACM Internet Measurement Conference</refcontent>
+  <seriesInfo name="DOI" value="10.1145/3419394.3423623"/>
+</reference>
+<reference anchor="LAME2" target="http://dx.doi.org/10.1145/3487552.3487816">
+  <front>
+    <title>Risky BIZness</title>
+    <author fullname="Gautam Akiwate" surname="Akiwate">
+      <organization>UC San Diego</organization>
+    </author>
+    <author fullname="Stefan Savage" surname="Savage">
+      <organization>UC San Diego</organization>
+    </author>
+    <author fullname="Geoffrey M. Voelker" surname="Voelker">
+      <organization>UC San Diego</organization>
+    </author>
+    <author fullname="K C Claffy" surname="Claffy">
+      <organization>CAIDA/UC San Diego</organization>
+    </author>
+    <author>
+      <organization>ACM</organization>
+    </author>
+    <date day="2" month="November" year="2021"/>
+  </front>
+  <refcontent>Proceedings of the 21st ACM Internet Measurement Conference</refcontent>
+  <seriesInfo name="DOI" value="10.1145/3487552.3487816"/>
+</reference>
+
+
 # Change History (to be removed before publication)
 
 * draft-thomassen-dnsop-cds-consistency-03
+
+> Describe risk from lame delegations
 
 > Acknowledgments
 
