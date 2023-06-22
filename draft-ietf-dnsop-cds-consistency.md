@@ -141,6 +141,14 @@ Parental Agent MAY retry the full process, repeating all queries.
 A schedule with exponential back-off is RECOMMENDED (such as after 5,
 10, 20, 40, ... minutes).
 
+Any pending queries can immediately be dequeued when encountering a
+response that confirms the status quo (i.e. indicates no update).
+This is because any subsequent responses could only confirm that nothing
+needs to happen, or give an inconsistent result in which case nothing
+needs to happen.
+Queries MAY be continued across all nameservers for inconsistency
+reporting purposes.
+
 
 ## CDS and CDNSKEY
 
@@ -201,6 +209,9 @@ providers is uncooperative), Parental Agents SHOULD continue to accept
 DS and NS update requests from the domain owner via an authenticated
 out-of-band channel (such as EPP [@!RFC5730]), irrespective of the rise
 of automated delegation maintenance.
+Availability of such an interface also enables recovery from a situation
+where the private key is no longer available for signing the CDS/CDNSKEY
+or CSYNC records in the child zone.
 
 
 # Acknowledgments
@@ -379,11 +390,15 @@ DNSSEC validation fails for all answers served by the old provider.
 
 * draft-ietf-dnsop-cds-consistency-01
 
+> Point out zero overhead if nothing changed, and need for OOB interface
+
 > Editorial changes
 
 > Moved Failure Scenarios to appendix
 
 * draft-ietf-dnsop-cds-consistency-00
+
+> Point out zero overhead if nothing changed, and need for OOB interface
 
 > Editorial changes.
 
