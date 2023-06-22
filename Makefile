@@ -1,5 +1,5 @@
-VERSION = 03
-DOCNAME = draft-thomassen-dnsop-cds-consistency
+VERSION = 00
+DOCNAME = draft-ietf-dnsop-cds-consistency
 today := $(shell TZ=UTC date +%Y-%m-%dT00:00:00Z)
 
 all: $(DOCNAME)-$(VERSION).txt $(DOCNAME)-$(VERSION).html
