@@ -72,20 +72,20 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Requirements Notation . . . . . . . . . . . . . . . . . .   3
      1.2.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
-   2.  Failure Scenarios . . . . . . . . . . . . . . . . . . . . . .   4
-     2.1.  Lame Delegations  . . . . . . . . . . . . . . . . . . . .   4
-     2.2.  Multi-Homing (Permanent Multi-Signer) . . . . . . . . . .   5
-       2.2.1.  DS Breakage . . . . . . . . . . . . . . . . . . . . .   5
-       2.2.2.  NS Breakage . . . . . . . . . . . . . . . . . . . . .   5
-     2.3.  Provider Change (Temporary Multi-Signer)  . . . . . . . .   5
-   3.  Polling Requirements  . . . . . . . . . . . . . . . . . . . .   6
-     3.1.  CDS and CDNSKEY . . . . . . . . . . . . . . . . . . . . .   6
-     3.2.  CSYNC . . . . . . . . . . . . . . . . . . . . . . . . . .   7
-   4.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
-   5.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   7
-   6.  Normative References  . . . . . . . . . . . . . . . . . . . .   7
-   7.  Informative References  . . . . . . . . . . . . . . . . . . .   8
-   Appendix A.  Change History (to be removed before publication)  .   9
+   2.  Polling Requirements  . . . . . . . . . . . . . . . . . . . .   4
+     2.1.  CDS and CDNSKEY . . . . . . . . . . . . . . . . . . . . .   4
+     2.2.  CSYNC . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+   3.  Security Considerations . . . . . . . . . . . . . . . . . . .   5
+   4.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   5
+   5.  Normative References  . . . . . . . . . . . . . . . . . . . .   5
+   6.  Informative References  . . . . . . . . . . . . . . . . . . .   6
+   Appendix A.  Failure Scenarios  . . . . . . . . . . . . . . . . .   7
+     A.1.  Lame Delegations  . . . . . . . . . . . . . . . . . . . .   7
+     A.2.  Multi-Homing (Permanent Multi-Signer) . . . . . . . . . .   8
+       A.2.1.  DS Breakage . . . . . . . . . . . . . . . . . . . . .   8
+       A.2.2.  NS Breakage . . . . . . . . . . . . . . . . . . . . .   8
+     A.3.  Provider Change (Temporary Multi-Signer)  . . . . . . . .   8
+   Appendix B.  Change History (to be removed before publication)  .   9
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  10
 
 1.  Introduction
@@ -136,7 +136,7 @@ Internet-Draft               cds-consistency                   June 2023
    maliciously) cause another provider's trust anchors and/or
    nameservers to be removed from the delegation.  Similar breakage can
    occur when the delegation has lame nameservers.  More detailed
-   examples are given in Section 2.
+   examples are given in Appendix A.
 
    A single provider should not be in the position to remove the other
    providers' records from the delegation.  To address this issue, this
@@ -170,7 +170,175 @@ Thomassen               Expires 24 December 2023                [Page 3]
 Internet-Draft               cds-consistency                   June 2023
 
 
-2.  Failure Scenarios
+2.  Polling Requirements
+
+   This section defines consistency requirements for poll-based updates,
+   updating [RFC7344] Section 4.1 and [RFC7477] Sections 3.1 and 4.2.
+   Common ones are listed first, with type-specific criteria for polling
+   consistency described in each subsection.
+
+   In all cases, consistency is REQUIRED across received responses only.
+   Nameservers that appear to be unavailable SHOULD be disregarded as if
+   they were not part of the NS record set.
+
+   If an inconsistent polling state is encountered, the Parental Agent
+   MUST take no action.  Specifically, it MUST NOT delete or alter any
+   existing RRset that would have been deleted or altered, had the
+   polling state been consistent.
+
+   To accommodate transient inconsistencies (e.g. replication delays),
+   the Parental Agent MAY retry the full process, repeating all queries.
+   A schedule with exponential back-off is RECOMMENDED (such as after 5,
+   10, 20, 40, ... minutes).
+
+2.1.  CDS and CDNSKEY
+
+   To retrieve a Child's CDS/CDNSKEY RRset for DNSSEC delegation trust
+   maintenance, the Parental Agent, knowing both the Child zone name and
+   its NS hostnames, MUST ascertain that queries are made against all of
+   the nameservers listed in the Child's delegation from the Parent, and
+   ensure that each key referenced in any of the received answers is
+   also referenced in all other received responses.
+
+   In other words, CDS/CDNSKEY records at the Child zone apex MUST be
+   fetched directly from each of the authoritative servers as determined
+   by the delegation's NS record set, with DNSSEC validation enforced.
+   When a key is referenced in a CDS or CDNSKEY record set returned by
+   one nameserver, but is missing from a least one other nameserver's
+   answer, the CDS/CDNSKEY polling state MUST be considered
+   inconsistent.
+
+2.2.  CSYNC
+
+   A CSYNC-based update consists of (1) polling the CSYNC record to
+   determine which data records shall be synchronized from child to
+   parent; (2) querying for these data records (e.g.  NS) and placing
+   them in the parent zone.  If the below conditions are not met during
+   these steps, the CSYNC polling state MUST be considered inconsistent.
+
+
+
+
+
+
+Thomassen               Expires 24 December 2023                [Page 4]
+
+Internet-Draft               cds-consistency                   June 2023
+
+
+   When polling the CYSNC record set, the Parental Agent MUST ascertain
+   that queries are made against all of the nameservers listed in the
+   Child's delegation from the Parent, and ensure that the CSYNC record
+   sets are equal across all received responses.
+
+   When retrieving data record sets (e.g.  NS), the Parental Agent MUST
+   ascertain that all queries are made against all of the nameservers
+   listed in the Child's delegation from the Parent, and ensure that the
+   record sets are all equal (including all empty).
+
+3.  Security Considerations
+
+   The level of rigor mandated by this document is needed to prevent
+   publication of half-baked DS or delegation NS RRsets (authorized only
+   under an insufficient subset of authoritative nameservers), and
+   ensures that an operator in a multi-homing setup cannot unilaterally
+   modify the delegation (add or remove trust anchors or nameservers).
+   This applies both to intentional and unintentional multi-homing
+   setups (such as in the case of lame delegation hijacking).
+
+   As a consequence, the delegation's records can only be modified when
+   there is consensus across operators, which is expected to reflect the
+   domain owners intentions.  Both availability and integrity of the
+   domain's DNS service benefit from this policy.
+
+   In order to resolve situations in which consensus about child zone
+   contents cannot be reached (e.g. because one of the nameserver
+   providers is uncooperative), Parental Agents SHOULD continue to
+   accept DS and NS update requests from the domain owner via an
+   authenticated out-of-band channel (such as EPP [RFC5730]),
+   irrespective of the rise of automated delegation maintenance.
+
+4.  Acknowledgments
+
+   Viktor Dukhovni
+
+5.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "DNS Security Introduction and Requirements",
+              RFC 4033, DOI 10.17487/RFC4033, March 2005,
+              <https://www.rfc-editor.org/info/rfc4033>.
+
+
+
+
+Thomassen               Expires 24 December 2023                [Page 5]
+
+Internet-Draft               cds-consistency                   June 2023
+
+
+   [RFC4034]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "Resource Records for the DNS Security Extensions",
+              RFC 4034, DOI 10.17487/RFC4034, March 2005,
+              <https://www.rfc-editor.org/info/rfc4034>.
+
+   [RFC4035]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "Protocol Modifications for the DNS Security
+              Extensions", RFC 4035, DOI 10.17487/RFC4035, March 2005,
+              <https://www.rfc-editor.org/info/rfc4035>.
+
+   [RFC5730]  Hollenbeck, S., "Extensible Provisioning Protocol (EPP)",
+              STD 69, RFC 5730, DOI 10.17487/RFC5730, August 2009,
+              <https://www.rfc-editor.org/info/rfc5730>.
+
+   [RFC7344]  Kumari, W., Gudmundsson, O., and G. Barwood, "Automating
+              DNSSEC Delegation Trust Maintenance", RFC 7344,
+              DOI 10.17487/RFC7344, September 2014,
+              <https://www.rfc-editor.org/info/rfc7344>.
+
+   [RFC7477]  Hardaker, W., "Child-to-Parent Synchronization in DNS",
+              RFC 7477, DOI 10.17487/RFC7477, March 2015,
+              <https://www.rfc-editor.org/info/rfc7477>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+6.  Informative References
+
+   [LAME1]    Akiwate, G., Jonker, M., Sommese, R., Foster, I., Voelker,
+              G. M., Savage, S., Claffy, K., and ACM, "Unresolved
+              Issues", DOI 10.1145/3419394.3423623, 27 October 2020,
+              <http://dx.doi.org/10.1145/3419394.3423623>.
+
+   [LAME2]    Akiwate, G., Savage, S., Voelker, G. M., Claffy, K. C.,
+              and ACM, "Risky BIZness", DOI 10.1145/3487552.3487816, 2
+              November 2021,
+              <http://dx.doi.org/10.1145/3487552.3487816>.
+
+   [RFC6781]  Kolkman, O., Mekking, W., and R. Gieben, "DNSSEC
+              Operational Practices, Version 2", RFC 6781,
+              DOI 10.17487/RFC6781, December 2012,
+              <https://www.rfc-editor.org/info/rfc6781>.
+
+   [RFC8901]  Huque, S., Aras, P., Dickinson, J., Vcelak, J., and D.
+              Blacka, "Multi-Signer DNSSEC Models", RFC 8901,
+              DOI 10.17487/RFC8901, September 2020,
+              <https://www.rfc-editor.org/info/rfc8901>.
+
+
+
+Thomassen               Expires 24 December 2023                [Page 6]
+
+Internet-Draft               cds-consistency                   June 2023
+
+
+Appendix A.  Failure Scenarios
 
    The following scenarios are examples of how things can go wrong when
    consistency is not enforced by the parent during CDS/CDNSKEY/CSYNC
@@ -183,7 +351,7 @@ Internet-Draft               cds-consistency                   June 2023
    operator independence that multi-homing configurations are expected
    to provide.
 
-2.1.  Lame Delegations
+A.1.  Lame Delegations
 
    A delegation may include a non-existent NS hostname, for example due
    to a typo or when the nameserver's domain registration has expired.
@@ -221,14 +389,14 @@ Internet-Draft               cds-consistency                   June 2023
 
 
 
-Thomassen               Expires 24 December 2023                [Page 4]
+Thomassen               Expires 24 December 2023                [Page 7]
 
 Internet-Draft               cds-consistency                   June 2023
 
 
-2.2.  Multi-Homing (Permanent Multi-Signer)
+A.2.  Multi-Homing (Permanent Multi-Signer)
 
-2.2.1.  DS Breakage
+A.2.1.  DS Breakage
 
    While performing a key rollover and adjusting the corresponding CDS/
    CDNSKEY records, a provider could accidentally publish CDS/CDNSKEY
@@ -239,7 +407,7 @@ Internet-Draft               cds-consistency                   June 2023
    removed from the delegation.  As a result, the zone is broken at
    least for some queries.
 
-2.2.2.  NS Breakage
+A.2.2.  NS Breakage
 
    A similar scenario affects the CSYNC record, which is used to update
    the delegation's NS record set at the parent.  The issue occurs, for
@@ -252,7 +420,7 @@ Internet-Draft               cds-consistency                   June 2023
    delegation may be updated in a way that breaks resolution or silently
    reduces the multi-homing setup to a single-provider setup.
 
-2.3.  Provider Change (Temporary Multi-Signer)
+A.3.  Provider Change (Temporary Multi-Signer)
 
    Transferring DNS service for a domain name from one (signing) DNS
    provider to another, without going insecure, necessitates a brief
@@ -277,7 +445,7 @@ Internet-Draft               cds-consistency                   June 2023
 
 
 
-Thomassen               Expires 24 December 2023                [Page 5]
+Thomassen               Expires 24 December 2023                [Page 8]
 
 Internet-Draft               cds-consistency                   June 2023
 
@@ -290,179 +458,11 @@ Internet-Draft               cds-consistency                   June 2023
    new DS record set authenticates the new provider's DNSKEYs only, and
    DNSSEC validation fails for all answers served by the old provider.
 
-3.  Polling Requirements
-
-   This section defines consistency requirements for poll-based updates,
-   updating [RFC7344] Section 4.1 and [RFC7477] Sections 3.1 and 4.2.
-   Common ones are listed first, with type-specific criteria for polling
-   consistency described in each subsection.
-
-   In all cases, consistency is REQUIRED across received responses only.
-   Nameservers that appear to be unavailable SHOULD be disregarded as if
-   they were not part of the NS record set.
-
-   If an inconsistent polling state is encountered, the Parental Agent
-   MUST take no action.  Specifically, it MUST NOT delete or alter any
-   existing RRset that would have been deleted or altered, had the
-   polling state been consistent.
-
-   To accommodate transient inconsistencies (e.g. replication delays),
-   the Parental Agent MAY retry the full process, repeating all queries.
-   A schedule with exponential back-off is RECOMMENDED (such as after 5,
-   10, 20, 40, ... minutes).
-
-3.1.  CDS and CDNSKEY
-
-   To retrieve a Child's CDS/CDNSKEY RRset for DNSSEC delegation trust
-   maintenance, the Parental Agent, knowing both the Child zone name and
-   its NS hostnames, MUST ascertain that queries are made against all of
-   the nameservers listed in the Child's delegation from the Parent, and
-   ensure that each key referenced in any of the received answers is
-   also referenced in all other received responses.
-
-   In other words, CDS/CDNSKEY records at the Child zone apex MUST be
-   fetched directly from each of the authoritative servers as determined
-   by the delegation's NS record set, with DNSSEC validation enforced.
-   When a key is referenced in a CDS or CDNSKEY record set returned by
-   one nameserver, but is missing from a least one other nameserver's
-   answer, the CDS/CDNSKEY polling state MUST be considered
-   inconsistent.
-
-
-
-
-
-
-Thomassen               Expires 24 December 2023                [Page 6]
-
-Internet-Draft               cds-consistency                   June 2023
-
-
-3.2.  CSYNC
-
-   A CSYNC-based update consists of (1) polling the CSYNC record to
-   determine which data records shall be synchronized from child to
-   parent; (2) querying for these data records (e.g.  NS) and placing
-   them in the parent zone.  If the below conditions are not met during
-   these steps, the CSYNC polling state MUST be considered inconsistent.
-
-   When polling the CYSNC record set, the Parental Agent MUST ascertain
-   that queries are made against all of the nameservers listed in the
-   Child's delegation from the Parent, and ensure that the CSYNC record
-   sets are equal across all received responses.
-
-   When retrieving data record sets (e.g.  NS), the Parental Agent MUST
-   ascertain that all queries are made against all of the nameservers
-   listed in the Child's delegation from the Parent, and ensure that the
-   record sets are all equal (including all empty).
-
-4.  Security Considerations
-
-   The level of rigor mandated by this document is needed to prevent
-   publication of half-baked DS or delegation NS RRsets (authorized only
-   under an insufficient subset of authoritative nameservers), and
-   ensures that an operator in a multi-homing setup cannot unilaterally
-   modify the delegation (add or remove trust anchors or nameservers).
-   This applies both to intentional and unintentional multi-homing
-   setups (such as in the case of lame delegation hijacking).
-
-   As a consequence, the delegation's records can only be modified when
-   there is consensus across operators, which is expected to reflect the
-   domain owners intentions.  Both availability and integrity of the
-   domain's DNS service benefit from this policy.
-
-   In order to resolve situations in which consensus about child zone
-   contents cannot be reached (e.g. because one of the nameserver
-   providers is uncooperative), Parental Agents SHOULD continue to
-   accept DS and NS update requests from the domain owner via an
-   authenticated out-of-band channel (such as EPP [RFC5730]),
-   irrespective of the rise of automated delegation maintenance.
-
-5.  Acknowledgments
-
-   Viktor Dukhovni
-
-6.  Normative References
-
-
-
-
-
-
-Thomassen               Expires 24 December 2023                [Page 7]
-
-Internet-Draft               cds-consistency                   June 2023
-
-
-   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119,
-              DOI 10.17487/RFC2119, March 1997,
-              <https://www.rfc-editor.org/info/rfc2119>.
-
-   [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
-              Rose, "DNS Security Introduction and Requirements",
-              RFC 4033, DOI 10.17487/RFC4033, March 2005,
-              <https://www.rfc-editor.org/info/rfc4033>.
-
-   [RFC4034]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
-              Rose, "Resource Records for the DNS Security Extensions",
-              RFC 4034, DOI 10.17487/RFC4034, March 2005,
-              <https://www.rfc-editor.org/info/rfc4034>.
-
-   [RFC4035]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
-              Rose, "Protocol Modifications for the DNS Security
-              Extensions", RFC 4035, DOI 10.17487/RFC4035, March 2005,
-              <https://www.rfc-editor.org/info/rfc4035>.
-
-   [RFC5730]  Hollenbeck, S., "Extensible Provisioning Protocol (EPP)",
-              STD 69, RFC 5730, DOI 10.17487/RFC5730, August 2009,
-              <https://www.rfc-editor.org/info/rfc5730>.
-
-   [RFC7344]  Kumari, W., Gudmundsson, O., and G. Barwood, "Automating
-              DNSSEC Delegation Trust Maintenance", RFC 7344,
-              DOI 10.17487/RFC7344, September 2014,
-              <https://www.rfc-editor.org/info/rfc7344>.
-
-   [RFC7477]  Hardaker, W., "Child-to-Parent Synchronization in DNS",
-              RFC 7477, DOI 10.17487/RFC7477, March 2015,
-              <https://www.rfc-editor.org/info/rfc7477>.
-
-   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
-              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
-              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
-
-7.  Informative References
-
-   [LAME1]    Akiwate, G., Jonker, M., Sommese, R., Foster, I., Voelker,
-              G. M., Savage, S., Claffy, K., and ACM, "Unresolved
-              Issues", DOI 10.1145/3419394.3423623, 27 October 2020,
-              <http://dx.doi.org/10.1145/3419394.3423623>.
-
-   [LAME2]    Akiwate, G., Savage, S., Voelker, G. M., Claffy, K. C.,
-              and ACM, "Risky BIZness", DOI 10.1145/3487552.3487816, 2
-              November 2021,
-              <http://dx.doi.org/10.1145/3487552.3487816>.
-
-
-
-Thomassen               Expires 24 December 2023                [Page 8]
-
-Internet-Draft               cds-consistency                   June 2023
-
-
-   [RFC6781]  Kolkman, O., Mekking, W., and R. Gieben, "DNSSEC
-              Operational Practices, Version 2", RFC 6781,
-              DOI 10.17487/RFC6781, December 2012,
-              <https://www.rfc-editor.org/info/rfc6781>.
-
-   [RFC8901]  Huque, S., Aras, P., Dickinson, J., Vcelak, J., and D.
-              Blacka, "Multi-Signer DNSSEC Models", RFC 8901,
-              DOI 10.17487/RFC8901, September 2020,
-              <https://www.rfc-editor.org/info/rfc8901>.
-
-Appendix A.  Change History (to be removed before publication)
+Appendix B.  Change History (to be removed before publication)
 
    *  draft-ietf-dnsop-cds-consistency-01
+
+   |  Moved Failure Scenarios to appendix
 
    *  draft-ietf-dnsop-cds-consistency-00
 

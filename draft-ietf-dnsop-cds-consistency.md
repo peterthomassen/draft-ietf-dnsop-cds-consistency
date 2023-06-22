@@ -120,113 +120,6 @@ capitals, as shown here.
 The terminology in this document is as defined in [@!RFC7344].
 
 
-{#scenarios}
-# Failure Scenarios
-
-The following scenarios are examples of how things can go wrong when
-consistency is not enforced by the parent during CDS/CDNSKEY/CSYNC
-processing.
-Other scenarios that cause similar (or perhaps even more) harm may
-exist.
-
-The common feature of these scenarios is that if one DNS provider steps
-out of line and the parent is not careful, DNS resolution and/or
-validation will break down, undermining the very guarantees of operator
-independence that multi-homing configurations are expected to provide.
-
-## Lame Delegations
-
-A delegation may include a non-existent NS hostname, for example due to
-a typo or when the nameserver's domain registration has expired.
-(Re-)registering such a non-resolvable nameserver domain allows a third
-party to run authoritative DNS service for all domains delegated to that
-NS hostname, serving responses different from those in the legitimate
-zonefile.
-
-This strategy for hijacking (at least part of the) DNS traffic and
-spoofing responses is not new, but surprisingly common [@?LAME1;@LAME2].
-It is also known that DNSSEC reduces the impact of such an attack,
-as validating resolvers will reject illegitimate responses due to lack
-of signatures consistent with the delegation's DS records.
-
-On the other hand, if the delegation is not protected by DNSSEC, the
-rogue nameserver is not only able to serve unauthorized responses
-without detection; it is even possible for the attacker to escalate the
-nameserver takeover to a full domain takeover.
-
-In particular, the rogue nameserver can publish CDS/CDNSKEY records.
-If those are processed by the parent without ensuring consistency with
-other authoritative nameservers, the delegation will be secured with
-the attacker's DNSSEC keys.
-As responses served by the remaining legitimate nameservers are not
-signed with these keys, validating resolvers will start rejecting them.
-
-Once DNSSEC is established, the attacker can use CSYNC to remove other
-nameservers from the delegation at will (and potentially add new ones
-under their control).
-This enables the attacker to position themself as the only party
-providing authoritiative DNS service for the victim domain,
-significantly augmenting the attack's impact.
-
-
-## Multi-Homing (Permanent Multi-Signer)
-
-### DS Breakage
-
-While performing a key rollover and adjusting the corresponding
-CDS/CDNSKEY records, a provider could accidentally publish CDS/CDNSKEY
-records that only include its own keys.
-
-When the parent happens to retrieve the records from a nameserver
-controlled by this provider, the other providers' DS records would be
-removed from the delegation.
-As a result, the zone is broken at least for some queries.
-
-### NS Breakage
-
-A similar scenario affects the CSYNC record, which is used to update the
-delegation's NS record set at the parent.
-The issue occurs, for example, when a provider accidentally includes
-only their own set of hostnames in the local NS record set, or publishes
-an otherwise flawed NS record set.
-
-If the parent then observes a CSYNC signal and fetches the flawed NS
-record set without ensuring consistency across nameservers, the
-delegation may be updated in a way that breaks resolution or silently
-reduces the multi-homing setup to a single-provider setup.
-
-## Provider Change (Temporary Multi-Signer)
-
-Transferring DNS service for a domain name from one (signing) DNS
-provider to another, without going insecure, necessitates a brief period
-during which the domain is operated in multi-signer mode:
-First, the providers include each other's signing keys as DNSKEY and
-CDS/CDNSKEY records in their copy of the zone.
-Once the parent detects the updated CDS/CDNSKEY record set at the old
-provider, the delegation's DS record set is updated.
-Then, after waiting for cache expiration, the new provider's NS
-hostnames can be added to the zone's NS record set, so that queries
-start balancing across both providers.
-(To conclude the hand-over, the old provider is removed by inverting
-these steps with swapped roles.)
-
-The multi-signer phase of this process breaks when the new provider
-fails to include the old provider's keys in the DNSKEY and CDS/CDNSKEY
-record sets.
-One obvious consequence of that is that whenever the resolver happens to
-retrieve the DNSKEY record set from the new provider, the old provider's
-RRSIGs do no longer validate, causing responses to SERVFAIL.
-
-However, an even worse consequence can occur when the parent performs
-their next CDS/CDNSKEY scan:
-It may then happen that the incorrect CDS/CDNSKEY record set is fetched
-from the new provider and used to update the delegation's DS record set.
-As a result, the old provider is prematureley removed from the domain's
-DNSSEC chain of trust.
-The new DS record set authenticates the new provider's DNSKEYs only, and
-DNSSEC validation fails for all answers served by the old provider.
-
-
 # Polling Requirements
 
 This section defines consistency requirements for poll-based updates,
@@ -376,9 +269,118 @@ Viktor Dukhovni
 </reference>
 
 
+{#scenarios}
+# Failure Scenarios
+
+The following scenarios are examples of how things can go wrong when
+consistency is not enforced by the parent during CDS/CDNSKEY/CSYNC
+processing.
+Other scenarios that cause similar (or perhaps even more) harm may
+exist.
+
+The common feature of these scenarios is that if one DNS provider steps
+out of line and the parent is not careful, DNS resolution and/or
+validation will break down, undermining the very guarantees of operator
+independence that multi-homing configurations are expected to provide.
+
+## Lame Delegations
+
+A delegation may include a non-existent NS hostname, for example due to
+a typo or when the nameserver's domain registration has expired.
+(Re-)registering such a non-resolvable nameserver domain allows a third
+party to run authoritative DNS service for all domains delegated to that
+NS hostname, serving responses different from those in the legitimate
+zonefile.
+
+This strategy for hijacking (at least part of the) DNS traffic and
+spoofing responses is not new, but surprisingly common [@?LAME1;@LAME2].
+It is also known that DNSSEC reduces the impact of such an attack,
+as validating resolvers will reject illegitimate responses due to lack
+of signatures consistent with the delegation's DS records.
+
+On the other hand, if the delegation is not protected by DNSSEC, the
+rogue nameserver is not only able to serve unauthorized responses
+without detection; it is even possible for the attacker to escalate the
+nameserver takeover to a full domain takeover.
+
+In particular, the rogue nameserver can publish CDS/CDNSKEY records.
+If those are processed by the parent without ensuring consistency with
+other authoritative nameservers, the delegation will be secured with
+the attacker's DNSSEC keys.
+As responses served by the remaining legitimate nameservers are not
+signed with these keys, validating resolvers will start rejecting them.
+
+Once DNSSEC is established, the attacker can use CSYNC to remove other
+nameservers from the delegation at will (and potentially add new ones
+under their control).
+This enables the attacker to position themself as the only party
+providing authoritiative DNS service for the victim domain,
+significantly augmenting the attack's impact.
+
+
+## Multi-Homing (Permanent Multi-Signer)
+
+### DS Breakage
+
+While performing a key rollover and adjusting the corresponding
+CDS/CDNSKEY records, a provider could accidentally publish CDS/CDNSKEY
+records that only include its own keys.
+
+When the parent happens to retrieve the records from a nameserver
+controlled by this provider, the other providers' DS records would be
+removed from the delegation.
+As a result, the zone is broken at least for some queries.
+
+### NS Breakage
+
+A similar scenario affects the CSYNC record, which is used to update the
+delegation's NS record set at the parent.
+The issue occurs, for example, when a provider accidentally includes
+only their own set of hostnames in the local NS record set, or publishes
+an otherwise flawed NS record set.
+
+If the parent then observes a CSYNC signal and fetches the flawed NS
+record set without ensuring consistency across nameservers, the
+delegation may be updated in a way that breaks resolution or silently
+reduces the multi-homing setup to a single-provider setup.
+
+## Provider Change (Temporary Multi-Signer)
+
+Transferring DNS service for a domain name from one (signing) DNS
+provider to another, without going insecure, necessitates a brief period
+during which the domain is operated in multi-signer mode:
+First, the providers include each other's signing keys as DNSKEY and
+CDS/CDNSKEY records in their copy of the zone.
+Once the parent detects the updated CDS/CDNSKEY record set at the old
+provider, the delegation's DS record set is updated.
+Then, after waiting for cache expiration, the new provider's NS
+hostnames can be added to the zone's NS record set, so that queries
+start balancing across both providers.
+(To conclude the hand-over, the old provider is removed by inverting
+these steps with swapped roles.)
+
+The multi-signer phase of this process breaks when the new provider
+fails to include the old provider's keys in the DNSKEY and CDS/CDNSKEY
+record sets.
+One obvious consequence of that is that whenever the resolver happens to
+retrieve the DNSKEY record set from the new provider, the old provider's
+RRSIGs do no longer validate, causing responses to SERVFAIL.
+
+However, an even worse consequence can occur when the parent performs
+their next CDS/CDNSKEY scan:
+It may then happen that the incorrect CDS/CDNSKEY record set is fetched
+from the new provider and used to update the delegation's DS record set.
+As a result, the old provider is prematureley removed from the domain's
+DNSSEC chain of trust.
+The new DS record set authenticates the new provider's DNSKEYs only, and
+DNSSEC validation fails for all answers served by the old provider.
+
+
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-01
+
+> Moved Failure Scenarios to appendix
 
 * draft-ietf-dnsop-cds-consistency-00
 
