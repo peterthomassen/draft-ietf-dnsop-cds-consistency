@@ -378,7 +378,11 @@ Viktor Dukhovni
 
 # Change History (to be removed before publication)
 
+* draft-ietf-dnsop-cds-consistency-01
+
 * draft-ietf-dnsop-cds-consistency-00
+
+> Editorial changes.
 
 * draft-thomassen-dnsop-cds-consistency-03
 
