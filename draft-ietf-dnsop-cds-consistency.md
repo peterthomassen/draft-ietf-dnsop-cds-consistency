@@ -149,6 +149,10 @@ needs to happen.
 Queries MAY be continued across all nameservers for inconsistency
 reporting purposes.
 
+Existing requirements for ensuring integrity remain in effect.
+In particular, DNSSEC signatures MUST be requested and validated for all
+queries unless otherwise noted.
+
 
 ## CDS and CDNSKEY
 
@@ -161,10 +165,16 @@ referenced in all other received responses.
 
 In other words, CDS/CDNSKEY records at the Child zone apex MUST be
 fetched directly from each of the authoritative servers as determined by
-the delegation's NS record set, with DNSSEC validation enforced.
+the delegation's NS record set.
 When a key is referenced in a CDS or CDNSKEY record set returned by
 one nameserver, but is missing from a least one other nameserver's
 answer, the CDS/CDNSKEY state MUST be considered inconsistent.
+
+When CDS/CDNSKEY queries are performed for deploying the initial DS
+record set (DNSSEC bootstrapping), responses cannot be directly
+validated.
+In this case, integrity checks according to [@!RFC8078] Section 3 (or
+its successors) continue to apply.
 
 
 ## CSYNC

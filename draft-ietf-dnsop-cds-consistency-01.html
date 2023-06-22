@@ -1187,7 +1187,7 @@ li > p:last-of-type {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Thomassen</td>
-<td class="center">Expires 24 December 2023</td>
+<td class="center">Expires 28 December 2023</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1203,12 +1203,12 @@ li > p:last-of-type {
 <a href="https://www.rfc-editor.org/rfc/rfc7344" class="eref">7344</a>, <a href="https://www.rfc-editor.org/rfc/rfc7477" class="eref">7477</a> (if approved)</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-06-22" class="published">22 June 2023</time>
+<time datetime="2023-06-26" class="published">26 June 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2023-12-24">24 December 2023</time></dd>
+<dd class="expires"><time datetime="2023-12-28">28 December 2023</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1254,7 +1254,7 @@ before taking any action based on these records.<a href="#section-abstract-2" cl
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 24 December 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 28 December 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1457,6 +1457,9 @@ needs to happen, or give an inconsistent result in which case nothing
 needs to happen.
 Queries MAY be continued across all nameservers for inconsistency
 reporting purposes.<a href="#section-2-5" class="pilcrow">¶</a></p>
+<p id="section-2-6">Existing requirements for ensuring integrity remain in effect.
+In particular, DNSSEC signatures MUST be requested and validated for all
+queries unless otherwise noted.<a href="#section-2-6" class="pilcrow">¶</a></p>
 <div id="cds-and-cdnskey">
 <section id="section-2.1">
         <h3 id="name-cds-and-cdnskey">
@@ -1470,10 +1473,15 @@ ensure that each key referenced in any of the received answers is also
 referenced in all other received responses.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
 <p id="section-2.1-2">In other words, CDS/CDNSKEY records at the Child zone apex MUST be
 fetched directly from each of the authoritative servers as determined by
-the delegation's NS record set, with DNSSEC validation enforced.
+the delegation's NS record set.
 When a key is referenced in a CDS or CDNSKEY record set returned by
 one nameserver, but is missing from a least one other nameserver's
 answer, the CDS/CDNSKEY state MUST be considered inconsistent.<a href="#section-2.1-2" class="pilcrow">¶</a></p>
+<p id="section-2.1-3">When CDS/CDNSKEY queries are performed for deploying the initial DS
+record set (DNSSEC bootstrapping), responses cannot be directly
+validated.
+In this case, integrity checks according to <span>[<a href="#RFC8078" class="xref">RFC8078</a>]</span> Section 3 (or
+its successors) continue to apply.<a href="#section-2.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="csync">
@@ -1576,6 +1584,10 @@ or CSYNC records in the child zone.<a href="#section-4-3" class="pilcrow">¶</a>
 <dt id="RFC7477">[RFC7477]</dt>
       <dd>
 <span class="refAuthor">Hardaker, W.</span>, <span class="refTitle">"Child-to-Parent Synchronization in DNS"</span>, <span class="seriesInfo">RFC 7477</span>, <span class="seriesInfo">DOI 10.17487/RFC7477</span>, <time datetime="2015-03" class="refDate">March 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc7477">https://www.rfc-editor.org/info/rfc7477</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8078">[RFC8078]</dt>
+      <dd>
+<span class="refAuthor">Gudmundsson, O.</span> and <span class="refAuthor">P. Wouters</span>, <span class="refTitle">"Managing DS Records from the Parent via CDS/CDNSKEY"</span>, <span class="seriesInfo">RFC 8078</span>, <span class="seriesInfo">DOI 10.17487/RFC8078</span>, <time datetime="2017-03" class="refDate">March 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8078">https://www.rfc-editor.org/info/rfc8078</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
     <dd>
