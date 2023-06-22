@@ -19,11 +19,13 @@ status = "standard"
 initials = "P."
 surname = "Thomassen"
 fullname = "Peter Thomassen"
-organization = "Secure Systems Engineering, deSEC"
+organization = "SSE - Secure Systems Engineering GmbH"
 [author.address]
  email = "peter.thomassen@securesystems.de"
 [author.address.postal]
+ street = "Hauptstraße 3"
  city = "Berlin"
+ code = "10827"
  country = "Germany"
 %%%
 

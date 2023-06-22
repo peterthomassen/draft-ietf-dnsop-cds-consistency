@@ -3,7 +3,7 @@
 
 
 DNSOP Working Group                                         P. Thomassen
-Internet-Draft                         Secure Systems Engineering, deSEC
+Internet-Draft                     SSE - Secure Systems Engineering GmbH
 Updates: 7344, 7477 (if approved)                           22 June 2023
 Intended status: Standards Track                                        
 Expires: 24 December 2023
@@ -507,11 +507,11 @@ Internet-Draft               cds-consistency                   June 2023
 
 
    Peter Thomassen
-   Secure Systems Engineering, deSEC
-   Berlin
+   SSE - Secure Systems Engineering GmbH
+   Hauptstraße 3
+   10827 Berlin
    Germany
    Email: peter.thomassen@securesystems.de
-
 
 
 
