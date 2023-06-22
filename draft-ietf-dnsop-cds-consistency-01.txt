@@ -80,11 +80,12 @@ Table of Contents
    5.  Normative References  . . . . . . . . . . . . . . . . . . . .   5
    6.  Informative References  . . . . . . . . . . . . . . . . . . .   6
    Appendix A.  Failure Scenarios  . . . . . . . . . . . . . . . . .   7
-     A.1.  Lame Delegations  . . . . . . . . . . . . . . . . . . . .   7
-     A.2.  Multi-Homing (Permanent Multi-Signer) . . . . . . . . . .   8
-       A.2.1.  DS Breakage . . . . . . . . . . . . . . . . . . . . .   8
-       A.2.2.  NS Breakage . . . . . . . . . . . . . . . . . . . . .   8
-     A.3.  Provider Change (Temporary Multi-Signer)  . . . . . . . .   8
+     A.1.  DS Breakage due to Replication Lag  . . . . . . . . . . .   7
+     A.2.  Lame Delegations  . . . . . . . . . . . . . . . . . . . .   7
+     A.3.  Multi-Homing (Permanent Multi-Signer) . . . . . . . . . .   8
+       A.3.1.  DS Breakage . . . . . . . . . . . . . . . . . . . . .   8
+       A.3.2.  NS Breakage . . . . . . . . . . . . . . . . . . . . .   8
+     A.4.  Provider Change (Temporary Multi-Signer)  . . . . . . . .   9
    Appendix B.  Change History (to be removed before publication)  .   9
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  10
 
@@ -103,7 +104,6 @@ Table of Contents
    to just one authoritative nameserver.  The corresponding Section 6.1
    of [RFC7344] (CDS/CDNSKEY) contains no such provision for how
    specifically polling of these records should be done.
-
 
 
 
@@ -355,13 +355,28 @@ Appendix A.  Failure Scenarios
    processing.  Other scenarios that cause similar (or perhaps even
    more) harm may exist.
 
-   The common feature of these scenarios is that if one DNS provider
-   steps out of line and the parent is not careful, DNS resolution and/
-   or validation will break down, undermining the very guarantees of
-   operator independence that multi-homing configurations are expected
-   to provide.
+   The common feature of these scenarios is that if one nameserver steps
+   out of line and the parent is not careful, DNS resolution and/or
+   validation will break down.  When several DNS providers are involved,
+   this undermines the very guarantees of operator independence that
+   multi-homing configurations are expected to provide.
 
-A.1.  Lame Delegations
+A.1.  DS Breakage due to Replication Lag
+
+   If an authoritative nameserver is lagging behind during a key
+   rollover, the parent may see different CDS/CDNSKEY RRsets depending
+   on the nameserver contacted.  This may cause old and new DS RRsets to
+   be deployed in an alternating fashion.  The zone maintainer, having
+   detected that the DS deployment was successful, may then confidently
+   remove the old DNSKEY from the zonefile, only to find out later that
+   the DS RRset has been turned back, breaking the delegation's DNSSEC
+   chain of trust.
+
+   Checking for consistency minimizes this risk.  In case the parent
+   reports consistency errors downstream, it can also help detect the
+   replication issue on the child side.
+
+A.2.  Lame Delegations
 
    A delegation may include a non-existent NS hostname, for example due
    to a typo or when the nameserver's domain registration has expired.
@@ -369,6 +384,15 @@ A.1.  Lame Delegations
    third party to run authoritative DNS service for all domains
    delegated to that NS hostname, serving responses different from those
    in the legitimate zonefile.
+
+
+
+
+
+Thomassen               Expires 24 December 2023                [Page 7]
+
+Internet-Draft               cds-consistency                   June 2023
+
 
    This strategy for hijacking (at least part of the) DNS traffic and
    spoofing responses is not new, but surprisingly common
@@ -381,18 +405,6 @@ A.1.  Lame Delegations
    rogue nameserver is not only able to serve unauthorized responses
    without detection; it is even possible for the attacker to escalate
    the nameserver takeover to a full domain takeover.
-
-
-
-
-
-
-
-
-Thomassen               Expires 24 December 2023                [Page 7]
-
-Internet-Draft               cds-consistency                   June 2023
-
 
    In particular, the rogue nameserver can publish CDS/CDNSKEY records.
    If those are processed by the parent without ensuring consistency
@@ -407,9 +419,9 @@ Internet-Draft               cds-consistency                   June 2023
    themself as the only party providing authoritiative DNS service for
    the victim domain, significantly augmenting the attack's impact.
 
-A.2.  Multi-Homing (Permanent Multi-Signer)
+A.3.  Multi-Homing (Permanent Multi-Signer)
 
-A.2.1.  DS Breakage
+A.3.1.  DS Breakage
 
    While performing a key rollover and adjusting the corresponding CDS/
    CDNSKEY records, a provider could accidentally publish CDS/CDNSKEY
@@ -420,7 +432,7 @@ A.2.1.  DS Breakage
    removed from the delegation.  As a result, the zone is broken at
    least for some queries.
 
-A.2.2.  NS Breakage
+A.3.2.  NS Breakage
 
    A similar scenario affects the CSYNC record, which is used to update
    the delegation's NS record set at the parent.  The issue occurs, for
@@ -428,20 +440,8 @@ A.2.2.  NS Breakage
    hostnames in the local NS record set, or publishes an otherwise
    flawed NS record set.
 
-   If the parent then observes a CSYNC signal and fetches the flawed NS
-   record set without ensuring consistency across nameservers, the
-   delegation may be updated in a way that breaks resolution or silently
-   reduces the multi-homing setup to a single-provider setup.
 
-A.3.  Provider Change (Temporary Multi-Signer)
 
-   Transferring DNS service for a domain name from one (signing) DNS
-   provider to another, without going insecure, necessitates a brief
-   period during which the domain is operated in multi-signer mode:
-   First, the providers include each other's signing keys as DNSKEY and
-   CDS/CDNSKEY records in their copy of the zone.  Once the parent
-   detects the updated CDS/CDNSKEY record set at the old provider, the
-   delegation's DS record set is updated.  Then, after waiting for cache
 
 
 
@@ -450,6 +450,20 @@ Thomassen               Expires 24 December 2023                [Page 8]
 Internet-Draft               cds-consistency                   June 2023
 
 
+   If the parent then observes a CSYNC signal and fetches the flawed NS
+   record set without ensuring consistency across nameservers, the
+   delegation may be updated in a way that breaks resolution or silently
+   reduces the multi-homing setup to a single-provider setup.
+
+A.4.  Provider Change (Temporary Multi-Signer)
+
+   Transferring DNS service for a domain name from one (signing) DNS
+   provider to another, without going insecure, necessitates a brief
+   period during which the domain is operated in multi-signer mode:
+   First, the providers include each other's signing keys as DNSKEY and
+   CDS/CDNSKEY records in their copy of the zone.  Once the parent
+   detects the updated CDS/CDNSKEY record set at the old provider, the
+   delegation's DS record set is updated.  Then, after waiting for cache
    expiration, the new provider's NS hostnames can be added to the
    zone's NS record set, so that queries start balancing across both
    providers.  (To conclude the hand-over, the old provider is removed
@@ -476,12 +490,21 @@ Appendix B.  Change History (to be removed before publication)
 
    *  draft-ietf-dnsop-cds-consistency-01
 
+   |  New failure mode: DS Breakage due to Replication Lag
+   |  
    |  Point out zero overhead if nothing changed, and need for OOB
    |  interface
    |  
    |  Editorial changes
    |  
    |  Moved Failure Scenarios to appendix
+
+
+
+Thomassen               Expires 24 December 2023                [Page 9]
+
+Internet-Draft               cds-consistency                   June 2023
+
 
    *  draft-ietf-dnsop-cds-consistency-00
 
@@ -498,14 +521,6 @@ Appendix B.  Change History (to be removed before publication)
    |  
    |  Say what is being updated
    |  
-
-
-
-Thomassen               Expires 24 December 2023                [Page 9]
-
-Internet-Draft               cds-consistency                   June 2023
-
-
    |  Editorial changes.
    |  
    |  Retry mechanism to resolve inconsistencies
@@ -536,21 +551,6 @@ Author's Address
    10827 Berlin
    Germany
    Email: peter.thomassen@securesystems.de
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

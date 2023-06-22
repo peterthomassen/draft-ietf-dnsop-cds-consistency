@@ -1321,21 +1321,24 @@ before taking any action based on these records.<a href="#section-abstract-2" cl
             <p id="section-toc.1-1.7.1"><a href="#appendix-A" class="xref">Appendix A</a>.  <a href="#name-failure-scenarios" class="xref">Failure Scenarios</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
-                <p id="section-toc.1-1.7.2.1.1"><a href="#appendix-A.1" class="xref">A.1</a>.  <a href="#name-lame-delegations" class="xref">Lame Delegations</a></p>
+                <p id="section-toc.1-1.7.2.1.1"><a href="#appendix-A.1" class="xref">A.1</a>.  <a href="#name-ds-breakage-due-to-replicat" class="xref">DS Breakage due to Replication Lag</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#appendix-A.2" class="xref">A.2</a>.  <a href="#name-multi-homing-permanent-mult" class="xref">Multi-Homing (Permanent Multi-Signer)</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2.2.1">
-                    <p id="section-toc.1-1.7.2.2.2.1.1"><a href="#appendix-A.2.1" class="xref">A.2.1</a>.  <a href="#name-ds-breakage" class="xref">DS Breakage</a></p>
+                <p id="section-toc.1-1.7.2.2.1"><a href="#appendix-A.2" class="xref">A.2</a>.  <a href="#name-lame-delegations" class="xref">Lame Delegations</a></p>
 </li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2.2.2">
-                    <p id="section-toc.1-1.7.2.2.2.2.1"><a href="#appendix-A.2.2" class="xref">A.2.2</a>.  <a href="#name-ns-breakage" class="xref">NS Breakage</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
+                <p id="section-toc.1-1.7.2.3.1"><a href="#appendix-A.3" class="xref">A.3</a>.  <a href="#name-multi-homing-permanent-mult" class="xref">Multi-Homing (Permanent Multi-Signer)</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3.2.1">
+                    <p id="section-toc.1-1.7.2.3.2.1.1"><a href="#appendix-A.3.1" class="xref">A.3.1</a>.  <a href="#name-ds-breakage" class="xref">DS Breakage</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3.2.2">
+                    <p id="section-toc.1-1.7.2.3.2.2.1"><a href="#appendix-A.3.2" class="xref">A.3.2</a>.  <a href="#name-ns-breakage" class="xref">NS Breakage</a></p>
 </li>
                 </ul>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
-                <p id="section-toc.1-1.7.2.3.1"><a href="#appendix-A.3" class="xref">A.3</a>.  <a href="#name-provider-change-temporary-m" class="xref">Provider Change (Temporary Multi-Signer)</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
+                <p id="section-toc.1-1.7.2.4.1"><a href="#appendix-A.4" class="xref">A.4</a>.  <a href="#name-provider-change-temporary-m" class="xref">Provider Change (Temporary Multi-Signer)</a></p>
 </li>
             </ul>
 </li>
@@ -1601,87 +1604,105 @@ consistency is not enforced by the parent during CDS/CDNSKEY/CSYNC
 processing.
 Other scenarios that cause similar (or perhaps even more) harm may
 exist.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
-<p id="appendix-A-2">The common feature of these scenarios is that if one DNS provider steps
+<p id="appendix-A-2">The common feature of these scenarios is that if one nameserver steps
 out of line and the parent is not careful, DNS resolution and/or
-validation will break down, undermining the very guarantees of operator
-independence that multi-homing configurations are expected to provide.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
-<div id="lame-delegations">
+validation will break down. When several DNS providers are involved,
+this undermines the very guarantees of operator independence that
+multi-homing configurations are expected to provide.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+<div id="ds-breakage-due-to-replication-lag">
 <section id="appendix-A.1">
-        <h3 id="name-lame-delegations">
-<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-lame-delegations" class="section-name selfRef">Lame Delegations</a>
+        <h3 id="name-ds-breakage-due-to-replicat">
+<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-ds-breakage-due-to-replicat" class="section-name selfRef">DS Breakage due to Replication Lag</a>
         </h3>
-<p id="appendix-A.1-1">A delegation may include a non-existent NS hostname, for example due to
+<p id="appendix-A.1-1">If an authoritative nameserver is lagging behind during a key rollover,
+the parent may see different CDS/CDNSKEY RRsets depending on the
+nameserver contacted. This may cause old and new DS RRsets to be
+deployed in an alternating fashion. The zone maintainer, having detected
+that the DS deployment was successful, may then confidently remove the
+old DNSKEY from the zonefile, only to find out later that the DS RRset
+has been turned back, breaking the delegation's DNSSEC chain of trust.<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.1-2">Checking for consistency minimizes this risk. In case the parent reports
+consistency errors downstream, it can also help detect the replication
+issue on the child side.<a href="#appendix-A.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="lame-delegations">
+<section id="appendix-A.2">
+        <h3 id="name-lame-delegations">
+<a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-lame-delegations" class="section-name selfRef">Lame Delegations</a>
+        </h3>
+<p id="appendix-A.2-1">A delegation may include a non-existent NS hostname, for example due to
 a typo or when the nameserver's domain registration has expired.
 (Re-)registering such a non-resolvable nameserver domain allows a third
 party to run authoritative DNS service for all domains delegated to that
 NS hostname, serving responses different from those in the legitimate
-zonefile.<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
-<p id="appendix-A.1-2">This strategy for hijacking (at least part of the) DNS traffic and
+zonefile.<a href="#appendix-A.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.2-2">This strategy for hijacking (at least part of the) DNS traffic and
 spoofing responses is not new, but surprisingly common <span>[<a href="#LAME1" class="xref">LAME1</a>]</span><span>[<a href="#LAME2" class="xref">LAME2</a>]</span>.
 It is also known that DNSSEC reduces the impact of such an attack,
 as validating resolvers will reject illegitimate responses due to lack
-of signatures consistent with the delegation's DS records.<a href="#appendix-A.1-2" class="pilcrow">¶</a></p>
-<p id="appendix-A.1-3">On the other hand, if the delegation is not protected by DNSSEC, the
+of signatures consistent with the delegation's DS records.<a href="#appendix-A.2-2" class="pilcrow">¶</a></p>
+<p id="appendix-A.2-3">On the other hand, if the delegation is not protected by DNSSEC, the
 rogue nameserver is not only able to serve unauthorized responses
 without detection; it is even possible for the attacker to escalate the
-nameserver takeover to a full domain takeover.<a href="#appendix-A.1-3" class="pilcrow">¶</a></p>
-<p id="appendix-A.1-4">In particular, the rogue nameserver can publish CDS/CDNSKEY records.
+nameserver takeover to a full domain takeover.<a href="#appendix-A.2-3" class="pilcrow">¶</a></p>
+<p id="appendix-A.2-4">In particular, the rogue nameserver can publish CDS/CDNSKEY records.
 If those are processed by the parent without ensuring consistency with
 other authoritative nameservers, the delegation will be secured with
 the attacker's DNSSEC keys.
 As responses served by the remaining legitimate nameservers are not
-signed with these keys, validating resolvers will start rejecting them.<a href="#appendix-A.1-4" class="pilcrow">¶</a></p>
-<p id="appendix-A.1-5">Once DNSSEC is established, the attacker can use CSYNC to remove other
+signed with these keys, validating resolvers will start rejecting them.<a href="#appendix-A.2-4" class="pilcrow">¶</a></p>
+<p id="appendix-A.2-5">Once DNSSEC is established, the attacker can use CSYNC to remove other
 nameservers from the delegation at will (and potentially add new ones
 under their control).
 This enables the attacker to position themself as the only party
 providing authoritiative DNS service for the victim domain,
-significantly augmenting the attack's impact.<a href="#appendix-A.1-5" class="pilcrow">¶</a></p>
+significantly augmenting the attack's impact.<a href="#appendix-A.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="multi-homing-permanent-multi-signer">
-<section id="appendix-A.2">
+<section id="appendix-A.3">
         <h3 id="name-multi-homing-permanent-mult">
-<a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-multi-homing-permanent-mult" class="section-name selfRef">Multi-Homing (Permanent Multi-Signer)</a>
+<a href="#appendix-A.3" class="section-number selfRef">A.3. </a><a href="#name-multi-homing-permanent-mult" class="section-name selfRef">Multi-Homing (Permanent Multi-Signer)</a>
         </h3>
 <div id="ds-breakage">
-<section id="appendix-A.2.1">
+<section id="appendix-A.3.1">
           <h4 id="name-ds-breakage">
-<a href="#appendix-A.2.1" class="section-number selfRef">A.2.1. </a><a href="#name-ds-breakage" class="section-name selfRef">DS Breakage</a>
+<a href="#appendix-A.3.1" class="section-number selfRef">A.3.1. </a><a href="#name-ds-breakage" class="section-name selfRef">DS Breakage</a>
           </h4>
-<p id="appendix-A.2.1-1">While performing a key rollover and adjusting the corresponding
+<p id="appendix-A.3.1-1">While performing a key rollover and adjusting the corresponding
 CDS/CDNSKEY records, a provider could accidentally publish CDS/CDNSKEY
-records that only include its own keys.<a href="#appendix-A.2.1-1" class="pilcrow">¶</a></p>
-<p id="appendix-A.2.1-2">When the parent happens to retrieve the records from a nameserver
+records that only include its own keys.<a href="#appendix-A.3.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.3.1-2">When the parent happens to retrieve the records from a nameserver
 controlled by this provider, the other providers' DS records would be
 removed from the delegation.
-As a result, the zone is broken at least for some queries.<a href="#appendix-A.2.1-2" class="pilcrow">¶</a></p>
+As a result, the zone is broken at least for some queries.<a href="#appendix-A.3.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="ns-breakage">
-<section id="appendix-A.2.2">
+<section id="appendix-A.3.2">
           <h4 id="name-ns-breakage">
-<a href="#appendix-A.2.2" class="section-number selfRef">A.2.2. </a><a href="#name-ns-breakage" class="section-name selfRef">NS Breakage</a>
+<a href="#appendix-A.3.2" class="section-number selfRef">A.3.2. </a><a href="#name-ns-breakage" class="section-name selfRef">NS Breakage</a>
           </h4>
-<p id="appendix-A.2.2-1">A similar scenario affects the CSYNC record, which is used to update the
+<p id="appendix-A.3.2-1">A similar scenario affects the CSYNC record, which is used to update the
 delegation's NS record set at the parent.
 The issue occurs, for example, when a provider accidentally includes
 only their own set of hostnames in the local NS record set, or publishes
-an otherwise flawed NS record set.<a href="#appendix-A.2.2-1" class="pilcrow">¶</a></p>
-<p id="appendix-A.2.2-2">If the parent then observes a CSYNC signal and fetches the flawed NS
+an otherwise flawed NS record set.<a href="#appendix-A.3.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.3.2-2">If the parent then observes a CSYNC signal and fetches the flawed NS
 record set without ensuring consistency across nameservers, the
 delegation may be updated in a way that breaks resolution or silently
-reduces the multi-homing setup to a single-provider setup.<a href="#appendix-A.2.2-2" class="pilcrow">¶</a></p>
+reduces the multi-homing setup to a single-provider setup.<a href="#appendix-A.3.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="provider-change-temporary-multi-signer">
-<section id="appendix-A.3">
+<section id="appendix-A.4">
         <h3 id="name-provider-change-temporary-m">
-<a href="#appendix-A.3" class="section-number selfRef">A.3. </a><a href="#name-provider-change-temporary-m" class="section-name selfRef">Provider Change (Temporary Multi-Signer)</a>
+<a href="#appendix-A.4" class="section-number selfRef">A.4. </a><a href="#name-provider-change-temporary-m" class="section-name selfRef">Provider Change (Temporary Multi-Signer)</a>
         </h3>
-<p id="appendix-A.3-1">Transferring DNS service for a domain name from one (signing) DNS
+<p id="appendix-A.4-1">Transferring DNS service for a domain name from one (signing) DNS
 provider to another, without going insecure, necessitates a brief period
 during which the domain is operated in multi-signer mode:
 First, the providers include each other's signing keys as DNSKEY and
@@ -1692,21 +1713,21 @@ Then, after waiting for cache expiration, the new provider's NS
 hostnames can be added to the zone's NS record set, so that queries
 start balancing across both providers.
 (To conclude the hand-over, the old provider is removed by inverting
-these steps with swapped roles.)<a href="#appendix-A.3-1" class="pilcrow">¶</a></p>
-<p id="appendix-A.3-2">The multi-signer phase of this process breaks when the new provider,
+these steps with swapped roles.)<a href="#appendix-A.4-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.4-2">The multi-signer phase of this process breaks when the new provider,
 perhaps unaware of the situation and its intricacies, fails to include
 the old provider's keys in the DNSKEY (and CDS/CDNSKEY) record sets.
 One obvious consequence of that is that whenever the resolver happens to
 retrieve the DNSKEY record set from the new provider, the old provider's
-RRSIGs do no longer validate, causing SERVFAIL to be returned.<a href="#appendix-A.3-2" class="pilcrow">¶</a></p>
-<p id="appendix-A.3-3">However, an even worse consequence can occur when the parent performs
+RRSIGs do no longer validate, causing SERVFAIL to be returned.<a href="#appendix-A.4-2" class="pilcrow">¶</a></p>
+<p id="appendix-A.4-3">However, an even worse consequence can occur when the parent performs
 their next CDS/CDNSKEY scan:
 It may then happen that the incorrect CDS/CDNSKEY record set is fetched
 from the new provider and used to update the delegation's DS record set.
 As a result, the old provider (who still appears in the delegation) is
 prematurely removed from the domain's DNSSEC chain of trust.
 The new DS record set authenticates the new provider's DNSKEYs only, and
-DNSSEC validation fails for all answers served by the old provider.<a href="#appendix-A.3-3" class="pilcrow">¶</a></p>
+DNSSEC validation fails for all answers served by the old provider.<a href="#appendix-A.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1721,9 +1742,10 @@ DNSSEC validation fails for all answers served by the old provider.<a href="#app
 </li>
       </ul>
 <blockquote id="appendix-B-2">
-        <p id="appendix-B-2.1">Point out zero overhead if nothing changed, and need for OOB interface<a href="#appendix-B-2.1" class="pilcrow">¶</a></p>
-<p id="appendix-B-2.2">Editorial changes<a href="#appendix-B-2.2" class="pilcrow">¶</a></p>
-<p id="appendix-B-2.3">Moved Failure Scenarios to appendix<a href="#appendix-B-2.3" class="pilcrow">¶</a></p>
+        <p id="appendix-B-2.1">New failure mode: DS Breakage due to Replication Lag<a href="#appendix-B-2.1" class="pilcrow">¶</a></p>
+<p id="appendix-B-2.2">Point out zero overhead if nothing changed, and need for OOB interface<a href="#appendix-B-2.2" class="pilcrow">¶</a></p>
+<p id="appendix-B-2.3">Editorial changes<a href="#appendix-B-2.3" class="pilcrow">¶</a></p>
+<p id="appendix-B-2.4">Moved Failure Scenarios to appendix<a href="#appendix-B-2.4" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="normal">
 <li class="normal" id="appendix-B-3.1">draft-ietf-dnsop-cds-consistency-00<a href="#appendix-B-3.1" class="pilcrow">¶</a>

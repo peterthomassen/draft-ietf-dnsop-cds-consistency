@@ -288,10 +288,26 @@ processing.
 Other scenarios that cause similar (or perhaps even more) harm may
 exist.
 
-The common feature of these scenarios is that if one DNS provider steps
+The common feature of these scenarios is that if one nameserver steps
 out of line and the parent is not careful, DNS resolution and/or
-validation will break down, undermining the very guarantees of operator
-independence that multi-homing configurations are expected to provide.
+validation will break down. When several DNS providers are involved,
+this undermines the very guarantees of operator independence that
+multi-homing configurations are expected to provide.
+
+## DS Breakage due to Replication Lag
+
+If an authoritative nameserver is lagging behind during a key rollover,
+the parent may see different CDS/CDNSKEY RRsets depending on the
+nameserver contacted. This may cause old and new DS RRsets to be
+deployed in an alternating fashion. The zone maintainer, having detected
+that the DS deployment was successful, may then confidently remove the
+old DNSKEY from the zonefile, only to find out later that the DS RRset
+has been turned back, breaking the delegation's DNSSEC chain of trust.
+
+Checking for consistency minimizes this risk. In case the parent reports
+consistency errors downstream, it can also help detect the replication
+issue on the child side.
+
 
 ## Lame Delegations
 
@@ -389,6 +405,8 @@ DNSSEC validation fails for all answers served by the old provider.
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-01
+
+> New failure mode: DS Breakage due to Replication Lag
 
 > Point out zero overhead if nothing changed, and need for OOB interface
 
