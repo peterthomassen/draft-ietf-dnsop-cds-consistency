@@ -14,12 +14,12 @@ CDS and/or CDNSKEY records which hold the prospective DS parameters.
 Similarly, CSYNC records indicate a desired update of the delegation's
 NS records  .
 Parent-side entities (e.g. Registries, Registrars) typically discover
-these records by periodically querying them from the child (&quot;polling&quot;),
-before using them to update the delegation's parameters. 
-       This document specifies that if polling is used, parent-side entities
-MUST ensure that updates triggered via CDS/CDNSKEY and CSYNC records
-are consistent across the child's authoritative nameservers, before
-taking any action based on these records. 
+these records by querying them from the child, and then use them to
+update the delegation's DS RRset accordingly. 
+       This document specifies that when performing such queries, parent-side
+entities MUST ensure that updates triggered via CDS/CDNSKEY and CSYNC
+records are consistent across the child's authoritative nameservers,
+before taking any action based on these records. 
     " name="description">
 <meta content="xml2rfc 3.12.2" name="generator">
 <meta content="draft-ietf-dnsop-cds-consistency-01" name="ietf.draft">
@@ -1228,12 +1228,12 @@ CDS and/or CDNSKEY records which hold the prospective DS parameters.
 Similarly, CSYNC records indicate a desired update of the delegation's
 NS records <span>[<a href="#RFC7477" class="xref">RFC7477</a>]</span>.
 Parent-side entities (e.g. Registries, Registrars) typically discover
-these records by periodically querying them from the child ("polling"),
-before using them to update the delegation's parameters.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
-<p id="section-abstract-2">This document specifies that if polling is used, parent-side entities
-MUST ensure that updates triggered via CDS/CDNSKEY and CSYNC records
-are consistent across the child's authoritative nameservers, before
-taking any action based on these records.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+these records by querying them from the child, and then use them to
+update the delegation's DS RRset accordingly.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-2">This document specifies that when performing such queries, parent-side
+entities MUST ensure that updates triggered via CDS/CDNSKEY and CSYNC
+records are consistent across the child's authoritative nameservers,
+before taking any action based on these records.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 </section>
 <div id="status-of-memo">
 <section id="section-boilerplate.1">
@@ -1295,7 +1295,7 @@ taking any action based on these records.<a href="#section-abstract-2" class="pi
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
-            <p id="section-toc.1-1.2.1"><a href="#section-2" class="xref">2</a>.  <a href="#name-polling-requirements" class="xref">Polling Requirements</a></p>
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="xref">2</a>.  <a href="#name-processing-requirements" class="xref">Processing Requirements</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
                 <p id="section-toc.1-1.2.2.1.1"><a href="#section-2.1" class="xref">2.1</a>.  <a href="#name-cds-and-cdnskey" class="xref">CDS and CDNSKEY</a></p>
@@ -1364,7 +1364,7 @@ to update the delegation's DS and NS records.<a href="#section-1-1" class="pilcr
 <p id="section-1-2">A common method for discovering these signals is to periodically query
 them from the child zone ("polling").
 For CSYNC, this is described in <span>[<a href="#RFC7477" class="xref">RFC7477</a>]</span> Section 3.1 which advocates
-limiting polling queries to just one authoritative nameserver.
+limiting queries to just one authoritative nameserver.
 The corresponding Section 6.1 of <span>[<a href="#RFC7344" class="xref">RFC7344</a>]</span> (CDS/CDNSKEY) contains no
 such provision for how specifically polling of these records should be
 done.<a href="#section-1-2" class="pilcrow">¶</a></p>
@@ -1393,11 +1393,10 @@ Similar breakage can occur when the delegation has lame nameservers.
 More detailed examples are given in <a href="#scenarios" class="xref">Appendix A</a>.<a href="#section-1-5" class="pilcrow">¶</a></p>
 <p id="section-1-6">A single provider should not be in the position to remove the other
 providers' records from the delegation.
-To address this issue, this document specifies that if polling is used,
-parent-side entities MUST ensure that the updates indicated by
-CDS/CDNSKEY and CSYNC record sets are consistent across all of the
-child's authoritative nameservers, before taking any action based on
-these records.<a href="#section-1-6" class="pilcrow">¶</a></p>
+To address this issue, this document specifies that parent-side entities
+MUST ensure that the updates indicated by CDS/CDNSKEY and CSYNC record
+sets are consistent across all of the child's authoritative nameservers,
+before taking any action based on these records.<a href="#section-1-6" class="pilcrow">¶</a></p>
 <p id="section-1-7">Readers are expected to be familiar with DNSSEC, including <span>[<a href="#RFC4033" class="xref">RFC4033</a>]</span>,
 <span>[<a href="#RFC4034" class="xref">RFC4034</a>]</span>, <span>[<a href="#RFC4035" class="xref">RFC4035</a>]</span>, <span>[<a href="#RFC6781" class="xref">RFC6781</a>]</span>, <span>[<a href="#RFC7344" class="xref">RFC7344</a>]</span>, <span>[<a href="#RFC7477" class="xref">RFC7477</a>]</span>, and
 <span>[<a href="#RFC8901" class="xref">RFC8901</a>]</span>.<a href="#section-1-7" class="pilcrow">¶</a></p>
@@ -1424,22 +1423,23 @@ capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
 </div>
 </section>
 </div>
-<div id="polling-requirements">
+<div id="processing-requirements">
 <section id="section-2">
-      <h2 id="name-polling-requirements">
-<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-polling-requirements" class="section-name selfRef">Polling Requirements</a>
+      <h2 id="name-processing-requirements">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-processing-requirements" class="section-name selfRef">Processing Requirements</a>
       </h2>
-<p id="section-2-1">This section defines consistency requirements for poll-based updates,
-updating <span>[<a href="#RFC7344" class="xref">RFC7344</a>]</span> Section 4.1 and <span>[<a href="#RFC7477" class="xref">RFC7477</a>]</span> Sections 3.1 and 4.2.
-Common ones are listed first, with type-specific criteria for polling
-consistency described in each subsection.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<p id="section-2-1">This section defines consistency requirements for CDS/CDNSKEY/CSYNC
+queries in the context of automatic delegation maintenance, updating
+<span>[<a href="#RFC7344" class="xref">RFC7344</a>]</span> Section 4.1 and <span>[<a href="#RFC7477" class="xref">RFC7477</a>]</span> Sections 3.1 and 4.2.
+Common ones are listed first, with type-specific consistency criteria
+described in each subsection.<a href="#section-2-1" class="pilcrow">¶</a></p>
 <p id="section-2-2">In all cases, consistency is REQUIRED across received responses only.
 Nameservers that appear to be unavailable SHOULD be disregarded as if
 they were not part of the NS record set.<a href="#section-2-2" class="pilcrow">¶</a></p>
-<p id="section-2-3">If an inconsistent polling state is encountered, the Parental Agent
-MUST take no action.
+<p id="section-2-3">If an inconsistent state is encountered, the Parental Agent MUST take no
+action.
 Specifically, it MUST NOT delete or alter any existing RRset that would
-have been deleted or altered, had the polling state been consistent.<a href="#section-2-3" class="pilcrow">¶</a></p>
+have been deleted or altered, had the state been consistent.<a href="#section-2-3" class="pilcrow">¶</a></p>
 <p id="section-2-4">To accommodate transient inconsistencies (e.g. replication delays), the
 Parental Agent MAY retry the full process, repeating all queries.
 A schedule with exponential back-off is RECOMMENDED (such as after 5,
@@ -1460,7 +1460,7 @@ fetched directly from each of the authoritative servers as determined by
 the delegation's NS record set, with DNSSEC validation enforced.
 When a key is referenced in a CDS or CDNSKEY record set returned by
 one nameserver, but is missing from a least one other nameserver's
-answer, the CDS/CDNSKEY polling state MUST be considered inconsistent.<a href="#section-2.1-2" class="pilcrow">¶</a></p>
+answer, the CDS/CDNSKEY state MUST be considered inconsistent.<a href="#section-2.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="csync">
@@ -1468,13 +1468,13 @@ answer, the CDS/CDNSKEY polling state MUST be considered inconsistent.<a href="#
         <h3 id="name-csync">
 <a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-csync" class="section-name selfRef">CSYNC</a>
         </h3>
-<p id="section-2.2-1">A CSYNC-based update consists of (1) polling the CSYNC record to
+<p id="section-2.2-1">A CSYNC-based update consists of (1) querying the CSYNC record to
 determine which data records shall be synchronized from child to parent;
 (2) querying for these data records (e.g. NS) and placing them in the
 parent zone.
-If the below conditions are not met during these steps, the CSYNC
-polling state MUST be considered inconsistent.<a href="#section-2.2-1" class="pilcrow">¶</a></p>
-<p id="section-2.2-2">When polling the CYSNC record set, the Parental Agent MUST ascertain
+If the below conditions are not met during these steps, the CSYNC state
+MUST be considered inconsistent.<a href="#section-2.2-1" class="pilcrow">¶</a></p>
+<p id="section-2.2-2">When querying the CYSNC record set, the Parental Agent MUST ascertain
 that queries are made against all of the nameservers listed in the
 Child's delegation from the Parent, and ensure that the CSYNC record
 sets are equal across all received responses.<a href="#section-2.2-2" class="pilcrow">¶</a></p>
@@ -1493,14 +1493,14 @@ record sets are all equal (including all empty).<a href="#section-2.2-3" class="
       </h2>
 <p id="section-3-1">The level of rigor mandated by this document is needed to prevent
 publication of half-baked DS or delegation NS RRsets (authorized only
-under an insufficient subset of authoritative nameservers), and ensures
+under an insufficient subset of authoritative nameservers), ensuring
 that an operator in a multi-homing setup cannot unilaterally modify the
 delegation (add or remove trust anchors or nameservers).
 This applies both to intentional and unintentional multi-homing setups
 (such as in the case of lame delegation hijacking).<a href="#section-3-1" class="pilcrow">¶</a></p>
 <p id="section-3-2">As a consequence, the delegation's records can only be modified when
 there is consensus across operators, which is expected to reflect the
-domain owners intentions.
+domain owner's intentions.
 Both availability and integrity of the domain's DNS service benefit from
 this policy.<a href="#section-3-2" class="pilcrow">¶</a></p>
 <p id="section-3-3">In order to resolve situations in which consensus about child zone
@@ -1516,7 +1516,7 @@ of automated delegation maintenance.<a href="#section-3-3" class="pilcrow">¶</a
       <h2 id="name-acknowledgments">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
-<p id="section-4-1">Viktor Dukhovni<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-1">Viktor Dukhovni, Wes Hardaker, Libor Peltan, Oli Schacher<a href="#section-4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <section id="section-5">
@@ -1683,18 +1683,18 @@ hostnames can be added to the zone's NS record set, so that queries
 start balancing across both providers.
 (To conclude the hand-over, the old provider is removed by inverting
 these steps with swapped roles.)<a href="#appendix-A.3-1" class="pilcrow">¶</a></p>
-<p id="appendix-A.3-2">The multi-signer phase of this process breaks when the new provider
-fails to include the old provider's keys in the DNSKEY and CDS/CDNSKEY
-record sets.
+<p id="appendix-A.3-2">The multi-signer phase of this process breaks when the new provider,
+perhaps unaware of the situation and its intricacies, fails to include
+the old provider's keys in the DNSKEY (and CDS/CDNSKEY) record sets.
 One obvious consequence of that is that whenever the resolver happens to
 retrieve the DNSKEY record set from the new provider, the old provider's
-RRSIGs do no longer validate, causing responses to SERVFAIL.<a href="#appendix-A.3-2" class="pilcrow">¶</a></p>
+RRSIGs do no longer validate, causing SERVFAIL to be returned.<a href="#appendix-A.3-2" class="pilcrow">¶</a></p>
 <p id="appendix-A.3-3">However, an even worse consequence can occur when the parent performs
 their next CDS/CDNSKEY scan:
 It may then happen that the incorrect CDS/CDNSKEY record set is fetched
 from the new provider and used to update the delegation's DS record set.
-As a result, the old provider is prematureley removed from the domain's
-DNSSEC chain of trust.
+As a result, the old provider (who still appears in the delegation) is
+prematurely removed from the domain's DNSSEC chain of trust.
 The new DS record set authenticates the new provider's DNSKEYs only, and
 DNSSEC validation fails for all answers served by the old provider.<a href="#appendix-A.3-3" class="pilcrow">¶</a></p>
 </section>
@@ -1711,7 +1711,8 @@ DNSSEC validation fails for all answers served by the old provider.<a href="#app
 </li>
       </ul>
 <blockquote id="appendix-B-2">
-        <p id="appendix-B-2.1">Moved Failure Scenarios to appendix<a href="#appendix-B-2.1" class="pilcrow">¶</a></p>
+        <p id="appendix-B-2.1">Editorial changes<a href="#appendix-B-2.1" class="pilcrow">¶</a></p>
+<p id="appendix-B-2.2">Moved Failure Scenarios to appendix<a href="#appendix-B-2.2" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="normal">
 <li class="normal" id="appendix-B-3.1">draft-ietf-dnsop-cds-consistency-00<a href="#appendix-B-3.1" class="pilcrow">¶</a>
