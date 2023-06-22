@@ -37,7 +37,7 @@ NS record sets on the parent side of the delegation.
 RFC 7344 automates this for DS records by having the child publish
 CDS and/or CDNSKEY records which hold the prospective DS parameters.
 Similarly, RFC 7477 specifies CSYNC records to indicate a desired update
-of the delegation's NS records.
+of the delegation's NS (and glue) records.
 Parent-side entities (e.g. Registries, Registrars) typically discover
 these records by querying them from the child, and then use them to
 update the delegation's DS RRset accordingly.
@@ -55,9 +55,9 @@ before taking any action based on these records.
 child publish CDS and/or CDNSKEY records which hold the prospective DS
 parameters.
 Similarly, [@!RFC7477] specifies CSYNC records indicating a desired
-update of the delegation's NS records.
+update of the delegation's NS and associated glue records.
 Parent-side entities (e.g. Registries, Registrars) can use these records
-to update the delegation's DS and NS records.
+to update the corresponding records of the delegation.
 
 A common method for discovering these signals is to periodically query
 them from the child zone ("polling").
@@ -178,13 +178,14 @@ MUST be considered inconsistent.
 
 When querying the CYSNC record set, the Parental Agent MUST ascertain
 that queries are made against all of the nameservers listed in the
-Child's delegation from the Parent, and ensure that the CSYNC record
-sets are equal across all received responses.
+Child's delegation from the Parent, and ensure that the CSYNC rdata sets
+are equal across all received responses.
 
-When retrieving data record sets (e.g. NS), the Parental Agent MUST
-ascertain that all queries are made against all of the nameservers
-listed in the Child's delegation from the Parent, and ensure that the
-record sets are all equal (including all empty).
+Further, when retrieving the data record sets as indicated in the CSYNC
+record (such as NS or A/AAAA records), the Parental Agent MUST ascertain
+that all queries are made against all nameservers from which CSYNC
+responses were received, and ensure that all return responses with equal
+rdata sets (including all empty).
 
 
 # IANA Considerations
@@ -211,9 +212,9 @@ this policy.
 In order to resolve situations in which consensus about child zone
 contents cannot be reached (e.g. because one of the nameserver
 providers is uncooperative), Parental Agents SHOULD continue to accept
-DS and NS update requests from the domain owner via an authenticated
-out-of-band channel (such as EPP [@!RFC5730]), irrespective of the rise
-of automated delegation maintenance.
+DS and NS/glue update requests from the domain owner via an
+authenticated out-of-band channel (such as EPP [@!RFC5730]),
+irrespective of the rise of automated delegation maintenance.
 Availability of such an interface also enables recovery from a situation
 where the private key is no longer available for signing the CDS/CDNSKEY
 or CSYNC records in the child zone.

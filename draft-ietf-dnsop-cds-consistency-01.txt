@@ -19,10 +19,10 @@ Abstract
    automates this for DS records by having the child publish CDS and/or
    CDNSKEY records which hold the prospective DS parameters.  Similarly,
    RFC 7477 specifies CSYNC records to indicate a desired update of the
-   delegation's NS records.  Parent-side entities (e.g.  Registries,
-   Registrars) typically discover these records by querying them from
-   the child, and then use them to update the delegation's DS RRset
-   accordingly.
+   delegation's NS (and glue) records.  Parent-side entities (e.g.
+   Registries, Registrars) typically discover these records by querying
+   them from the child, and then use them to update the delegation's DS
+   RRset accordingly.
 
    This document specifies that when performing such queries, parent-
    side entities MUST ensure that updates triggered via CDS/CDNSKEY and
@@ -95,9 +95,10 @@ Table of Contents
    [RFC7344] automates DNSSEC delegation trust maintenance by having the
    child publish CDS and/or CDNSKEY records which hold the prospective
    DS parameters.  Similarly, [RFC7477] specifies CSYNC records
-   indicating a desired update of the delegation's NS records.  Parent-
-   side entities (e.g.  Registries, Registrars) can use these records to
-   update the delegation's DS and NS records.
+   indicating a desired update of the delegation's NS and associated
+   glue records.  Parent-side entities (e.g.  Registries, Registrars)
+   can use these records to update the corresponding records of the
+   delegation.
 
    A common method for discovering these signals is to periodically
    query them from the child zone ("polling").  For CSYNC, this is
@@ -105,7 +106,6 @@ Table of Contents
    to just one authoritative nameserver.  The corresponding Section 6.1
    of [RFC7344] (CDS/CDNSKEY) contains no such provision for how
    specifically polling of these records should be done.
-
 
 
 
@@ -236,13 +236,14 @@ Internet-Draft               cds-consistency                   June 2023
 
    When querying the CYSNC record set, the Parental Agent MUST ascertain
    that queries are made against all of the nameservers listed in the
-   Child's delegation from the Parent, and ensure that the CSYNC record
+   Child's delegation from the Parent, and ensure that the CSYNC rdata
    sets are equal across all received responses.
 
-   When retrieving data record sets (e.g.  NS), the Parental Agent MUST
-   ascertain that all queries are made against all of the nameservers
-   listed in the Child's delegation from the Parent, and ensure that the
-   record sets are all equal (including all empty).
+   Further, when retrieving the data record sets as indicated in the
+   CSYNC record (such as NS or A/AAAA records), the Parental Agent MUST
+   ascertain that all queries are made against all nameservers from
+   which CSYNC responses were received, and ensure that all return
+   responses with equal rdata sets (including all empty).
 
 3.  IANA Considerations
 
@@ -266,13 +267,12 @@ Internet-Draft               cds-consistency                   June 2023
    In order to resolve situations in which consensus about child zone
    contents cannot be reached (e.g. because one of the nameserver
    providers is uncooperative), Parental Agents SHOULD continue to
-   accept DS and NS update requests from the domain owner via an
+   accept DS and NS/glue update requests from the domain owner via an
    authenticated out-of-band channel (such as EPP [RFC5730]),
    irrespective of the rise of automated delegation maintenance.
    Availability of such an interface also enables recovery from a
    situation where the private key is no longer available for signing
    the CDS/CDNSKEY or CSYNC records in the child zone.
-
 
 
 
