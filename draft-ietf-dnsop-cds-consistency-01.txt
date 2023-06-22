@@ -15,11 +15,11 @@ Expires: 24 December 2023
 Abstract
 
    Maintenance of DNS delegations requires occasional changes of the DS
-   and NS record sets on the parent side of the delegation.  [RFC7344]
+   and NS record sets on the parent side of the delegation.  RFC 7344
    automates this for DS records by having the child publish CDS and/or
    CDNSKEY records which hold the prospective DS parameters.  Similarly,
-   CSYNC records indicate a desired update of the delegation's NS
-   records [RFC7477].  Parent-side entities (e.g.  Registries,
+   RFC 7477 specifies CSYNC records to indicate a desired update of the
+   delegation's NS records.  Parent-side entities (e.g.  Registries,
    Registrars) typically discover these records by querying them from
    the child, and then use them to update the delegation's DS RRset
    accordingly.
@@ -75,19 +75,20 @@ Table of Contents
    2.  Processing Requirements . . . . . . . . . . . . . . . . . . .   4
      2.1.  CDS and CDNSKEY . . . . . . . . . . . . . . . . . . . . .   4
      2.2.  CSYNC . . . . . . . . . . . . . . . . . . . . . . . . . .   5
-   3.  Security Considerations . . . . . . . . . . . . . . . . . . .   5
-   4.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   5
-   5.  Normative References  . . . . . . . . . . . . . . . . . . . .   5
-   6.  Informative References  . . . . . . . . . . . . . . . . . . .   6
+   3.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   5
+   4.  Security Considerations . . . . . . . . . . . . . . . . . . .   5
+   5.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   6
+   6.  Normative References  . . . . . . . . . . . . . . . . . . . .   6
+   7.  Informative References  . . . . . . . . . . . . . . . . . . .   6
    Appendix A.  Failure Scenarios  . . . . . . . . . . . . . . . . .   7
      A.1.  DS Breakage due to Replication Lag  . . . . . . . . . . .   7
-     A.2.  Lame Delegations  . . . . . . . . . . . . . . . . . . . .   7
+     A.2.  Lame Delegations  . . . . . . . . . . . . . . . . . . . .   8
      A.3.  Multi-Homing (Permanent Multi-Signer) . . . . . . . . . .   8
        A.3.1.  DS Breakage . . . . . . . . . . . . . . . . . . . . .   8
-       A.3.2.  NS Breakage . . . . . . . . . . . . . . . . . . . . .   8
+       A.3.2.  NS Breakage . . . . . . . . . . . . . . . . . . . . .   9
      A.4.  Provider Change (Temporary Multi-Signer)  . . . . . . . .   9
    Appendix B.  Change History (to be removed before publication)  .   9
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  10
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  11
 
 1.  Introduction
 
@@ -104,7 +105,6 @@ Table of Contents
    to just one authoritative nameserver.  The corresponding Section 6.1
    of [RFC7344] (CDS/CDNSKEY) contains no such provision for how
    specifically polling of these records should be done.
-
 
 
 
@@ -244,7 +244,11 @@ Internet-Draft               cds-consistency                   June 2023
    listed in the Child's delegation from the Parent, and ensure that the
    record sets are all equal (including all empty).
 
-3.  Security Considerations
+3.  IANA Considerations
+
+   This document has no IANA actions.
+
+4.  Security Considerations
 
    The level of rigor mandated by this document is needed to prevent
    publication of half-baked DS or delegation NS RRsets (authorized only
@@ -269,11 +273,7 @@ Internet-Draft               cds-consistency                   June 2023
    situation where the private key is no longer available for signing
    the CDS/CDNSKEY or CSYNC records in the child zone.
 
-4.  Acknowledgments
 
-   Viktor Dukhovni, Wes Hardaker, Libor Peltan, Oli Schacher
-
-5.  Normative References
 
 
 
@@ -281,6 +281,12 @@ Thomassen               Expires 24 December 2023                [Page 5]
 
 Internet-Draft               cds-consistency                   June 2023
 
+
+5.  Acknowledgments
+
+   Viktor Dukhovni, Wes Hardaker, Libor Peltan, Oli Schacher
+
+6.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -319,7 +325,18 @@ Internet-Draft               cds-consistency                   June 2023
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
 
-6.  Informative References
+7.  Informative References
+
+
+
+
+
+
+
+Thomassen               Expires 24 December 2023                [Page 6]
+
+Internet-Draft               cds-consistency                   June 2023
+
 
    [LAME1]    Akiwate, G., Jonker, M., Sommese, R., Foster, I., Voelker,
               G. M., Savage, S., Claffy, K., and ACM, "Unresolved
@@ -330,13 +347,6 @@ Internet-Draft               cds-consistency                   June 2023
               and ACM, "Risky BIZness", DOI 10.1145/3487552.3487816, 2
               November 2021,
               <http://dx.doi.org/10.1145/3487552.3487816>.
-
-
-
-Thomassen               Expires 24 December 2023                [Page 6]
-
-Internet-Draft               cds-consistency                   June 2023
-
 
    [RFC6781]  Kolkman, O., Mekking, W., and R. Gieben, "DNSSEC
               Operational Practices, Version 2", RFC 6781,
@@ -376,6 +386,14 @@ A.1.  DS Breakage due to Replication Lag
    reports consistency errors downstream, it can also help detect the
    replication issue on the child side.
 
+
+
+
+Thomassen               Expires 24 December 2023                [Page 7]
+
+Internet-Draft               cds-consistency                   June 2023
+
+
 A.2.  Lame Delegations
 
    A delegation may include a non-existent NS hostname, for example due
@@ -384,15 +402,6 @@ A.2.  Lame Delegations
    third party to run authoritative DNS service for all domains
    delegated to that NS hostname, serving responses different from those
    in the legitimate zonefile.
-
-
-
-
-
-Thomassen               Expires 24 December 2023                [Page 7]
-
-Internet-Draft               cds-consistency                   June 2023
-
 
    This strategy for hijacking (at least part of the) DNS traffic and
    spoofing responses is not new, but surprisingly common
@@ -432,15 +441,6 @@ A.3.1.  DS Breakage
    removed from the delegation.  As a result, the zone is broken at
    least for some queries.
 
-A.3.2.  NS Breakage
-
-   A similar scenario affects the CSYNC record, which is used to update
-   the delegation's NS record set at the parent.  The issue occurs, for
-   example, when a provider accidentally includes only their own set of
-   hostnames in the local NS record set, or publishes an otherwise
-   flawed NS record set.
-
-
 
 
 
@@ -449,6 +449,14 @@ Thomassen               Expires 24 December 2023                [Page 8]
 
 Internet-Draft               cds-consistency                   June 2023
 
+
+A.3.2.  NS Breakage
+
+   A similar scenario affects the CSYNC record, which is used to update
+   the delegation's NS record set at the parent.  The issue occurs, for
+   example, when a provider accidentally includes only their own set of
+   hostnames in the local NS record set, or publishes an otherwise
+   flawed NS record set.
 
    If the parent then observes a CSYNC signal and fetches the flawed NS
    record set without ensuring consistency across nameservers, the
@@ -490,6 +498,16 @@ Appendix B.  Change History (to be removed before publication)
 
    *  draft-ietf-dnsop-cds-consistency-01
 
+
+
+
+Thomassen               Expires 24 December 2023                [Page 9]
+
+Internet-Draft               cds-consistency                   June 2023
+
+
+   |  Make nits tool happy
+   |  
    |  New failure mode: DS Breakage due to Replication Lag
    |  
    |  Point out zero overhead if nothing changed, and need for OOB
@@ -498,13 +516,6 @@ Appendix B.  Change History (to be removed before publication)
    |  Editorial changes
    |  
    |  Moved Failure Scenarios to appendix
-
-
-
-Thomassen               Expires 24 December 2023                [Page 9]
-
-Internet-Draft               cds-consistency                   June 2023
-
 
    *  draft-ietf-dnsop-cds-consistency-00
 
@@ -543,6 +554,14 @@ Internet-Draft               cds-consistency                   June 2023
 
    |  Initial public draft.
 
+
+
+
+Thomassen               Expires 24 December 2023               [Page 10]
+
+Internet-Draft               cds-consistency                   June 2023
+
+
 Author's Address
 
    Peter Thomassen
@@ -557,4 +576,41 @@ Author's Address
 
 
 
-Thomassen               Expires 24 December 2023               [Page 10]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Thomassen               Expires 24 December 2023               [Page 11]

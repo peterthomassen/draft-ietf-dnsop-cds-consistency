@@ -34,10 +34,10 @@ organization = "SSE - Secure Systems Engineering GmbH"
 
 Maintenance of DNS delegations requires occasional changes of the DS and
 NS record sets on the parent side of the delegation.
-[@!RFC7344] automates this for DS records by having the child publish
+RFC 7344 automates this for DS records by having the child publish
 CDS and/or CDNSKEY records which hold the prospective DS parameters.
-Similarly, CSYNC records indicate a desired update of the delegation's
-NS records [@!RFC7477].
+Similarly, RFC 7477 specifies CSYNC records to indicate a desired update
+of the delegation's NS records.
 Parent-side entities (e.g. Registries, Registrars) typically discover
 these records by querying them from the child, and then use them to
 update the delegation's DS RRset accordingly.
@@ -185,6 +185,11 @@ When retrieving data record sets (e.g. NS), the Parental Agent MUST
 ascertain that all queries are made against all of the nameservers
 listed in the Child's delegation from the Parent, and ensure that the
 record sets are all equal (including all empty).
+
+
+# IANA Considerations
+
+This document has no IANA actions.
 
 
 # Security Considerations
@@ -405,6 +410,8 @@ DNSSEC validation fails for all answers served by the old provider.
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-01
+
+> Make nits tool happy
 
 > New failure mode: DS Breakage due to Replication Lag
 
