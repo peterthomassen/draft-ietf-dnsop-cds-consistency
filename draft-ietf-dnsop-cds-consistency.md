@@ -420,6 +420,8 @@ DNSSEC validation fails for all answers served by the old provider.
 
 # Change History (to be removed before publication)
 
+* draft-ietf-dnsop-cds-consistency-02
+
 * draft-ietf-dnsop-cds-consistency-01
 
 > Make nits tool happy
