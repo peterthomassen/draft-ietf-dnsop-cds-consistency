@@ -128,8 +128,14 @@ Common ones are listed first, with type-specific consistency criteria
 described in each subsection.
 
 In all cases, consistency is REQUIRED across received responses only.
-Nameservers that appear to be unavailable SHOULD be disregarded as if
-they were not part of the NS record set.
+When a response cannot be obtained from a given nameserver, the Parental
+Agent SHOULD attempt obtaining it at a later time, before concluding
+that the nameserver is permanently unreachable and removing it from
+consideration.
+A retry schedule with exponential back-off is RECOMMENDED (such as after
+5, 10, 20, 40, ... minutes).
+To sidestep localized routing issues, the Parental Agent MAY also
+attempt contacting the nameserver from another vantage point.
 
 If an inconsistent state is encountered, the Parental Agent MUST take no
 action.
@@ -138,8 +144,7 @@ have been deleted or altered, had the state been consistent.
 
 To accommodate transient inconsistencies (e.g. replication delays), the
 Parental Agent MAY retry the full process, repeating all queries.
-A schedule with exponential back-off is RECOMMENDED (such as after 5,
-10, 20, 40, ... minutes).
+A schedule with exponential back-off is RECOMMENDED.
 
 Any pending queries can immediately be dequeued when encountering a
 response that confirms the status quo (i.e. indicates no update).
@@ -208,8 +213,9 @@ This document has no IANA actions.
 The level of rigor mandated by this document is needed to prevent
 publication of half-baked DS or delegation NS RRsets (authorized only
 under an insufficient subset of authoritative nameservers), ensuring
-that an operator in a multi-homing setup cannot unilaterally modify the
-delegation (add or remove trust anchors or nameservers).
+that an operator in a (functioning) multi-homing setup cannot
+unilaterally modify the delegation (add or remove trust anchors or
+nameservers).
 This applies both to intentional and unintentional multi-homing setups
 (such as in the case of lame delegation hijacking).
 
@@ -421,6 +427,8 @@ DNSSEC validation fails for all answers served by the old provider.
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-02
+
+> Retry before assuming a nameserver is permanently unreachable
 
 * draft-ietf-dnsop-cds-consistency-01
 

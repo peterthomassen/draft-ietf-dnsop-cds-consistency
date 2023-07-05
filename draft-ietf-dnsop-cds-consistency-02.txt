@@ -4,9 +4,9 @@
 
 DNSOP Working Group                                         P. Thomassen
 Internet-Draft                     SSE - Secure Systems Engineering GmbH
-Updates: 7344, 7477 (if approved)                            4 July 2023
+Updates: 7344, 7477 (if approved)                           10 July 2023
 Intended status: Standards Track                                        
-Expires: 5 January 2024
+Expires: 11 January 2024
 
 
            Consistency for CDS/CDNSKEY and CSYNC is Mandatory
@@ -44,7 +44,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 January 2024.
+   This Internet-Draft will expire on 11 January 2024.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Thomassen                Expires 5 January 2024                 [Page 1]
+Thomassen                Expires 11 January 2024                [Page 1]
 
 Internet-Draft               cds-consistency                   July 2023
 
@@ -81,10 +81,10 @@ Table of Contents
    6.  Normative References  . . . . . . . . . . . . . . . . . . . .   6
    7.  Informative References  . . . . . . . . . . . . . . . . . . .   7
    Appendix A.  Failure Scenarios  . . . . . . . . . . . . . . . . .   7
-     A.1.  DS Breakage due to Replication Lag  . . . . . . . . . . .   7
+     A.1.  DS Breakage due to Replication Lag  . . . . . . . . . . .   8
      A.2.  Lame Delegations  . . . . . . . . . . . . . . . . . . . .   8
-     A.3.  Multi-Homing (Permanent Multi-Signer) . . . . . . . . . .   8
-       A.3.1.  DS Breakage . . . . . . . . . . . . . . . . . . . . .   8
+     A.3.  Multi-Homing (Permanent Multi-Signer) . . . . . . . . . .   9
+       A.3.1.  DS Breakage . . . . . . . . . . . . . . . . . . . . .   9
        A.3.2.  NS Breakage . . . . . . . . . . . . . . . . . . . . .   9
      A.4.  Provider Change (Temporary Multi-Signer)  . . . . . . . .   9
    Appendix B.  Change History (to be removed before publication)  .  10
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Thomassen                Expires 5 January 2024                 [Page 2]
+Thomassen                Expires 11 January 2024                [Page 2]
 
 Internet-Draft               cds-consistency                   July 2023
 
@@ -165,7 +165,7 @@ Internet-Draft               cds-consistency                   July 2023
 
 
 
-Thomassen                Expires 5 January 2024                 [Page 3]
+Thomassen                Expires 11 January 2024                [Page 3]
 
 Internet-Draft               cds-consistency                   July 2023
 
@@ -179,8 +179,13 @@ Internet-Draft               cds-consistency                   July 2023
    described in each subsection.
 
    In all cases, consistency is REQUIRED across received responses only.
-   Nameservers that appear to be unavailable SHOULD be disregarded as if
-   they were not part of the NS record set.
+   When a response cannot be obtained from a given nameserver, the
+   Parental Agent SHOULD attempt obtaining it at a later time, before
+   concluding that the nameserver is permanently unreachable and
+   removing it from consideration.  A retry schedule with exponential
+   back-off is RECOMMENDED (such as after 5, 10, 20, 40, ... minutes).
+   To sidestep localized routing issues, the Parental Agent MAY also
+   attempt contacting the nameserver from another vantage point.
 
    If an inconsistent state is encountered, the Parental Agent MUST take
    no action.  Specifically, it MUST NOT delete or alter any existing
@@ -189,8 +194,7 @@ Internet-Draft               cds-consistency                   July 2023
 
    To accommodate transient inconsistencies (e.g. replication delays),
    the Parental Agent MAY retry the full process, repeating all queries.
-   A schedule with exponential back-off is RECOMMENDED (such as after 5,
-   10, 20, 40, ... minutes).
+   A schedule with exponential back-off is RECOMMENDED.
 
    Any pending queries can immediately be dequeued when encountering a
    response that confirms the status quo (i.e. indicates no update).
@@ -212,19 +216,22 @@ Internet-Draft               cds-consistency                   July 2023
    ensure that each key referenced in any of the received answers is
    also referenced in all other received responses.
 
+
+
+
+
+
+Thomassen                Expires 11 January 2024                [Page 4]
+
+Internet-Draft               cds-consistency                   July 2023
+
+
    In other words, CDS/CDNSKEY records at the Child zone apex MUST be
    fetched directly from each of the authoritative servers as determined
    by the delegation's NS record set.  When a key is referenced in a CDS
    or CDNSKEY record set returned by one nameserver, but is missing from
    a least one other nameserver's answer, the CDS/CDNSKEY state MUST be
    considered inconsistent.
-
-
-
-Thomassen                Expires 5 January 2024                 [Page 4]
-
-Internet-Draft               cds-consistency                   July 2023
-
 
    When CDS/CDNSKEY queries are performed for deploying the initial DS
    record set (DNSSEC bootstrapping), responses cannot be directly
@@ -259,10 +266,21 @@ Internet-Draft               cds-consistency                   July 2023
    The level of rigor mandated by this document is needed to prevent
    publication of half-baked DS or delegation NS RRsets (authorized only
    under an insufficient subset of authoritative nameservers), ensuring
-   that an operator in a multi-homing setup cannot unilaterally modify
-   the delegation (add or remove trust anchors or nameservers).  This
-   applies both to intentional and unintentional multi-homing setups
-   (such as in the case of lame delegation hijacking).
+   that an operator in a (functioning) multi-homing setup cannot
+   unilaterally modify the delegation (add or remove trust anchors or
+   nameservers).  This applies both to intentional and unintentional
+   multi-homing setups (such as in the case of lame delegation
+   hijacking).
+
+
+
+
+
+
+Thomassen                Expires 11 January 2024                [Page 5]
+
+Internet-Draft               cds-consistency                   July 2023
+
 
    As a consequence, the delegation's records can only be modified when
    there is consensus across operators, which is expected to reflect the
@@ -274,14 +292,6 @@ Internet-Draft               cds-consistency                   July 2023
    providers is uncooperative), Parental Agents SHOULD continue to
    accept DS and NS/glue update requests from the domain owner via an
    authenticated out-of-band channel (such as EPP [RFC5730]),
-
-
-
-Thomassen                Expires 5 January 2024                 [Page 5]
-
-Internet-Draft               cds-consistency                   July 2023
-
-
    irrespective of the rise of automated delegation maintenance.
    Availability of such an interface also enables recovery from a
    situation where the private key is no longer available for signing
@@ -317,6 +327,17 @@ Internet-Draft               cds-consistency                   July 2023
               STD 69, RFC 5730, DOI 10.17487/RFC5730, August 2009,
               <https://www.rfc-editor.org/info/rfc5730>.
 
+
+
+
+
+
+
+Thomassen                Expires 11 January 2024                [Page 6]
+
+Internet-Draft               cds-consistency                   July 2023
+
+
    [RFC7344]  Kumari, W., Gudmundsson, O., and G. Barwood, "Automating
               DNSSEC Delegation Trust Maintenance", RFC 7344,
               DOI 10.17487/RFC7344, September 2014,
@@ -330,13 +351,6 @@ Internet-Draft               cds-consistency                   July 2023
               the Parent via CDS/CDNSKEY", RFC 8078,
               DOI 10.17487/RFC8078, March 2017,
               <https://www.rfc-editor.org/info/rfc8078>.
-
-
-
-Thomassen                Expires 5 January 2024                 [Page 6]
-
-Internet-Draft               cds-consistency                   July 2023
-
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
@@ -371,6 +385,15 @@ Appendix A.  Failure Scenarios
    processing.  Other scenarios that cause similar (or perhaps even
    more) harm may exist.
 
+
+
+
+
+Thomassen                Expires 11 January 2024                [Page 7]
+
+Internet-Draft               cds-consistency                   July 2023
+
+
    The common feature of these scenarios is that if one nameserver steps
    out of line and the parent is not careful, DNS resolution and/or
    validation will break down.  When several DNS providers are involved,
@@ -386,14 +409,6 @@ A.1.  DS Breakage due to Replication Lag
    detected that the DS deployment was successful, may then confidently
    remove the old DNSKEY from the zonefile, only to find out later that
    the DS RRset has been turned back, breaking the delegation's DNSSEC
-
-
-
-Thomassen                Expires 5 January 2024                 [Page 7]
-
-Internet-Draft               cds-consistency                   July 2023
-
-
    chain of trust.
 
    Checking for consistency minimizes this risk.  In case the parent
@@ -428,6 +443,13 @@ A.2.  Lame Delegations
    remaining legitimate nameservers are not signed with these keys,
    validating resolvers will start rejecting them.
 
+
+
+Thomassen                Expires 11 January 2024                [Page 8]
+
+Internet-Draft               cds-consistency                   July 2023
+
+
    Once DNSSEC is established, the attacker can use CSYNC to remove
    other nameservers from the delegation at will (and potentially add
    new ones under their control).  This enables the attacker to position
@@ -441,14 +463,6 @@ A.3.1.  DS Breakage
    While performing a key rollover and adjusting the corresponding CDS/
    CDNSKEY records, a provider could accidentally publish CDS/CDNSKEY
    records that only include its own keys.
-
-
-
-
-Thomassen                Expires 5 January 2024                 [Page 8]
-
-Internet-Draft               cds-consistency                   July 2023
-
 
    When the parent happens to retrieve the records from a nameserver
    controlled by this provider, the other providers' DS records would be
@@ -482,6 +496,16 @@ A.4.  Provider Change (Temporary Multi-Signer)
    providers.  (To conclude the hand-over, the old provider is removed
    by inverting these steps with swapped roles.)
 
+
+
+
+
+
+Thomassen                Expires 11 January 2024                [Page 9]
+
+Internet-Draft               cds-consistency                   July 2023
+
+
    The multi-signer phase of this process breaks when the new provider,
    perhaps unaware of the situation and its intricacies, fails to
    include the old provider's keys in the DNSKEY (and CDS/CDNSKEY)
@@ -499,16 +523,11 @@ A.4.  Provider Change (Temporary Multi-Signer)
    the new provider's DNSKEYs only, and DNSSEC validation fails for all
    answers served by the old provider.
 
-
-
-Thomassen                Expires 5 January 2024                 [Page 9]
-
-Internet-Draft               cds-consistency                   July 2023
-
-
 Appendix B.  Change History (to be removed before publication)
 
    *  draft-ietf-dnsop-cds-consistency-02
+
+   |  Retry before assuming a nameserver is permanently unreachable
 
    *  draft-ietf-dnsop-cds-consistency-01
 
@@ -535,6 +554,14 @@ Appendix B.  Change History (to be removed before publication)
    |  Describe risk from lame delegations
    |  
    |  Acknowledgments
+
+
+
+Thomassen                Expires 11 January 2024               [Page 10]
+
+Internet-Draft               cds-consistency                   July 2023
+
+
    |  
    |  Say what is being updated
    |  
@@ -554,14 +581,6 @@ Appendix B.  Change History (to be removed before publication)
    |  
    |  Define similar requirements for CSYNC.
    |  
-
-
-
-Thomassen                Expires 5 January 2024                [Page 10]
-
-Internet-Draft               cds-consistency                   July 2023
-
-
    |  Editorial changes.
 
    *  draft-thomassen-dnsop-cds-consistency-00
@@ -594,23 +613,4 @@ Author's Address
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Thomassen                Expires 5 January 2024                [Page 11]
+Thomassen                Expires 11 January 2024               [Page 11]
