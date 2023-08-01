@@ -1495,21 +1495,29 @@ its successors) continue to apply.<a href="#section-2.1-3" class="pilcrow">¶</a
         <h3 id="name-csync">
 <a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-csync" class="section-name selfRef">CSYNC</a>
         </h3>
-<p id="section-2.2-1">A CSYNC-based update consists of (1) querying the CSYNC record to
-determine which data records shall be synchronized from child to parent;
-(2) querying for these data records (e.g. NS) and placing them in the
-parent zone.
+<p id="section-2.2-1">A CSYNC-based update consists of (1) querying the CSYNC (and possibly
+SOA) record to determine which data records shall be synchronized from
+child to parent; (2) querying for these data records (e.g. NS) and
+placing them in the parent zone.
 If the below conditions are not met during these steps, the CSYNC state
 MUST be considered inconsistent.<a href="#section-2.2-1" class="pilcrow">¶</a></p>
-<p id="section-2.2-2">When querying the CYSNC record set, the Parental Agent MUST ascertain
-that queries are made against all of the nameservers listed in the
-Child's delegation from the Parent, and ensure that the CSYNC rdata sets
-are equal across all received responses.<a href="#section-2.2-2" class="pilcrow">¶</a></p>
-<p id="section-2.2-3">Further, when retrieving the data record sets as indicated in the CSYNC
+<p id="section-2.2-2">When querying the CYSNC record, the Parental Agent MUST ascertain that
+queries are made against all of the nameservers listed in the Child's
+delegation from the Parent, and ensure that the record's immediate flag
+and type bitmap are equal across received responses.<a href="#section-2.2-2" class="pilcrow">¶</a></p>
+<p id="section-2.2-3">The CSYNC record's SOA serial field and soaminimum flag might
+legitimately differ across nameservers (such as in multi-provider
+setups); equality is thus not required across responses.
+Instead, for a given response, processing of these values thus MUST
+occur with respect to the SOA record as obtained from the same
+nameserver (preferably in the same connection).
+The resulting per-response assessments of whether the CSYNC update is
+permissible MUST match across received responses.<a href="#section-2.2-3" class="pilcrow">¶</a></p>
+<p id="section-2.2-4">Further, when retrieving the data record sets as indicated in the CSYNC
 record (such as NS or A/AAAA records), the Parental Agent MUST ascertain
 that all queries are made against all nameservers from which CSYNC
-responses were received, and ensure that all return responses with equal
-rdata sets (including all empty).<a href="#section-2.2-3" class="pilcrow">¶</a></p>
+responses were received (preferably in the same connection), and ensure
+that all return responses with equal rdata sets (including all empty).<a href="#section-2.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1773,7 +1781,8 @@ DNSSEC validation fails for all answers served by the old provider.<a href="#app
 </li>
       </ul>
 <blockquote id="appendix-B-2">
-        <p id="appendix-B-2.1">Editorial changes<a href="#appendix-B-2.1" class="pilcrow">¶</a></p>
+        <p id="appendix-B-2.1">Describe consistency requirements for CSYNC soaminimum<a href="#appendix-B-2.1" class="pilcrow">¶</a></p>
+<p id="appendix-B-2.2">Editorial changes<a href="#appendix-B-2.2" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="normal">
 <li class="normal" id="appendix-B-3.1">draft-ietf-dnsop-cds-consistency-02<a href="#appendix-B-3.1" class="pilcrow">¶</a>

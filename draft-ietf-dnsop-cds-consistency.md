@@ -185,23 +185,32 @@ its successors) continue to apply.
 
 ## CSYNC
 
-A CSYNC-based update consists of (1) querying the CSYNC record to
-determine which data records shall be synchronized from child to parent;
-(2) querying for these data records (e.g. NS) and placing them in the
-parent zone.
+A CSYNC-based update consists of (1) querying the CSYNC (and possibly
+SOA) record to determine which data records shall be synchronized from
+child to parent; (2) querying for these data records (e.g. NS) and
+placing them in the parent zone.
 If the below conditions are not met during these steps, the CSYNC state
 MUST be considered inconsistent.
 
-When querying the CYSNC record set, the Parental Agent MUST ascertain
-that queries are made against all of the nameservers listed in the
-Child's delegation from the Parent, and ensure that the CSYNC rdata sets
-are equal across all received responses.
+When querying the CYSNC record, the Parental Agent MUST ascertain that
+queries are made against all of the nameservers listed in the Child's
+delegation from the Parent, and ensure that the record's immediate flag
+and type bitmap are equal across received responses.
+
+The CSYNC record's SOA serial field and soaminimum flag might
+legitimately differ across nameservers (such as in multi-provider
+setups); equality is thus not required across responses.
+Instead, for a given response, processing of these values thus MUST
+occur with respect to the SOA record as obtained from the same
+nameserver (preferably in the same connection).
+The resulting per-response assessments of whether the CSYNC update is
+permissible MUST match across received responses.
 
 Further, when retrieving the data record sets as indicated in the CSYNC
 record (such as NS or A/AAAA records), the Parental Agent MUST ascertain
 that all queries are made against all nameservers from which CSYNC
-responses were received, and ensure that all return responses with equal
-rdata sets (including all empty).
+responses were received (preferably in the same connection), and ensure
+that all return responses with equal rdata sets (including all empty).
 
 
 # IANA Considerations
@@ -428,6 +437,8 @@ DNSSEC validation fails for all answers served by the old provider.
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-03
+
+> Describe consistency requirements for CSYNC soaminimum
 
 > Editorial changes
 

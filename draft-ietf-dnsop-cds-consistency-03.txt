@@ -76,11 +76,11 @@ Table of Contents
      2.1.  CDS and CDNSKEY . . . . . . . . . . . . . . . . . . . . .   4
      2.2.  CSYNC . . . . . . . . . . . . . . . . . . . . . . . . . .   5
    3.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   5
-   4.  Security Considerations . . . . . . . . . . . . . . . . . . .   5
+   4.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
    5.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   6
    6.  Normative References  . . . . . . . . . . . . . . . . . . . .   6
    7.  Informative References  . . . . . . . . . . . . . . . . . . .   7
-   Appendix A.  Failure Scenarios  . . . . . . . . . . . . . . . . .   7
+   Appendix A.  Failure Scenarios  . . . . . . . . . . . . . . . . .   8
      A.1.  DS Breakage due to Replication Lag  . . . . . . . . . . .   8
      A.2.  Lame Delegations  . . . . . . . . . . . . . . . . . . . .   8
      A.3.  Multi-Homing (Permanent Multi-Signer) . . . . . . . . . .   9
@@ -240,26 +240,47 @@ Internet-Draft               cds-consistency                 August 2023
 
 2.2.  CSYNC
 
-   A CSYNC-based update consists of (1) querying the CSYNC record to
-   determine which data records shall be synchronized from child to
-   parent; (2) querying for these data records (e.g.  NS) and placing
-   them in the parent zone.  If the below conditions are not met during
-   these steps, the CSYNC state MUST be considered inconsistent.
+   A CSYNC-based update consists of (1) querying the CSYNC (and possibly
+   SOA) record to determine which data records shall be synchronized
+   from child to parent; (2) querying for these data records (e.g.  NS)
+   and placing them in the parent zone.  If the below conditions are not
+   met during these steps, the CSYNC state MUST be considered
+   inconsistent.
 
-   When querying the CYSNC record set, the Parental Agent MUST ascertain
+   When querying the CYSNC record, the Parental Agent MUST ascertain
    that queries are made against all of the nameservers listed in the
-   Child's delegation from the Parent, and ensure that the CSYNC rdata
-   sets are equal across all received responses.
+   Child's delegation from the Parent, and ensure that the record's
+   immediate flag and type bitmap are equal across received responses.
+
+   The CSYNC record's SOA serial field and soaminimum flag might
+   legitimately differ across nameservers (such as in multi-provider
+   setups); equality is thus not required across responses.  Instead,
+   for a given response, processing of these values thus MUST occur with
+   respect to the SOA record as obtained from the same nameserver
+   (preferably in the same connection).  The resulting per-response
+   assessments of whether the CSYNC update is permissible MUST match
+   across received responses.
 
    Further, when retrieving the data record sets as indicated in the
    CSYNC record (such as NS or A/AAAA records), the Parental Agent MUST
    ascertain that all queries are made against all nameservers from
-   which CSYNC responses were received, and ensure that all return
-   responses with equal rdata sets (including all empty).
+   which CSYNC responses were received (preferably in the same
+   connection), and ensure that all return responses with equal rdata
+   sets (including all empty).
 
 3.  IANA Considerations
 
    This document has no IANA actions.
+
+
+
+
+
+
+Thomassen                Expires 2 February 2024                [Page 5]
+
+Internet-Draft               cds-consistency                 August 2023
+
 
 4.  Security Considerations
 
@@ -271,16 +292,6 @@ Internet-Draft               cds-consistency                 August 2023
    nameservers).  This applies both to intentional and unintentional
    multi-homing setups (such as in the case of lame delegation
    hijacking).
-
-
-
-
-
-
-Thomassen                Expires 2 February 2024                [Page 5]
-
-Internet-Draft               cds-consistency                 August 2023
-
 
    As a consequence, the delegation's records can only be modified when
    there is consensus across operators, which is expected to reflect the
@@ -318,17 +329,6 @@ Internet-Draft               cds-consistency                 August 2023
               RFC 4034, DOI 10.17487/RFC4034, March 2005,
               <https://www.rfc-editor.org/info/rfc4034>.
 
-   [RFC4035]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
-              Rose, "Protocol Modifications for the DNS Security
-              Extensions", RFC 4035, DOI 10.17487/RFC4035, March 2005,
-              <https://www.rfc-editor.org/info/rfc4035>.
-
-   [RFC5730]  Hollenbeck, S., "Extensible Provisioning Protocol (EPP)",
-              STD 69, RFC 5730, DOI 10.17487/RFC5730, August 2009,
-              <https://www.rfc-editor.org/info/rfc5730>.
-
-
-
 
 
 
@@ -337,6 +337,15 @@ Thomassen                Expires 2 February 2024                [Page 6]
 
 Internet-Draft               cds-consistency                 August 2023
 
+
+   [RFC4035]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "Protocol Modifications for the DNS Security
+              Extensions", RFC 4035, DOI 10.17487/RFC4035, March 2005,
+              <https://www.rfc-editor.org/info/rfc4035>.
+
+   [RFC5730]  Hollenbeck, S., "Extensible Provisioning Protocol (EPP)",
+              STD 69, RFC 5730, DOI 10.17487/RFC5730, August 2009,
+              <https://www.rfc-editor.org/info/rfc5730>.
 
    [RFC7344]  Kumari, W., Gudmundsson, O., and G. Barwood, "Automating
               DNSSEC Delegation Trust Maintenance", RFC 7344,
@@ -378,21 +387,19 @@ Internet-Draft               cds-consistency                 August 2023
               DOI 10.17487/RFC8901, September 2020,
               <https://www.rfc-editor.org/info/rfc8901>.
 
-Appendix A.  Failure Scenarios
-
-   The following scenarios are examples of how things can go wrong when
-   consistency is not enforced by the parent during CDS/CDNSKEY/CSYNC
-   processing.  Other scenarios that cause similar (or perhaps even
-   more) harm may exist.
-
-
-
 
 
 Thomassen                Expires 2 February 2024                [Page 7]
 
 Internet-Draft               cds-consistency                 August 2023
 
+
+Appendix A.  Failure Scenarios
+
+   The following scenarios are examples of how things can go wrong when
+   consistency is not enforced by the parent during CDS/CDNSKEY/CSYNC
+   processing.  Other scenarios that cause similar (or perhaps even
+   more) harm may exist.
 
    The common feature of these scenarios is that if one nameserver steps
    out of line and the parent is not careful, DNS resolution and/or
@@ -436,19 +443,19 @@ A.2.  Lame Delegations
    without detection; it is even possible for the attacker to escalate
    the nameserver takeover to a full domain takeover.
 
-   In particular, the rogue nameserver can publish CDS/CDNSKEY records.
-   If those are processed by the parent without ensuring consistency
-   with other authoritative nameservers, the delegation will be secured
-   with the attacker's DNSSEC keys.  As responses served by the
-   remaining legitimate nameservers are not signed with these keys,
-   validating resolvers will start rejecting them.
-
 
 
 Thomassen                Expires 2 February 2024                [Page 8]
 
 Internet-Draft               cds-consistency                 August 2023
 
+
+   In particular, the rogue nameserver can publish CDS/CDNSKEY records.
+   If those are processed by the parent without ensuring consistency
+   with other authoritative nameservers, the delegation will be secured
+   with the attacker's DNSSEC keys.  As responses served by the
+   remaining legitimate nameservers are not signed with these keys,
+   validating resolvers will start rejecting them.
 
    Once DNSSEC is established, the attacker can use CSYNC to remove
    other nameservers from the delegation at will (and potentially add
@@ -491,13 +498,6 @@ A.4.  Provider Change (Temporary Multi-Signer)
    CDS/CDNSKEY records in their copy of the zone.  Once the parent
    detects the updated CDS/CDNSKEY record set at the old provider, the
    delegation's DS record set is updated.  Then, after waiting for cache
-   expiration, the new provider's NS hostnames can be added to the
-   zone's NS record set, so that queries start balancing across both
-   providers.  (To conclude the hand-over, the old provider is removed
-   by inverting these steps with swapped roles.)
-
-
-
 
 
 
@@ -505,6 +505,11 @@ Thomassen                Expires 2 February 2024                [Page 9]
 
 Internet-Draft               cds-consistency                 August 2023
 
+
+   expiration, the new provider's NS hostnames can be added to the
+   zone's NS record set, so that queries start balancing across both
+   providers.  (To conclude the hand-over, the old provider is removed
+   by inverting these steps with swapped roles.)
 
    The multi-signer phase of this process breaks when the new provider,
    perhaps unaware of the situation and its intricacies, fails to
@@ -527,6 +532,8 @@ Appendix B.  Change History (to be removed before publication)
 
    *  draft-ietf-dnsop-cds-consistency-03
 
+   |  Describe consistency requirements for CSYNC soaminimum
+   |  
    |  Editorial changes
 
    *  draft-ietf-dnsop-cds-consistency-02
@@ -548,19 +555,19 @@ Appendix B.  Change History (to be removed before publication)
 
    *  draft-ietf-dnsop-cds-consistency-00
 
-   |  Point out zero overhead if nothing changed, and need for OOB
-   |  interface
-   |  
-   |  Editorial changes.
-
-   *  draft-thomassen-dnsop-cds-consistency-03
-
 
 
 Thomassen                Expires 2 February 2024               [Page 10]
 
 Internet-Draft               cds-consistency                 August 2023
 
+
+   |  Point out zero overhead if nothing changed, and need for OOB
+   |  interface
+   |  
+   |  Editorial changes.
+
+   *  draft-thomassen-dnsop-cds-consistency-03
 
    |  Describe risk from lame delegations
    |  
@@ -598,13 +605,6 @@ Author's Address
    10827 Berlin
    Germany
    Email: peter.thomassen@securesystems.de
-
-
-
-
-
-
-
 
 
 
