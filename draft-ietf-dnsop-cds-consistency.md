@@ -137,10 +137,11 @@ A retry schedule with exponential back-off is RECOMMENDED (such as after
 To sidestep localized routing issues, the Parental Agent MAY also
 attempt contacting the nameserver from another vantage point.
 
-If an inconsistent state is encountered, the Parental Agent MUST take no
-action.
+If an inconsistent state is encountered, the Parental Agent MUST abort
+the operation.
 Specifically, it MUST NOT delete or alter any existing RRset that would
-have been deleted or altered, had the state been consistent.
+have been deleted or altered, and MUST NOT create any RRsets that would
+have been created, had the polling state been consistent.
 
 To accommodate transient inconsistencies (e.g. replication delays), the
 Parental Agent MAY retry the full process, repeating all queries.
@@ -427,6 +428,8 @@ DNSSEC validation fails for all answers served by the old provider.
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-03
+
+> Editorial changes
 
 * draft-ietf-dnsop-cds-consistency-02
 

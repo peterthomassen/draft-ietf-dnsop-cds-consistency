@@ -1448,10 +1448,11 @@ A retry schedule with exponential back-off is RECOMMENDED (such as after
 5, 10, 20, 40, ... minutes).
 To sidestep localized routing issues, the Parental Agent MAY also
 attempt contacting the nameserver from another vantage point.<a href="#section-2-2" class="pilcrow">¶</a></p>
-<p id="section-2-3">If an inconsistent state is encountered, the Parental Agent MUST take no
-action.
+<p id="section-2-3">If an inconsistent state is encountered, the Parental Agent MUST abort
+the operation.
 Specifically, it MUST NOT delete or alter any existing RRset that would
-have been deleted or altered, had the state been consistent.<a href="#section-2-3" class="pilcrow">¶</a></p>
+have been deleted or altered, and MUST NOT create any RRsets that would
+have been created, had the polling state been consistent.<a href="#section-2-3" class="pilcrow">¶</a></p>
 <p id="section-2-4">To accommodate transient inconsistencies (e.g. replication delays), the
 Parental Agent MAY retry the full process, repeating all queries.
 A schedule with exponential back-off is RECOMMENDED.<a href="#section-2-4" class="pilcrow">¶</a></p>
@@ -1768,70 +1769,73 @@ DNSSEC validation fails for all answers served by the old provider.<a href="#app
 <a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-change-history-to-be-remove" class="section-name selfRef">Change History (to be removed before publication)</a>
       </h2>
 <ul class="normal">
-<li class="normal" id="appendix-B-1.1">
-          <p id="appendix-B-1.1.1">draft-ietf-dnsop-cds-consistency-03<a href="#appendix-B-1.1.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="appendix-B-1.2">
-          <p id="appendix-B-1.2.1">draft-ietf-dnsop-cds-consistency-02<a href="#appendix-B-1.2.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-B-1.1">draft-ietf-dnsop-cds-consistency-03<a href="#appendix-B-1.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-2">
-        <p id="appendix-B-2.1">Retry before assuming a nameserver is permanently unreachable<a href="#appendix-B-2.1" class="pilcrow">¶</a></p>
+        <p id="appendix-B-2.1">Editorial changes<a href="#appendix-B-2.1" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="normal">
-<li class="normal" id="appendix-B-3.1">draft-ietf-dnsop-cds-consistency-01<a href="#appendix-B-3.1" class="pilcrow">¶</a>
+<li class="normal" id="appendix-B-3.1">draft-ietf-dnsop-cds-consistency-02<a href="#appendix-B-3.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-4">
-        <p id="appendix-B-4.1">Make nits tool happy<a href="#appendix-B-4.1" class="pilcrow">¶</a></p>
-<p id="appendix-B-4.2">New failure mode: DS Breakage due to Replication Lag<a href="#appendix-B-4.2" class="pilcrow">¶</a></p>
-<p id="appendix-B-4.3">Point out zero overhead if nothing changed, and need for OOB interface<a href="#appendix-B-4.3" class="pilcrow">¶</a></p>
-<p id="appendix-B-4.4">Editorial changes<a href="#appendix-B-4.4" class="pilcrow">¶</a></p>
-<p id="appendix-B-4.5">Moved Failure Scenarios to appendix<a href="#appendix-B-4.5" class="pilcrow">¶</a></p>
+        <p id="appendix-B-4.1">Retry before assuming a nameserver is permanently unreachable<a href="#appendix-B-4.1" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="normal">
-<li class="normal" id="appendix-B-5.1">draft-ietf-dnsop-cds-consistency-00<a href="#appendix-B-5.1" class="pilcrow">¶</a>
+<li class="normal" id="appendix-B-5.1">draft-ietf-dnsop-cds-consistency-01<a href="#appendix-B-5.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-6">
-        <p id="appendix-B-6.1">Point out zero overhead if nothing changed, and need for OOB interface<a href="#appendix-B-6.1" class="pilcrow">¶</a></p>
-<p id="appendix-B-6.2">Editorial changes.<a href="#appendix-B-6.2" class="pilcrow">¶</a></p>
+        <p id="appendix-B-6.1">Make nits tool happy<a href="#appendix-B-6.1" class="pilcrow">¶</a></p>
+<p id="appendix-B-6.2">New failure mode: DS Breakage due to Replication Lag<a href="#appendix-B-6.2" class="pilcrow">¶</a></p>
+<p id="appendix-B-6.3">Point out zero overhead if nothing changed, and need for OOB interface<a href="#appendix-B-6.3" class="pilcrow">¶</a></p>
+<p id="appendix-B-6.4">Editorial changes<a href="#appendix-B-6.4" class="pilcrow">¶</a></p>
+<p id="appendix-B-6.5">Moved Failure Scenarios to appendix<a href="#appendix-B-6.5" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="normal">
-<li class="normal" id="appendix-B-7.1">draft-thomassen-dnsop-cds-consistency-03<a href="#appendix-B-7.1" class="pilcrow">¶</a>
+<li class="normal" id="appendix-B-7.1">draft-ietf-dnsop-cds-consistency-00<a href="#appendix-B-7.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-8">
-        <p id="appendix-B-8.1">Describe risk from lame delegations<a href="#appendix-B-8.1" class="pilcrow">¶</a></p>
-<p id="appendix-B-8.2">Acknowledgments<a href="#appendix-B-8.2" class="pilcrow">¶</a></p>
-<p id="appendix-B-8.3">Say what is being updated<a href="#appendix-B-8.3" class="pilcrow">¶</a></p>
-<p id="appendix-B-8.4">Editorial changes.<a href="#appendix-B-8.4" class="pilcrow">¶</a></p>
-<p id="appendix-B-8.5">Retry mechanism to resolve inconsistencies<a href="#appendix-B-8.5" class="pilcrow">¶</a></p>
+        <p id="appendix-B-8.1">Point out zero overhead if nothing changed, and need for OOB interface<a href="#appendix-B-8.1" class="pilcrow">¶</a></p>
+<p id="appendix-B-8.2">Editorial changes.<a href="#appendix-B-8.2" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="normal">
-<li class="normal" id="appendix-B-9.1">draft-thomassen-dnsop-cds-consistency-02<a href="#appendix-B-9.1" class="pilcrow">¶</a>
+<li class="normal" id="appendix-B-9.1">draft-thomassen-dnsop-cds-consistency-03<a href="#appendix-B-9.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-10">
-        <p id="appendix-B-10.1">Don't ignore DoE responses from individual nameservers (instead,
-  require consistency across all responses received)<a href="#appendix-B-10.1" class="pilcrow">¶</a></p>
+        <p id="appendix-B-10.1">Describe risk from lame delegations<a href="#appendix-B-10.1" class="pilcrow">¶</a></p>
+<p id="appendix-B-10.2">Acknowledgments<a href="#appendix-B-10.2" class="pilcrow">¶</a></p>
+<p id="appendix-B-10.3">Say what is being updated<a href="#appendix-B-10.3" class="pilcrow">¶</a></p>
+<p id="appendix-B-10.4">Editorial changes.<a href="#appendix-B-10.4" class="pilcrow">¶</a></p>
+<p id="appendix-B-10.5">Retry mechanism to resolve inconsistencies<a href="#appendix-B-10.5" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="normal">
-<li class="normal" id="appendix-B-11.1">draft-thomassen-dnsop-cds-consistency-01<a href="#appendix-B-11.1" class="pilcrow">¶</a>
+<li class="normal" id="appendix-B-11.1">draft-thomassen-dnsop-cds-consistency-02<a href="#appendix-B-11.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-12">
-        <p id="appendix-B-12.1">Allow for nameservers that don't respond or provide DoE (i.e. require
-  consistency only among the non-empty answers received)<a href="#appendix-B-12.1" class="pilcrow">¶</a></p>
-<p id="appendix-B-12.2">Define similar requirements for CSYNC.<a href="#appendix-B-12.2" class="pilcrow">¶</a></p>
-<p id="appendix-B-12.3">Editorial changes.<a href="#appendix-B-12.3" class="pilcrow">¶</a></p>
+        <p id="appendix-B-12.1">Don't ignore DoE responses from individual nameservers (instead,
+  require consistency across all responses received)<a href="#appendix-B-12.1" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="normal">
-<li class="normal" id="appendix-B-13.1">draft-thomassen-dnsop-cds-consistency-00<a href="#appendix-B-13.1" class="pilcrow">¶</a>
+<li class="normal" id="appendix-B-13.1">draft-thomassen-dnsop-cds-consistency-01<a href="#appendix-B-13.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-14">
-        <p id="appendix-B-14.1">Initial public draft.<a href="#appendix-B-14.1" class="pilcrow">¶</a></p>
+        <p id="appendix-B-14.1">Allow for nameservers that don't respond or provide DoE (i.e. require
+  consistency only among the non-empty answers received)<a href="#appendix-B-14.1" class="pilcrow">¶</a></p>
+<p id="appendix-B-14.2">Define similar requirements for CSYNC.<a href="#appendix-B-14.2" class="pilcrow">¶</a></p>
+<p id="appendix-B-14.3">Editorial changes.<a href="#appendix-B-14.3" class="pilcrow">¶</a></p>
+</blockquote>
+<ul class="normal">
+<li class="normal" id="appendix-B-15.1">draft-thomassen-dnsop-cds-consistency-00<a href="#appendix-B-15.1" class="pilcrow">¶</a>
+</li>
+      </ul>
+<blockquote id="appendix-B-16">
+        <p id="appendix-B-16.1">Initial public draft.<a href="#appendix-B-16.1" class="pilcrow">¶</a></p>
 </blockquote>
 </section>
 </div>

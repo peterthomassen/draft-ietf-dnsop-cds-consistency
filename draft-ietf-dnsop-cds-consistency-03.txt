@@ -187,10 +187,11 @@ Internet-Draft               cds-consistency                 August 2023
    To sidestep localized routing issues, the Parental Agent MAY also
    attempt contacting the nameserver from another vantage point.
 
-   If an inconsistent state is encountered, the Parental Agent MUST take
-   no action.  Specifically, it MUST NOT delete or alter any existing
-   RRset that would have been deleted or altered, had the state been
-   consistent.
+   If an inconsistent state is encountered, the Parental Agent MUST
+   abort the operation.  Specifically, it MUST NOT delete or alter any
+   existing RRset that would have been deleted or altered, and MUST NOT
+   create any RRsets that would have been created, had the polling state
+   been consistent.
 
    To accommodate transient inconsistencies (e.g. replication delays),
    the Parental Agent MAY retry the full process, repeating all queries.
@@ -215,7 +216,6 @@ Internet-Draft               cds-consistency                 August 2023
    the nameservers listed in the Child's delegation from the Parent, and
    ensure that each key referenced in any of the received answers is
    also referenced in all other received responses.
-
 
 
 
@@ -527,6 +527,8 @@ Appendix B.  Change History (to be removed before publication)
 
    *  draft-ietf-dnsop-cds-consistency-03
 
+   |  Editorial changes
+
    *  draft-ietf-dnsop-cds-consistency-02
 
    |  Retry before assuming a nameserver is permanently unreachable
@@ -553,8 +555,6 @@ Appendix B.  Change History (to be removed before publication)
 
    *  draft-thomassen-dnsop-cds-consistency-03
 
-   |  Describe risk from lame delegations
-
 
 
 Thomassen                Expires 2 February 2024               [Page 10]
@@ -562,6 +562,7 @@ Thomassen                Expires 2 February 2024               [Page 10]
 Internet-Draft               cds-consistency                 August 2023
 
 
+   |  Describe risk from lame delegations
    |  
    |  Acknowledgments
    |  
@@ -597,7 +598,6 @@ Author's Address
    10827 Berlin
    Germany
    Email: peter.thomassen@securesystems.de
-
 
 
 
