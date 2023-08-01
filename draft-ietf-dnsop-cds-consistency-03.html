@@ -1518,6 +1518,11 @@ record (such as NS or A/AAAA records), the Parental Agent MUST ascertain
 that all queries are made against all nameservers from which CSYNC
 responses were received (preferably in the same connection), and ensure
 that all return responses with equal rdata sets (including all empty).<a href="#section-2.2-4" class="pilcrow">¶</a></p>
+<p id="section-2.2-5">CSYNC updates may cause validation or even insecure resolution to break
+(e.g. by changing the delegation to a set of nameservers that do not
+serve required DNSKEY records or do not know the zone at all).
+Parental Agents SHOULD check that CSYNC updates, if applied, do not
+break the delegation.<a href="#section-2.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1781,8 +1786,9 @@ DNSSEC validation fails for all answers served by the old provider.<a href="#app
 </li>
       </ul>
 <blockquote id="appendix-B-2">
-        <p id="appendix-B-2.1">Describe consistency requirements for CSYNC soaminimum<a href="#appendix-B-2.1" class="pilcrow">¶</a></p>
-<p id="appendix-B-2.2">Editorial changes<a href="#appendix-B-2.2" class="pilcrow">¶</a></p>
+        <p id="appendix-B-2.1">Clarify that CSYNC updates should not break delegations<a href="#appendix-B-2.1" class="pilcrow">¶</a></p>
+<p id="appendix-B-2.2">Describe consistency requirements for CSYNC soaminimum<a href="#appendix-B-2.2" class="pilcrow">¶</a></p>
+<p id="appendix-B-2.3">Editorial changes<a href="#appendix-B-2.3" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="normal">
 <li class="normal" id="appendix-B-3.1">draft-ietf-dnsop-cds-consistency-02<a href="#appendix-B-3.1" class="pilcrow">¶</a>

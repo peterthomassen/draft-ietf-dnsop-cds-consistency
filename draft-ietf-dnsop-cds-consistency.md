@@ -212,6 +212,12 @@ that all queries are made against all nameservers from which CSYNC
 responses were received (preferably in the same connection), and ensure
 that all return responses with equal rdata sets (including all empty).
 
+CSYNC updates may cause validation or even insecure resolution to break
+(e.g. by changing the delegation to a set of nameservers that do not
+serve required DNSKEY records or do not know the zone at all).
+Parental Agents SHOULD check that CSYNC updates, if applied, do not
+break the delegation.
+
 
 # IANA Considerations
 
@@ -437,6 +443,8 @@ DNSSEC validation fails for all answers served by the old provider.
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-03
+
+> Clarify that CSYNC updates should not break delegations
 
 > Describe consistency requirements for CSYNC soaminimum
 
