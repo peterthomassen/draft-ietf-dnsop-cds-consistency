@@ -1533,11 +1533,20 @@ record (such as NS or A/AAAA records), the Parental Agent MUST ascertain
 that all queries are made against all nameservers from which CSYNC
 responses were received (preferably in the same connection), and ensure
 that all return responses with equal rdata sets (including all empty).<a href="#section-2.2-4" class="pilcrow">¶</a></p>
-<p id="section-2.2-5">CSYNC updates may cause validation or even insecure resolution to break
+<p id="section-2.2-5">Other CSYNC processing rules from <span>[<a href="#RFC7477" class="xref">RFC7477</a>]</span> Section 3 remain in place without
+modification. For example, when the type bitmap contains the A/AAAA flags,
+corresponding address queries are only to be sent "to determine the A and AAAA
+record addresses for each NS record within a NS set for the child that are in
+bailiwick", while out-of-bailiwick NS records are ignored. Also, when the NS
+type flag is present, associated NS queries and consistency checks are to be
+performed before any address queries to ensure "that the right set of NS records
+is used as provided by the current NS set of the child". (Quotes from
+<span>[<a href="#RFC7477" class="xref">RFC7477</a>]</span> Section 3.2.2; see also Section 4.3.)<a href="#section-2.2-5" class="pilcrow">¶</a></p>
+<p id="section-2.2-6">CSYNC updates may cause validation or even insecure resolution to break
 (e.g. by changing the delegation to a set of nameservers that do not
 serve required DNSKEY records or do not know the zone at all).
 Parental Agents SHOULD check that CSYNC updates, if applied, do not
-break the delegation.<a href="#section-2.2-5" class="pilcrow">¶</a></p>
+break the delegation.<a href="#section-2.2-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1801,8 +1810,9 @@ DNSSEC validation fails for all answers served by the old provider.<a href="#app
 </li>
       </ul>
 <blockquote id="appendix-B-2">
-        <p id="appendix-B-2.1">Editorial changes<a href="#appendix-B-2.1" class="pilcrow">¶</a></p>
-<p id="appendix-B-2.2">Clean up "multi-homing" and define "multi-provider"/"multi-signer"<a href="#appendix-B-2.2" class="pilcrow">¶</a></p>
+        <p id="appendix-B-2.1">Clarify that existing CSYNC NS and glue processing rules remain in place<a href="#appendix-B-2.1" class="pilcrow">¶</a></p>
+<p id="appendix-B-2.2">Editorial changes<a href="#appendix-B-2.2" class="pilcrow">¶</a></p>
+<p id="appendix-B-2.3">Clean up "multi-homing" and define "multi-provider"/"multi-signer"<a href="#appendix-B-2.3" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="normal">
 <li class="normal" id="appendix-B-3.1">draft-ietf-dnsop-cds-consistency-03<a href="#appendix-B-3.1" class="pilcrow">¶</a>

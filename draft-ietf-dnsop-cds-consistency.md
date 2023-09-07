@@ -223,6 +223,16 @@ that all queries are made against all nameservers from which CSYNC
 responses were received (preferably in the same connection), and ensure
 that all return responses with equal rdata sets (including all empty).
 
+Other CSYNC processing rules from [@!RFC7477] Section 3 remain in place without
+modification. For example, when the type bitmap contains the A/AAAA flags,
+corresponding address queries are only to be sent "to determine the A and AAAA
+record addresses for each NS record within a NS set for the child that are in
+bailiwick", while out-of-bailiwick NS records are ignored. Also, when the NS
+type flag is present, associated NS queries and consistency checks are to be
+performed before any address queries to ensure "that the right set of NS records
+is used as provided by the current NS set of the child". (Quotes from
+[@!RFC7477] Section 3.2.2; see also Section 4.3.)
+
 CSYNC updates may cause validation or even insecure resolution to break
 (e.g. by changing the delegation to a set of nameservers that do not
 serve required DNSKEY records or do not know the zone at all).
@@ -454,6 +464,8 @@ DNSSEC validation fails for all answers served by the old provider.
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-04
+
+> Clarify that existing CSYNC NS and glue processing rules remain in place
 
 > Editorial changes
 

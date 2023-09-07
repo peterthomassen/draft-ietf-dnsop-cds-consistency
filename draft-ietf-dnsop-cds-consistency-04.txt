@@ -77,17 +77,17 @@ Table of Contents
      2.2.  CSYNC . . . . . . . . . . . . . . . . . . . . . . . . . .   5
    3.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
    4.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
-   5.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   6
-   6.  Normative References  . . . . . . . . . . . . . . . . . . . .   6
-   7.  Informative References  . . . . . . . . . . . . . . . . . . .   7
+   5.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   7
+   6.  Normative References  . . . . . . . . . . . . . . . . . . . .   7
+   7.  Informative References  . . . . . . . . . . . . . . . . . . .   8
    Appendix A.  Failure Scenarios  . . . . . . . . . . . . . . . . .   8
-     A.1.  DS Breakage due to Replication Lag  . . . . . . . . . . .   8
+     A.1.  DS Breakage due to Replication Lag  . . . . . . . . . . .   9
      A.2.  Lame Delegations  . . . . . . . . . . . . . . . . . . . .   9
-     A.3.  Multi-Provider (Permanent Multi-Signer) . . . . . . . . .   9
-       A.3.1.  DS Breakage . . . . . . . . . . . . . . . . . . . . .   9
+     A.3.  Multi-Provider (Permanent Multi-Signer) . . . . . . . . .  10
+       A.3.1.  DS Breakage . . . . . . . . . . . . . . . . . . . . .  10
        A.3.2.  NS Breakage . . . . . . . . . . . . . . . . . . . . .  10
      A.4.  Provider Change (Temporary Multi-Signer)  . . . . . . . .  10
-   Appendix B.  Change History (to be removed before publication)  .  10
+   Appendix B.  Change History (to be removed before publication)  .  11
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  12
 
 1.  Introduction
@@ -289,6 +289,17 @@ Internet-Draft               cds-consistency              September 2023
    connection), and ensure that all return responses with equal rdata
    sets (including all empty).
 
+   Other CSYNC processing rules from [RFC7477] Section 3 remain in place
+   without modification.  For example, when the type bitmap contains the
+   A/AAAA flags, corresponding address queries are only to be sent "to
+   determine the A and AAAA record addresses for each NS record within a
+   NS set for the child that are in bailiwick", while out-of-bailiwick
+   NS records are ignored.  Also, when the NS type flag is present,
+   associated NS queries and consistency checks are to be performed
+   before any address queries to ensure "that the right set of NS
+   records is used as provided by the current NS set of the child".
+   (Quotes from [RFC7477] Section 3.2.2; see also Section 4.3.)
+
    CSYNC updates may cause validation or even insecure resolution to
    break (e.g. by changing the delegation to a set of nameservers that
    do not serve required DNSKEY records or do not know the zone at all).
@@ -319,6 +330,14 @@ Internet-Draft               cds-consistency              September 2023
    contents cannot be reached (e.g. because one of the nameserver
    providers is uncooperative), Parental Agents SHOULD continue to
    accept DS and NS/glue update requests from the domain owner via an
+
+
+
+Thomassen                 Expires 10 March 2024                 [Page 6]
+
+Internet-Draft               cds-consistency              September 2023
+
+
    authenticated out-of-band channel (such as EPP [RFC5730]),
    irrespective of the rise of automated delegation maintenance.
    Availability of such an interface also enables recovery from a
@@ -330,13 +349,6 @@ Internet-Draft               cds-consistency              September 2023
    Viktor Dukhovni, Wes Hardaker, Libor Peltan, Oli Schacher
 
 6.  Normative References
-
-
-
-Thomassen                 Expires 10 March 2024                 [Page 6]
-
-Internet-Draft               cds-consistency              September 2023
-
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -371,6 +383,17 @@ Internet-Draft               cds-consistency              September 2023
               RFC 7477, DOI 10.17487/RFC7477, March 2015,
               <https://www.rfc-editor.org/info/rfc7477>.
 
+
+
+
+
+
+
+Thomassen                 Expires 10 March 2024                 [Page 7]
+
+Internet-Draft               cds-consistency              September 2023
+
+
    [RFC8078]  Gudmundsson, O. and P. Wouters, "Managing DS Records from
               the Parent via CDS/CDNSKEY", RFC 8078,
               DOI 10.17487/RFC8078, March 2017,
@@ -386,13 +409,6 @@ Internet-Draft               cds-consistency              September 2023
               G. M., Savage, S., Claffy, K., and ACM, "Unresolved
               Issues", DOI 10.1145/3419394.3423623, 27 October 2020,
               <http://dx.doi.org/10.1145/3419394.3423623>.
-
-
-
-Thomassen                 Expires 10 March 2024                 [Page 7]
-
-Internet-Draft               cds-consistency              September 2023
-
 
    [LAME2]    Akiwate, G., Savage, S., Voelker, G. M., Claffy, K. C.,
               and ACM, "Risky BIZness", DOI 10.1145/3487552.3487816, 2
@@ -422,6 +438,18 @@ Appendix A.  Failure Scenarios
    this undermines the very guarantees of operator independence that
    multi-provider configurations are expected to provide.
 
+
+
+
+
+
+
+
+Thomassen                 Expires 10 March 2024                 [Page 8]
+
+Internet-Draft               cds-consistency              September 2023
+
+
 A.1.  DS Breakage due to Replication Lag
 
    If an authoritative nameserver is lagging behind during a key
@@ -436,19 +464,6 @@ A.1.  DS Breakage due to Replication Lag
    Checking for consistency minimizes this risk.  In case the parent
    reports consistency errors downstream, it can also help detect the
    replication issue on the child side.
-
-
-
-
-
-
-
-
-
-Thomassen                 Expires 10 March 2024                 [Page 8]
-
-Internet-Draft               cds-consistency              September 2023
-
 
 A.2.  Lame Delegations
 
@@ -484,6 +499,13 @@ A.2.  Lame Delegations
    themself as the only party providing authoritiative DNS service for
    the victim domain, significantly augmenting the attack's impact.
 
+
+
+Thomassen                 Expires 10 March 2024                 [Page 9]
+
+Internet-Draft               cds-consistency              September 2023
+
+
 A.3.  Multi-Provider (Permanent Multi-Signer)
 
 A.3.1.  DS Breakage
@@ -496,15 +518,6 @@ A.3.1.  DS Breakage
    controlled by this provider, the other providers' DS records would be
    removed from the delegation.  As a result, the zone is broken at
    least for some queries.
-
-
-
-
-
-Thomassen                 Expires 10 March 2024                 [Page 9]
-
-Internet-Draft               cds-consistency              September 2023
-
 
 A.3.2.  NS Breakage
 
@@ -541,6 +554,14 @@ A.4.  Provider Change (Temporary Multi-Signer)
    provider, the old provider's RRSIGs do no longer validate, causing
    SERVFAIL to be returned.
 
+
+
+
+Thomassen                 Expires 10 March 2024                [Page 10]
+
+Internet-Draft               cds-consistency              September 2023
+
+
    However, an even worse consequence can occur when the parent performs
    their next CDS/CDNSKEY scan: It may then happen that the incorrect
    CDS/CDNSKEY record set is fetched from the new provider and used to
@@ -554,14 +575,9 @@ Appendix B.  Change History (to be removed before publication)
 
    *  draft-ietf-dnsop-cds-consistency-04
 
-
-
-
-Thomassen                 Expires 10 March 2024                [Page 10]
-
-Internet-Draft               cds-consistency              September 2023
-
-
+   |  Clarify that existing CSYNC NS and glue processing rules remain in
+   |  place
+   |  
    |  Editorial changes
    |  
    |  Clean up "multi-homing" and define "multi-provider"/"multi-signer"
@@ -593,6 +609,15 @@ Internet-Draft               cds-consistency              September 2023
 
    *  draft-ietf-dnsop-cds-consistency-00
 
+
+
+
+
+Thomassen                 Expires 10 March 2024                [Page 11]
+
+Internet-Draft               cds-consistency              September 2023
+
+
    |  Point out zero overhead if nothing changed, and need for OOB
    |  interface
    |  
@@ -609,14 +634,6 @@ Internet-Draft               cds-consistency              September 2023
    |  Editorial changes.
    |  
    |  Retry mechanism to resolve inconsistencies
-
-
-
-
-Thomassen                 Expires 10 March 2024                [Page 11]
-
-Internet-Draft               cds-consistency              September 2023
-
 
    *  draft-thomassen-dnsop-cds-consistency-02
 
@@ -644,23 +661,6 @@ Author's Address
    10827 Berlin
    Germany
    Email: peter.thomassen@securesystems.de
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
