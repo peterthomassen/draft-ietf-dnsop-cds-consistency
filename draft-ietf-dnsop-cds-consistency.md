@@ -40,7 +40,7 @@ Similarly, RFC 7477 specifies CSYNC records to indicate a desired update
 of the delegation's NS (and glue) records.
 Parent-side entities (e.g. Registries, Registrars) typically discover
 these records by querying them from the child, and then use them to
-update the delegation's DS RRset accordingly.
+update the parent-side RRsets of the delegation accordingly.
 
 This document specifies that when performing such queries, parent-side
 entities MUST ensure that updates triggered via CDS/CDNSKEY and CSYNC
@@ -140,7 +140,7 @@ described in each subsection.
 
 In all cases, consistency is REQUIRED across received responses only.
 When a response cannot be obtained from a given nameserver, the Parental
-Agent SHOULD attempt obtaining it at a later time, before concluding
+Agent SHOULD attempt to obtain it at a later time, before concluding
 that the nameserver is permanently unreachable and removing it from
 consideration.
 A retry schedule with exponential back-off is RECOMMENDED (such as after
@@ -454,6 +454,8 @@ DNSSEC validation fails for all answers served by the old provider.
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-04
+
+> Editorial changes
 
 > Clean up "multi-homing" and define "multi-provider"/"multi-signer"
 
