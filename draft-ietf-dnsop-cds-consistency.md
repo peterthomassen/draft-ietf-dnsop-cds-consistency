@@ -164,14 +164,14 @@ queries unless otherwise noted.
 
 To retrieve a Child's CDS/CDNSKEY RRset for DNSSEC delegation trust
 maintenance, the Parental Agent, knowing both the Child zone name and
-its NS hostnames, MUST ascertain that queries are made against all of
-the nameservers listed in the Child's delegation from the Parent, and
-ensure that each key referenced in any of the received answers is also
-referenced in all other received responses.
+its NS hostnames, MUST ascertain that queries are made against all
+(reachable) nameservers listed in the Child's delegation from the
+Parent, and ensure that each key referenced in any of the received
+answers is also referenced in all other received responses.
 
 In other words, CDS/CDNSKEY records at the Child zone apex MUST be
-fetched directly from each of the authoritative servers as determined by
-the delegation's NS record set.
+fetched directly from each (reachable) authoritative server as
+determined by the delegation's NS record set.
 When a key is referenced in a CDS or CDNSKEY record set returned by
 one nameserver, but is missing from a least one other nameserver's
 answer, the CDS/CDNSKEY state MUST be considered inconsistent.
@@ -193,9 +193,9 @@ If the below conditions are not met during these steps, the CSYNC state
 MUST be considered inconsistent.
 
 When querying the CYSNC record, the Parental Agent MUST ascertain that
-queries are made against all of the nameservers listed in the Child's
-delegation from the Parent, and ensure that the record's immediate flag
-and type bitmap are equal across received responses.
+queries are made against all (reachable) nameservers listed in the
+Child's delegation from the Parent, and ensure that the record's
+immediate flag and type bitmap are equal across received responses.
 
 The CSYNC record's SOA serial field and soaminimum flag might
 legitimately differ across nameservers (such as in multi-provider
@@ -441,6 +441,8 @@ DNSSEC validation fails for all answers served by the old provider.
 
 
 # Change History (to be removed before publication)
+
+* draft-ietf-dnsop-cds-consistency-04
 
 * draft-ietf-dnsop-cds-consistency-03
 
