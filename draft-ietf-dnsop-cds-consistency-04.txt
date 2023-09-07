@@ -4,9 +4,9 @@
 
 DNSOP Working Group                                         P. Thomassen
 Internet-Draft                     SSE - Secure Systems Engineering GmbH
-Updates: 7344, 7477 (if approved)                       7 September 2023
+Updates: 7344, 7477 (if approved)                         2 October 2023
 Intended status: Standards Track                                        
-Expires: 10 March 2024
+Expires: 4 April 2024
 
 
            Consistency for CDS/CDNSKEY and CSYNC is Mandatory
@@ -44,7 +44,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 March 2024.
+   This Internet-Draft will expire on 4 April 2024.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Thomassen                 Expires 10 March 2024                 [Page 1]
+Thomassen                 Expires 4 April 2024                  [Page 1]
 
-Internet-Draft               cds-consistency              September 2023
+Internet-Draft               cds-consistency                October 2023
 
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -82,11 +82,11 @@ Table of Contents
    7.  Informative References  . . . . . . . . . . . . . . . . . . .   8
    Appendix A.  Failure Scenarios  . . . . . . . . . . . . . . . . .   8
      A.1.  DS Breakage due to Replication Lag  . . . . . . . . . . .   9
-     A.2.  Lame Delegations  . . . . . . . . . . . . . . . . . . . .   9
+     A.2.  Escalation of Lame Delegation Takeover  . . . . . . . . .   9
      A.3.  Multi-Provider (Permanent Multi-Signer) . . . . . . . . .  10
        A.3.1.  DS Breakage . . . . . . . . . . . . . . . . . . . . .  10
        A.3.2.  NS Breakage . . . . . . . . . . . . . . . . . . . . .  10
-     A.4.  Provider Change (Temporary Multi-Signer)  . . . . . . . .  10
+     A.4.  Bogus Provider Change (Temporary Multi-Signer)  . . . . .  10
    Appendix B.  Change History (to be removed before publication)  .  11
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  12
 
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Thomassen                 Expires 10 March 2024                 [Page 2]
+Thomassen                 Expires 4 April 2024                  [Page 2]
 
-Internet-Draft               cds-consistency              September 2023
+Internet-Draft               cds-consistency                October 2023
 
 
    Implementations are thus likely to retrieve records from just one
@@ -165,9 +165,9 @@ Internet-Draft               cds-consistency              September 2023
 
 
 
-Thomassen                 Expires 10 March 2024                 [Page 3]
+Thomassen                 Expires 4 April 2024                  [Page 3]
 
-Internet-Draft               cds-consistency              September 2023
+Internet-Draft               cds-consistency                October 2023
 
 
    Multi-signer setup:  A multi-provider setup for a DNSSEC-enabled
@@ -221,9 +221,9 @@ Internet-Draft               cds-consistency              September 2023
 
 
 
-Thomassen                 Expires 10 March 2024                 [Page 4]
+Thomassen                 Expires 4 April 2024                  [Page 4]
 
-Internet-Draft               cds-consistency              September 2023
+Internet-Draft               cds-consistency                October 2023
 
 
 2.1.  CDS and CDNSKEY
@@ -249,12 +249,12 @@ Internet-Draft               cds-consistency              September 2023
 
 2.2.  CSYNC
 
-   A CSYNC-based update consists of (1) querying the CSYNC (and possibly
-   SOA) record to determine which data records shall be synchronized
-   from child to parent; (2) querying for these data records (e.g.  NS)
-   and placing them in the parent zone.  If the below conditions are not
-   met during these steps, the CSYNC state MUST be considered
-   inconsistent.
+   A CSYNC-based workflow generally consists of (1) querying the CSYNC
+   (and possibly SOA) record to determine which data records shall be
+   synchronized from child to parent, and (2) querying for these data
+   records (e.g.  NS), before placing them in the parent zone.  If the
+   below conditions are not met during these steps, the CSYNC state MUST
+   be considered inconsistent.
 
    When querying the CYSNC record, the Parental Agent MUST ascertain
    that queries are made against all (reachable) nameservers listed in
@@ -264,11 +264,11 @@ Internet-Draft               cds-consistency              September 2023
    The CSYNC record's SOA serial field and soaminimum flag might
    legitimately differ across nameservers (such as in multi-provider
    setups); equality is thus not required across responses.  Instead,
-   for a given response, processing of these values thus MUST occur with
+   for a given response, processing of these values MUST occur with
    respect to the SOA record as obtained from the same nameserver
    (preferably in the same connection).  The resulting per-response
-   assessments of whether the CSYNC update is permissible MUST match
-   across received responses.
+   assessments of whether the update is permissible MUST match across
+   received responses.
 
 
 
@@ -277,9 +277,9 @@ Internet-Draft               cds-consistency              September 2023
 
 
 
-Thomassen                 Expires 10 March 2024                 [Page 5]
+Thomassen                 Expires 4 April 2024                  [Page 5]
 
-Internet-Draft               cds-consistency              September 2023
+Internet-Draft               cds-consistency                October 2023
 
 
    Further, when retrieving the data record sets as indicated in the
@@ -300,11 +300,11 @@ Internet-Draft               cds-consistency              September 2023
    records is used as provided by the current NS set of the child".
    (Quotes from [RFC7477] Section 3.2.2; see also Section 4.3.)
 
-   CSYNC updates may cause validation or even insecure resolution to
-   break (e.g. by changing the delegation to a set of nameservers that
-   do not serve required DNSKEY records or do not know the zone at all).
-   Parental Agents SHOULD check that CSYNC updates, if applied, do not
-   break the delegation.
+   CSYNC-based updates may cause validation or even insecure resolution
+   to break (e.g. by changing the delegation to a set of nameservers
+   that do not serve required DNSKEY records or do not know the zone at
+   all).  Parental Agents SHOULD check that CSYNC-based updates, if
+   applied, do not break the delegation.
 
 3.  IANA Considerations
 
@@ -333,9 +333,9 @@ Internet-Draft               cds-consistency              September 2023
 
 
 
-Thomassen                 Expires 10 March 2024                 [Page 6]
+Thomassen                 Expires 4 April 2024                  [Page 6]
 
-Internet-Draft               cds-consistency              September 2023
+Internet-Draft               cds-consistency                October 2023
 
 
    authenticated out-of-band channel (such as EPP [RFC5730]),
@@ -346,7 +346,8 @@ Internet-Draft               cds-consistency              September 2023
 
 5.  Acknowledgments
 
-   Viktor Dukhovni, Wes Hardaker, Libor Peltan, Oli Schacher
+   David Blacka, Viktor Dukhovni, Wes Hardaker, Libor Peltan, Oli
+   Schacher
 
 6.  Normative References
 
@@ -388,10 +389,9 @@ Internet-Draft               cds-consistency              September 2023
 
 
 
-
-Thomassen                 Expires 10 March 2024                 [Page 7]
+Thomassen                 Expires 4 April 2024                  [Page 7]
 
-Internet-Draft               cds-consistency              September 2023
+Internet-Draft               cds-consistency                October 2023
 
 
    [RFC8078]  Gudmundsson, O. and P. Wouters, "Managing DS Records from
@@ -445,9 +445,9 @@ Appendix A.  Failure Scenarios
 
 
 
-Thomassen                 Expires 10 March 2024                 [Page 8]
+Thomassen                 Expires 4 April 2024                  [Page 8]
 
-Internet-Draft               cds-consistency              September 2023
+Internet-Draft               cds-consistency                October 2023
 
 
 A.1.  DS Breakage due to Replication Lag
@@ -465,7 +465,7 @@ A.1.  DS Breakage due to Replication Lag
    reports consistency errors downstream, it can also help detect the
    replication issue on the child side.
 
-A.2.  Lame Delegations
+A.2.  Escalation of Lame Delegation Takeover
 
    A delegation may include a non-existent NS hostname, for example due
    to a typo or when the nameserver's domain registration has expired.
@@ -488,23 +488,29 @@ A.2.  Lame Delegations
 
    In particular, the rogue nameserver can publish CDS/CDNSKEY records.
    If those are processed by the parent without ensuring consistency
-   with other authoritative nameservers, the delegation will be secured
-   with the attacker's DNSSEC keys.  As responses served by the
-   remaining legitimate nameservers are not signed with these keys,
-   validating resolvers will start rejecting them.
+   with other authoritative nameservers, the delegation will, with some
+   patience, get secured with the attacker's DNSSEC keys.  Of course, as
+   the parent's query (or sometimes queries) need to hit the attacker's
+   nameserver, this requires some statistical luck; but eventually it
+   will succeed.  As responses served by the remaining legitimate
+   nameservers are not signed with these keys, validating resolvers will
+   start rejecting them.
+
+
+
+
+
+
+Thomassen                 Expires 4 April 2024                  [Page 9]
+
+Internet-Draft               cds-consistency                October 2023
+
 
    Once DNSSEC is established, the attacker can use CSYNC to remove
    other nameservers from the delegation at will (and potentially add
    new ones under their control).  This enables the attacker to position
    themself as the only party providing authoritiative DNS service for
    the victim domain, significantly augmenting the attack's impact.
-
-
-
-Thomassen                 Expires 10 March 2024                 [Page 9]
-
-Internet-Draft               cds-consistency              September 2023
-
 
 A.3.  Multi-Provider (Permanent Multi-Signer)
 
@@ -532,7 +538,7 @@ A.3.2.  NS Breakage
    delegation may be updated in a way that breaks resolution or silently
    reduces the multi-provider setup to a single-provider setup.
 
-A.4.  Provider Change (Temporary Multi-Signer)
+A.4.  Bogus Provider Change (Temporary Multi-Signer)
 
    Transferring DNS service for a domain name from one (signing) DNS
    provider to another, without going insecure, necessitates a brief
@@ -546,6 +552,16 @@ A.4.  Provider Change (Temporary Multi-Signer)
    providers.  (To conclude the hand-over, the old provider is removed
    by inverting these steps with swapped roles.)
 
+
+
+
+
+
+Thomassen                 Expires 4 April 2024                 [Page 10]
+
+Internet-Draft               cds-consistency                October 2023
+
+
    The multi-signer phase of this process breaks when the new provider,
    perhaps unaware of the situation and its intricacies, fails to
    include the old provider's keys in the DNSKEY (and CDS/CDNSKEY)
@@ -553,14 +569,6 @@ A.4.  Provider Change (Temporary Multi-Signer)
    resolver happens to retrieve the DNSKEY record set from the new
    provider, the old provider's RRSIGs do no longer validate, causing
    SERVFAIL to be returned.
-
-
-
-
-Thomassen                 Expires 10 March 2024                [Page 10]
-
-Internet-Draft               cds-consistency              September 2023
-
 
    However, an even worse consequence can occur when the parent performs
    their next CDS/CDNSKEY scan: It may then happen that the incorrect
@@ -602,21 +610,20 @@ Appendix B.  Change History (to be removed before publication)
    |  
    |  Point out zero overhead if nothing changed, and need for OOB
    |  interface
+
+
+
+Thomassen                 Expires 4 April 2024                 [Page 11]
+
+Internet-Draft               cds-consistency                October 2023
+
+
    |  
    |  Editorial changes
    |  
    |  Moved Failure Scenarios to appendix
 
    *  draft-ietf-dnsop-cds-consistency-00
-
-
-
-
-
-Thomassen                 Expires 10 March 2024                [Page 11]
-
-Internet-Draft               cds-consistency              September 2023
-
 
    |  Point out zero overhead if nothing changed, and need for OOB
    |  interface
@@ -655,6 +662,18 @@ Internet-Draft               cds-consistency              September 2023
 
 Author's Address
 
+
+
+
+
+
+
+
+Thomassen                 Expires 4 April 2024                 [Page 12]
+
+Internet-Draft               cds-consistency                October 2023
+
+
    Peter Thomassen
    SSE - Secure Systems Engineering GmbH
    Hauptstraße 3
@@ -669,4 +688,41 @@ Author's Address
 
 
 
-Thomassen                 Expires 10 March 2024                [Page 12]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Thomassen                 Expires 4 April 2024                 [Page 13]

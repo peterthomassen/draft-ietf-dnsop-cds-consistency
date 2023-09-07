@@ -196,9 +196,9 @@ its successors) continue to apply.
 
 ## CSYNC
 
-A CSYNC-based update consists of (1) querying the CSYNC (and possibly
-SOA) record to determine which data records shall be synchronized from
-child to parent; (2) querying for these data records (e.g. NS) and
+A CSYNC-based workflow generally consists of (1) querying the CSYNC (and
+possibly SOA) record to determine which data records shall be synchronized from
+child to parent, and (2) querying for these data records (e.g. NS), before
 placing them in the parent zone.
 If the below conditions are not met during these steps, the CSYNC state
 MUST be considered inconsistent.
@@ -211,10 +211,10 @@ immediate flag and type bitmap are equal across received responses.
 The CSYNC record's SOA serial field and soaminimum flag might
 legitimately differ across nameservers (such as in multi-provider
 setups); equality is thus not required across responses.
-Instead, for a given response, processing of these values thus MUST
+Instead, for a given response, processing of these values MUST
 occur with respect to the SOA record as obtained from the same
 nameserver (preferably in the same connection).
-The resulting per-response assessments of whether the CSYNC update is
+The resulting per-response assessments of whether the update is
 permissible MUST match across received responses.
 
 Further, when retrieving the data record sets as indicated in the CSYNC
@@ -233,10 +233,10 @@ performed before any address queries to ensure "that the right set of NS records
 is used as provided by the current NS set of the child". (Quotes from
 [@!RFC7477] Section 3.2.2; see also Section 4.3.)
 
-CSYNC updates may cause validation or even insecure resolution to break
+CSYNC-based updates may cause validation or even insecure resolution to break
 (e.g. by changing the delegation to a set of nameservers that do not
 serve required DNSKEY records or do not know the zone at all).
-Parental Agents SHOULD check that CSYNC updates, if applied, do not
+Parental Agents SHOULD check that CSYNC-based updates, if applied, do not
 break the delegation.
 
 
@@ -275,7 +275,7 @@ or CSYNC records in the child zone.
 
 # Acknowledgments
 
-Viktor Dukhovni, Wes Hardaker, Libor Peltan, Oli Schacher
+David Blacka, Viktor Dukhovni, Wes Hardaker, Libor Peltan, Oli Schacher
 
 
 {backmatter}
@@ -368,7 +368,7 @@ consistency errors downstream, it can also help detect the replication
 issue on the child side.
 
 
-## Lame Delegations
+## Escalation of Lame Delegation Takeover
 
 A delegation may include a non-existent NS hostname, for example due to
 a typo or when the nameserver's domain registration has expired.
@@ -390,8 +390,10 @@ nameserver takeover to a full domain takeover.
 
 In particular, the rogue nameserver can publish CDS/CDNSKEY records.
 If those are processed by the parent without ensuring consistency with
-other authoritative nameservers, the delegation will be secured with
-the attacker's DNSSEC keys.
+other authoritative nameservers, the delegation will, with some patience, get
+secured with the attacker's DNSSEC keys. Of course, as the parent’s query (or
+sometimes queries) need to hit the attacker's nameserver, this requires some
+statistical luck; but eventually it will succeed.
 As responses served by the remaining legitimate nameservers are not
 signed with these keys, validating resolvers will start rejecting them.
 
@@ -429,7 +431,7 @@ record set without ensuring consistency across nameservers, the
 delegation may be updated in a way that breaks resolution or silently
 reduces the multi-provider setup to a single-provider setup.
 
-## Provider Change (Temporary Multi-Signer)
+## Bogus Provider Change (Temporary Multi-Signer)
 
 Transferring DNS service for a domain name from one (signing) DNS
 provider to another, without going insecure, necessitates a brief period
