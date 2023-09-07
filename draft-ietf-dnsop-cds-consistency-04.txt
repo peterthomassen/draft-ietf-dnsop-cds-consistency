@@ -73,7 +73,7 @@ Table of Contents
      1.1.  Requirements Notation . . . . . . . . . . . . . . . . . .   3
      1.2.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Processing Requirements . . . . . . . . . . . . . . . . . . .   4
-     2.1.  CDS and CDNSKEY . . . . . . . . . . . . . . . . . . . . .   4
+     2.1.  CDS and CDNSKEY . . . . . . . . . . . . . . . . . . . . .   5
      2.2.  CSYNC . . . . . . . . . . . . . . . . . . . . . . . . . .   5
    3.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
    4.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
@@ -82,10 +82,10 @@ Table of Contents
    7.  Informative References  . . . . . . . . . . . . . . . . . . .   7
    Appendix A.  Failure Scenarios  . . . . . . . . . . . . . . . . .   8
      A.1.  DS Breakage due to Replication Lag  . . . . . . . . . . .   8
-     A.2.  Lame Delegations  . . . . . . . . . . . . . . . . . . . .   8
-     A.3.  Multi-Homing (Permanent Multi-Signer) . . . . . . . . . .   9
+     A.2.  Lame Delegations  . . . . . . . . . . . . . . . . . . . .   9
+     A.3.  Multi-Provider (Permanent Multi-Signer) . . . . . . . . .   9
        A.3.1.  DS Breakage . . . . . . . . . . . . . . . . . . . . .   9
-       A.3.2.  NS Breakage . . . . . . . . . . . . . . . . . . . . .   9
+       A.3.2.  NS Breakage . . . . . . . . . . . . . . . . . . . . .  10
      A.4.  Provider Change (Temporary Multi-Signer)  . . . . . . . .  10
    Appendix B.  Change History (to be removed before publication)  .  10
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  12
@@ -131,12 +131,12 @@ Internet-Draft               cds-consistency              September 2023
 
    As a result, adverse consequences can arise in conjunction with the
    multi-signer scenarios laid out in [RFC8901], both when deployed
-   temporarily (during a provider change) and permanently (in a multi-
-   homing setup).  For example, a single provider may (accidentally or
-   maliciously) cause another provider's trust anchors and/or
-   nameservers to be removed from the delegation.  Similar breakage can
-   occur when the delegation has lame nameservers.  More detailed
-   examples are given in Appendix A.
+   temporarily (during a provider change) and permanently (in a
+   redundant multi-provider setup).  For example, a single provider may
+   (accidentally or maliciously) cause another provider's trust anchors
+   and/or nameservers to be removed from the delegation.  Similar
+   breakage can occur when the delegation has lame nameservers.  More
+   detailed examples are given in Appendix A.
 
    A single provider should not be in the position to remove the other
    providers' records from the delegation.  To address this issue, this
@@ -158,10 +158,10 @@ Internet-Draft               cds-consistency              September 2023
 
 1.2.  Terminology
 
-   The terminology in this document is as defined in [RFC7344].
-
-
-
+   Multi-provider setup:  A constellation where several providers
+      independently operate authoritative DNS service for a domain,
+      usually for purposes of redundancy.  This includes setups both
+      with and without DNSSEC.
 
 
 
@@ -169,6 +169,15 @@ Thomassen                 Expires 10 March 2024                 [Page 3]
 
 Internet-Draft               cds-consistency              September 2023
 
+
+   Multi-signer setup:  A multi-provider setup for a DNSSEC-enabled
+      domain with multiple independent signing entities [RFC8901].  Such
+      a setup may be permanent (for redundancy) or temporary (for
+      continuity of DNSSEC operation while changing the provider of a
+      domain that normally uses a single one).
+
+   Otherwise, the terminology in this document is as defined in
+   [RFC7344].
 
 2.  Processing Requirements
 
@@ -208,15 +217,6 @@ Internet-Draft               cds-consistency              September 2023
    particular, DNSSEC signatures MUST be requested and validated for all
    queries unless otherwise noted.
 
-2.1.  CDS and CDNSKEY
-
-   To retrieve a Child's CDS/CDNSKEY RRset for DNSSEC delegation trust
-   maintenance, the Parental Agent, knowing both the Child zone name and
-   its NS hostnames, MUST ascertain that queries are made against all
-   (reachable) nameservers listed in the Child's delegation from the
-   Parent, and ensure that each key referenced in any of the received
-   answers is also referenced in all other received responses.
-
 
 
 
@@ -225,6 +225,15 @@ Thomassen                 Expires 10 March 2024                 [Page 4]
 
 Internet-Draft               cds-consistency              September 2023
 
+
+2.1.  CDS and CDNSKEY
+
+   To retrieve a Child's CDS/CDNSKEY RRset for DNSSEC delegation trust
+   maintenance, the Parental Agent, knowing both the Child zone name and
+   its NS hostnames, MUST ascertain that queries are made against all
+   (reachable) nameservers listed in the Child's delegation from the
+   Parent, and ensure that each key referenced in any of the received
+   answers is also referenced in all other received responses.
 
    In other words, CDS/CDNSKEY records at the Child zone apex MUST be
    fetched directly from each (reachable) authoritative server as
@@ -261,6 +270,18 @@ Internet-Draft               cds-consistency              September 2023
    assessments of whether the CSYNC update is permissible MUST match
    across received responses.
 
+
+
+
+
+
+
+
+Thomassen                 Expires 10 March 2024                 [Page 5]
+
+Internet-Draft               cds-consistency              September 2023
+
+
    Further, when retrieving the data record sets as indicated in the
    CSYNC record (such as NS or A/AAAA records), the Parental Agent MUST
    ascertain that all queries are made against all nameservers from
@@ -274,14 +295,6 @@ Internet-Draft               cds-consistency              September 2023
    Parental Agents SHOULD check that CSYNC updates, if applied, do not
    break the delegation.
 
-
-
-
-Thomassen                 Expires 10 March 2024                 [Page 5]
-
-Internet-Draft               cds-consistency              September 2023
-
-
 3.  IANA Considerations
 
    This document has no IANA actions.
@@ -291,10 +304,10 @@ Internet-Draft               cds-consistency              September 2023
    The level of rigor mandated by this document is needed to prevent
    publication of half-baked DS or delegation NS RRsets (authorized only
    under an insufficient subset of authoritative nameservers), ensuring
-   that an operator in a (functioning) multi-homing setup cannot
+   that an operator in a (functioning) multi-provider setup cannot
    unilaterally modify the delegation (add or remove trust anchors or
-   nameservers).  This applies both to intentional and unintentional
-   multi-homing setups (such as in the case of lame delegation
+   nameservers).  This applies both when the setup is intentional and
+   when it is unintentional (such as in the case of lame delegation
    hijacking).
 
    As a consequence, the delegation's records can only be modified when
@@ -318,6 +331,13 @@ Internet-Draft               cds-consistency              September 2023
 
 6.  Normative References
 
+
+
+Thomassen                 Expires 10 March 2024                 [Page 6]
+
+Internet-Draft               cds-consistency              September 2023
+
+
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
@@ -327,16 +347,6 @@ Internet-Draft               cds-consistency              September 2023
               Rose, "DNS Security Introduction and Requirements",
               RFC 4033, DOI 10.17487/RFC4033, March 2005,
               <https://www.rfc-editor.org/info/rfc4033>.
-
-
-
-
-
-
-Thomassen                 Expires 10 March 2024                 [Page 6]
-
-Internet-Draft               cds-consistency              September 2023
-
 
    [RFC4034]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
               Rose, "Resource Records for the DNS Security Extensions",
@@ -377,6 +387,13 @@ Internet-Draft               cds-consistency              September 2023
               Issues", DOI 10.1145/3419394.3423623, 27 October 2020,
               <http://dx.doi.org/10.1145/3419394.3423623>.
 
+
+
+Thomassen                 Expires 10 March 2024                 [Page 7]
+
+Internet-Draft               cds-consistency              September 2023
+
+
    [LAME2]    Akiwate, G., Savage, S., Voelker, G. M., Claffy, K. C.,
               and ACM, "Risky BIZness", DOI 10.1145/3487552.3487816, 2
               November 2021,
@@ -386,13 +403,6 @@ Internet-Draft               cds-consistency              September 2023
               Operational Practices, Version 2", RFC 6781,
               DOI 10.17487/RFC6781, December 2012,
               <https://www.rfc-editor.org/info/rfc6781>.
-
-
-
-Thomassen                 Expires 10 March 2024                 [Page 7]
-
-Internet-Draft               cds-consistency              September 2023
-
 
    [RFC8901]  Huque, S., Aras, P., Dickinson, J., Vcelak, J., and D.
               Blacka, "Multi-Signer DNSSEC Models", RFC 8901,
@@ -410,7 +420,7 @@ Appendix A.  Failure Scenarios
    out of line and the parent is not careful, DNS resolution and/or
    validation will break down.  When several DNS providers are involved,
    this undermines the very guarantees of operator independence that
-   multi-homing configurations are expected to provide.
+   multi-provider configurations are expected to provide.
 
 A.1.  DS Breakage due to Replication Lag
 
@@ -427,6 +437,19 @@ A.1.  DS Breakage due to Replication Lag
    reports consistency errors downstream, it can also help detect the
    replication issue on the child side.
 
+
+
+
+
+
+
+
+
+Thomassen                 Expires 10 March 2024                 [Page 8]
+
+Internet-Draft               cds-consistency              September 2023
+
+
 A.2.  Lame Delegations
 
    A delegation may include a non-existent NS hostname, for example due
@@ -442,13 +465,6 @@ A.2.  Lame Delegations
    such an attack, as validating resolvers will reject illegitimate
    responses due to lack of signatures consistent with the delegation's
    DS records.
-
-
-
-Thomassen                 Expires 10 March 2024                 [Page 8]
-
-Internet-Draft               cds-consistency              September 2023
-
 
    On the other hand, if the delegation is not protected by DNSSEC, the
    rogue nameserver is not only able to serve unauthorized responses
@@ -468,7 +484,7 @@ Internet-Draft               cds-consistency              September 2023
    themself as the only party providing authoritiative DNS service for
    the victim domain, significantly augmenting the attack's impact.
 
-A.3.  Multi-Homing (Permanent Multi-Signer)
+A.3.  Multi-Provider (Permanent Multi-Signer)
 
 A.3.1.  DS Breakage
 
@@ -481,6 +497,15 @@ A.3.1.  DS Breakage
    removed from the delegation.  As a result, the zone is broken at
    least for some queries.
 
+
+
+
+
+Thomassen                 Expires 10 March 2024                 [Page 9]
+
+Internet-Draft               cds-consistency              September 2023
+
+
 A.3.2.  NS Breakage
 
    A similar scenario affects the CSYNC record, which is used to update
@@ -492,19 +517,7 @@ A.3.2.  NS Breakage
    If the parent then observes a CSYNC signal and fetches the flawed NS
    record set without ensuring consistency across nameservers, the
    delegation may be updated in a way that breaks resolution or silently
-   reduces the multi-homing setup to a single-provider setup.
-
-
-
-
-
-
-
-
-Thomassen                 Expires 10 March 2024                 [Page 9]
-
-Internet-Draft               cds-consistency              September 2023
-
+   reduces the multi-provider setup to a single-provider setup.
 
 A.4.  Provider Change (Temporary Multi-Signer)
 
@@ -541,6 +554,16 @@ Appendix B.  Change History (to be removed before publication)
 
    *  draft-ietf-dnsop-cds-consistency-04
 
+
+
+
+Thomassen                 Expires 10 March 2024                [Page 10]
+
+Internet-Draft               cds-consistency              September 2023
+
+
+   |  Clean up "multi-homing" and define "multi-provider"/"multi-signer"
+
    *  draft-ietf-dnsop-cds-consistency-03
 
    |  Clarify that CSYNC updates should not break delegations
@@ -554,13 +577,6 @@ Appendix B.  Change History (to be removed before publication)
    |  Retry before assuming a nameserver is permanently unreachable
 
    *  draft-ietf-dnsop-cds-consistency-01
-
-
-
-Thomassen                 Expires 10 March 2024                [Page 10]
-
-Internet-Draft               cds-consistency              September 2023
-
 
    |  Make nits tool happy
    |  
@@ -594,6 +610,14 @@ Internet-Draft               cds-consistency              September 2023
 
    *  draft-thomassen-dnsop-cds-consistency-02
 
+
+
+
+Thomassen                 Expires 10 March 2024                [Page 11]
+
+Internet-Draft               cds-consistency              September 2023
+
+
    |  Don't ignore DoE responses from individual nameservers (instead,
    |  require consistency across all responses received)
 
@@ -610,14 +634,6 @@ Internet-Draft               cds-consistency              September 2023
 
    |  Initial public draft.
 
-
-
-
-Thomassen                 Expires 10 March 2024                [Page 11]
-
-Internet-Draft               cds-consistency              September 2023
-
-
 Author's Address
 
    Peter Thomassen
@@ -626,22 +642,6 @@ Author's Address
    10827 Berlin
    Germany
    Email: peter.thomassen@securesystems.de
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

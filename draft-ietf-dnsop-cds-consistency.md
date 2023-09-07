@@ -85,8 +85,8 @@ trigger a roll of the DS or NS record set at the parent.
 
 As a result, adverse consequences can arise in conjunction with the
 multi-signer scenarios laid out in [@?RFC8901], both when deployed
-temporarily (during a provider change) and permanently (in a
-multi-homing setup).
+temporarily (during a provider change) and permanently (in a redundant
+multi-provider setup).
 For example, a single provider may (accidentally or maliciously) cause
 another provider's trust anchors and/or nameservers to be removed from
 the delegation.
@@ -116,7 +116,18 @@ capitals, as shown here.
 
 ## Terminology
 
-The terminology in this document is as defined in [@!RFC7344].
+Multi-provider setup:
+: A constellation where several providers independently operate authoritative
+  DNS service for a domain, usually for purposes of redundancy. This includes
+  setups both with and without DNSSEC.
+
+Multi-signer setup:
+: A multi-provider setup for a DNSSEC-enabled domain with multiple independent
+  signing entities [@?RFC8901]. Such a setup may be permanent (for redundancy)
+  or temporary (for continuity of DNSSEC operation while changing the provider
+  of a domain that normally uses a single one).
+
+Otherwise, the terminology in this document is as defined in [@!RFC7344].
 
 
 # Processing Requirements
@@ -229,11 +240,11 @@ This document has no IANA actions.
 The level of rigor mandated by this document is needed to prevent
 publication of half-baked DS or delegation NS RRsets (authorized only
 under an insufficient subset of authoritative nameservers), ensuring
-that an operator in a (functioning) multi-homing setup cannot
+that an operator in a (functioning) multi-provider setup cannot
 unilaterally modify the delegation (add or remove trust anchors or
 nameservers).
-This applies both to intentional and unintentional multi-homing setups
-(such as in the case of lame delegation hijacking).
+This applies both when the setup is intentional and when it is
+unintentional (such as in the case of lame delegation hijacking).
 
 As a consequence, the delegation's records can only be modified when
 there is consensus across operators, which is expected to reflect the
@@ -330,7 +341,7 @@ The common feature of these scenarios is that if one nameserver steps
 out of line and the parent is not careful, DNS resolution and/or
 validation will break down. When several DNS providers are involved,
 this undermines the very guarantees of operator independence that
-multi-homing configurations are expected to provide.
+multi-provider configurations are expected to provide.
 
 ## DS Breakage due to Replication Lag
 
@@ -382,7 +393,7 @@ providing authoritiative DNS service for the victim domain,
 significantly augmenting the attack's impact.
 
 
-## Multi-Homing (Permanent Multi-Signer)
+## Multi-Provider (Permanent Multi-Signer)
 
 ### DS Breakage
 
@@ -406,7 +417,7 @@ an otherwise flawed NS record set.
 If the parent then observes a CSYNC signal and fetches the flawed NS
 record set without ensuring consistency across nameservers, the
 delegation may be updated in a way that breaks resolution or silently
-reduces the multi-homing setup to a single-provider setup.
+reduces the multi-provider setup to a single-provider setup.
 
 ## Provider Change (Temporary Multi-Signer)
 
@@ -443,6 +454,8 @@ DNSSEC validation fails for all answers served by the old provider.
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-04
+
+> Clean up "multi-homing" and define "multi-provider"/"multi-signer"
 
 * draft-ietf-dnsop-cds-consistency-03
 
