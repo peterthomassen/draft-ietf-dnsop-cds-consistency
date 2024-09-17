@@ -465,6 +465,10 @@ DNSSEC validation fails for all answers served by the old provider.
 
 # Change History (to be removed before publication)
 
+* draft-ietf-dnsop-cds-consistency-05
+
+> Editorial changes
+
 * draft-ietf-dnsop-cds-consistency-04
 
 > Clarify that existing CSYNC NS and glue processing rules remain in place
