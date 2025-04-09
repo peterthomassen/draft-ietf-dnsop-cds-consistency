@@ -1,4 +1,4 @@
-VERSION = 05
+VERSION = 06
 DOCNAME = draft-ietf-dnsop-cds-consistency
 today := $(shell TZ=UTC date +%Y-%m-%dT00:00:00Z)
 
