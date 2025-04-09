@@ -286,9 +286,20 @@ where the private key is no longer available for signing the CDS/CDNSKEY
 or CSYNC records in the child zone.
 
 
+# Implementation Status
+
+**Note to the RFC Editor**: please remove this entire section before publication.
+
+This draft has been implemented by
+
+- TANGO Registry Services
+- CORE Registry
+
+
 # Acknowledgments
 
-David Blacka, Viktor Dukhovni, Wes Hardaker, Libor Peltan, Oli Schacher
+David Blacka, Viktor Dukhovni, Wes Hardaker, Libor Peltan, Oli Schacher,
+Michael Bauland
 
 
 {backmatter}
@@ -478,6 +489,10 @@ DNSSEC validation fails for all answers served by the old provider.
 
 
 # Change History (to be removed before publication)
+
+* draft-ietf-dnsop-cds-consistency-06
+
+> Add Implementation Status
 
 * draft-ietf-dnsop-cds-consistency-05
 
