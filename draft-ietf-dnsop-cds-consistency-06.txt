@@ -92,7 +92,7 @@ Table of Contents
      A.1.  DS Breakage due to Replication Lag  . . . . . . . . . . .   9
      A.2.  Escalation of Lame Delegation Takeover  . . . . . . . . .  10
      A.3.  Multi-Provider (Permanent Multi-Signer) . . . . . . . . .  10
-       A.3.1.  DS Breakage . . . . . . . . . . . . . . . . . . . . .  10
+       A.3.1.  DS Breakage . . . . . . . . . . . . . . . . . . . . .  11
        A.3.2.  NS Breakage . . . . . . . . . . . . . . . . . . . . .  11
      A.4.  Bogus Provider Change (Temporary Multi-Signer)  . . . . .  11
    Appendix B.  Change History (to be removed before publication)  .  12
@@ -300,10 +300,10 @@ Internet-Draft               cds-consistency                  April 2025
    legitimately differ across nameservers (such as in multi-provider
    setups); equality is thus not required across responses.  Instead,
    for a given response, processing of these values MUST occur with
-   respect to the SOA record as obtained from the same nameserver
-   (preferably in the same connection).  If the resulting per-nameserver
-   assessments of whether the update is permissible do not all agree,
-   the CSYNC state MUST be considered inconsistent.
+   respect to the SOA record as obtained from the same nameserver.  If
+   the resulting per-nameserver assessments of whether the update is
+   permissible do not all agree, the CSYNC state MUST be considered
+   inconsistent.
 
    Further, when retrieving the data record sets as indicated in the
    CSYNC record (such as NS or A/AAAA records), the Parental Agent MUST
@@ -349,9 +349,9 @@ Internet-Draft               cds-consistency                  April 2025
    is unintentional (such as in the case of lame delegation hijacking).
 
    As a consequence, the delegation's records can only be modified when
-   zonefiles are synchronized across operators, unanimously reflecting
-   the domain owner's intentions.  Both availability and integrity of
-   the domain's DNS service benefit from this policy.
+   zones are synchronized across operators, unanimously reflecting the
+   domain owner's intentions.  Both availability and integrity of the
+   domain's DNS service benefit from this policy.
 
    In order to resolve situations in which consensus about child zone
    contents cannot be reached (e.g. because one of the nameserver
@@ -375,17 +375,17 @@ Internet-Draft               cds-consistency                  April 2025
 
 7.  Acknowledgments
 
-   David Blacka, Viktor Dukhovni, Wes Hardaker, Libor Peltan, Oli
-   Schacher, Michael Bauland
+   In order of first contribution or review: Viktor Dukhovni, Wes
+   Hardaker, Libor Peltan, Oli Schacher, David Blacka, Michael Bauland,
+   Patrick Mevzek.
 
 8.  References
 
 8.1.  Normative References
 
-   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119,
-              DOI 10.17487/RFC2119, March 1997,
-              <https://www.rfc-editor.org/info/rfc2119>.
+
+
+
 
 
 
@@ -393,6 +393,11 @@ Thomassen                Expires 11 October 2025                [Page 7]
 
 Internet-Draft               cds-consistency                  April 2025
 
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
 
    [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
               Rose, "DNS Security Introduction and Requirements",
@@ -433,11 +438,6 @@ Internet-Draft               cds-consistency                  April 2025
 
 8.2.  Informative References
 
-   [LAME1]    Akiwate, G., Jonker, M., Sommese, R., Foster, I., Voelker,
-              G. M., Savage, S., Claffy, K., and ACM, "Unresolved
-              Issues", Proceedings of the ACM Internet Measurement
-              Conference, DOI 10.1145/3419394.3423623, 27 October 2020,
-              <http://dx.doi.org/10.1145/3419394.3423623>.
 
 
 
@@ -449,6 +449,12 @@ Thomassen                Expires 11 October 2025                [Page 8]
 
 Internet-Draft               cds-consistency                  April 2025
 
+
+   [LAME1]    Akiwate, G., Jonker, M., Sommese, R., Foster, I., Voelker,
+              G. M., Savage, S., Claffy, K., and ACM, "Unresolved
+              Issues", Proceedings of the ACM Internet Measurement
+              Conference, DOI 10.1145/3419394.3423623, 27 October 2020,
+              <http://dx.doi.org/10.1145/3419394.3423623>.
 
    [LAME2]    Akiwate, G., Savage, S., Voelker, G. M., Claffy, K. C.,
               and ACM, "Risky BIZness", Proceedings of the 21st ACM
@@ -486,15 +492,9 @@ A.1.  DS Breakage due to Replication Lag
    on the nameserver contacted.  This may cause old and new DS RRsets to
    be deployed in an alternating fashion.  The zone maintainer, having
    detected that the DS deployment was successful, may then confidently
-   remove the old DNSKEY from the zonefile, only to find out later that
-   the DS RRset has been turned back, breaking the delegation's DNSSEC
-   chain of trust.
-
-   Checking for consistency minimizes this risk.  In case the parent
-   reports consistency errors downstream, it can also help detect the
-   replication issue on the child side.
-
-
+   remove the old DNSKEY from the zone, only to find out later that the
+   DS RRset has been turned back, breaking the delegation's DNSSEC chain
+   of trust.
 
 
 
@@ -506,14 +506,18 @@ Thomassen                Expires 11 October 2025                [Page 9]
 Internet-Draft               cds-consistency                  April 2025
 
 
+   Checking for consistency minimizes this risk.  In case the parent
+   reports consistency errors downstream, it can also help detect the
+   replication issue on the child side.
+
 A.2.  Escalation of Lame Delegation Takeover
 
    A delegation may include a non-existent NS hostname, for example due
    to a typo or when the nameserver's domain registration has expired.
    (Re-)registering such a non-resolvable nameserver domain allows a
    third party to run authoritative DNS service for all domains
-   delegated to that NS hostname, serving responses different from those
-   in the legitimate zonefile.
+   delegated to that NS hostname, serving responses different from the
+   legitimate ones.
 
    This strategy for hijacking (at least part of the) DNS traffic and
    spoofing responses is not new, but surprisingly common
@@ -546,11 +550,7 @@ A.2.  Escalation of Lame Delegation Takeover
 
 A.3.  Multi-Provider (Permanent Multi-Signer)
 
-A.3.1.  DS Breakage
 
-   While performing a key rollover and adjusting the corresponding CDS/
-   CDNSKEY records, a provider could accidentally publish CDS/CDNSKEY
-   records that only include its own keys.
 
 
 
@@ -561,6 +561,12 @@ Thomassen                Expires 11 October 2025               [Page 10]
 
 Internet-Draft               cds-consistency                  April 2025
 
+
+A.3.1.  DS Breakage
+
+   While performing a key rollover and adjusting the corresponding CDS/
+   CDNSKEY records, a provider could accidentally publish CDS/CDNSKEY
+   records that only include its own keys.
 
    When the parent happens to retrieve the records from a nameserver
    controlled by this provider, the other providers' DS records would be
@@ -602,6 +608,16 @@ A.4.  Bogus Provider Change (Temporary Multi-Signer)
    provider, the old provider's RRSIGs do no longer validate, causing
    SERVFAIL to be returned.
 
+
+
+
+
+
+Thomassen                Expires 11 October 2025               [Page 11]
+
+Internet-Draft               cds-consistency                  April 2025
+
+
    However, an even worse consequence can occur when the parent performs
    their next CDS/CDNSKEY scan: It may then happen that the incorrect
    CDS/CDNSKEY record set is fetched from the new provider and used to
@@ -611,17 +627,12 @@ A.4.  Bogus Provider Change (Temporary Multi-Signer)
    the new provider's DNSKEYs only, and DNSSEC validation fails for all
    answers served by the old provider.
 
-
-
-Thomassen                Expires 11 October 2025               [Page 11]
-
-Internet-Draft               cds-consistency                  April 2025
-
-
 Appendix B.  Change History (to be removed before publication)
 
    *  draft-ietf-dnsop-cds-consistency-06
 
+   |  Editorial changes from Dnsdir early review
+   |  
    |  Add Implementation Status
 
    *  draft-ietf-dnsop-cds-consistency-05
@@ -655,6 +666,14 @@ Appendix B.  Change History (to be removed before publication)
    |  
    |  New failure mode: DS Breakage due to Replication Lag
    |  
+
+
+
+Thomassen                Expires 11 October 2025               [Page 12]
+
+Internet-Draft               cds-consistency                  April 2025
+
+
    |  Point out zero overhead if nothing changed, and need for OOB
    |  interface
    |  
@@ -666,14 +685,6 @@ Appendix B.  Change History (to be removed before publication)
 
    |  Point out zero overhead if nothing changed, and need for OOB
    |  interface
-
-
-
-Thomassen                Expires 11 October 2025               [Page 12]
-
-Internet-Draft               cds-consistency                  April 2025
-
-
    |  
    |  Editorial changes.
 
@@ -709,6 +720,16 @@ Internet-Draft               cds-consistency                  April 2025
 
 Author's Address
 
+
+
+
+
+
+Thomassen                Expires 11 October 2025               [Page 13]
+
+Internet-Draft               cds-consistency                  April 2025
+
+
    Peter Thomassen
    SSE - Secure Systems Engineering GmbH
    Hauptstraße 3
@@ -725,4 +746,39 @@ Author's Address
 
 
 
-Thomassen                Expires 11 October 2025               [Page 13]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Thomassen                Expires 11 October 2025               [Page 14]

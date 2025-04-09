@@ -227,7 +227,7 @@ legitimately differ across nameservers (such as in multi-provider
 setups); equality is thus not required across responses.
 Instead, for a given response, processing of these values MUST
 occur with respect to the SOA record as obtained from the same
-nameserver (preferably in the same connection).
+nameserver.
 If the resulting per-nameserver assessments of whether the update is
 permissible do not all agree, the CSYNC state MUST be considered
 inconsistent.
@@ -270,7 +270,7 @@ This applies both when the setup is intentional and when it is
 unintentional (such as in the case of lame delegation hijacking).
 
 As a consequence, the delegation's records can only be modified when
-zonefiles are synchronized across operators, unanimously reflecting the
+zones are synchronized across operators, unanimously reflecting the
 domain owner's intentions.
 Both availability and integrity of the domain's DNS service benefit from
 this policy.
@@ -298,8 +298,8 @@ This draft has been implemented by
 
 # Acknowledgments
 
-David Blacka, Viktor Dukhovni, Wes Hardaker, Libor Peltan, Oli Schacher,
-Michael Bauland
+In order of first contribution or review: Viktor Dukhovni, Wes Hardaker,
+Libor Peltan, Oli Schacher, David Blacka, Michael Bauland, Patrick Mevzek.
 
 
 {backmatter}
@@ -384,7 +384,7 @@ the parent may see different CDS/CDNSKEY RRsets depending on the
 nameserver contacted. This may cause old and new DS RRsets to be
 deployed in an alternating fashion. The zone maintainer, having detected
 that the DS deployment was successful, may then confidently remove the
-old DNSKEY from the zonefile, only to find out later that the DS RRset
+old DNSKEY from the zone, only to find out later that the DS RRset
 has been turned back, breaking the delegation's DNSSEC chain of trust.
 
 Checking for consistency minimizes this risk. In case the parent reports
@@ -398,8 +398,7 @@ A delegation may include a non-existent NS hostname, for example due to
 a typo or when the nameserver's domain registration has expired.
 (Re-)registering such a non-resolvable nameserver domain allows a third
 party to run authoritative DNS service for all domains delegated to that
-NS hostname, serving responses different from those in the legitimate
-zonefile.
+NS hostname, serving responses different from the legitimate ones.
 
 This strategy for hijacking (at least part of the) DNS traffic and
 spoofing responses is not new, but surprisingly common [@?LAME1;@LAME2].
@@ -491,6 +490,8 @@ DNSSEC validation fails for all answers served by the old provider.
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-06
+
+> Editorial changes from Dnsdir early review
 
 > Add Implementation Status
 

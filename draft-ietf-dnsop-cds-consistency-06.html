@@ -1589,7 +1589,7 @@ legitimately differ across nameservers (such as in multi-provider
 setups); equality is thus not required across responses.
 Instead, for a given response, processing of these values MUST
 occur with respect to the SOA record as obtained from the same
-nameserver (preferably in the same connection).
+nameserver.
 If the resulting per-nameserver assessments of whether the update is
 permissible do not all agree, the CSYNC state MUST be considered
 inconsistent.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
@@ -1636,7 +1636,7 @@ remove trust anchors or nameservers) when other operators are present.
 This applies both when the setup is intentional and when it is
 unintentional (such as in the case of lame delegation hijacking).<a href="#section-5-1" class="pilcrow">¶</a></p>
 <p id="section-5-2">As a consequence, the delegation's records can only be modified when
-zonefiles are synchronized across operators, unanimously reflecting the
+zones are synchronized across operators, unanimously reflecting the
 domain owner's intentions.
 Both availability and integrity of the domain's DNS service benefit from
 this policy.<a href="#section-5-2" class="pilcrow">¶</a></p>
@@ -1671,8 +1671,8 @@ or CSYNC records in the child zone.<a href="#section-5-3" class="pilcrow">¶</a>
       <h2 id="name-acknowledgments">
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
-<p id="section-7-1">David Blacka, Viktor Dukhovni, Wes Hardaker, Libor Peltan, Oli Schacher,
-Michael Bauland<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-1">In order of first contribution or review: Viktor Dukhovni, Wes Hardaker,
+Libor Peltan, Oli Schacher, David Blacka, Michael Bauland, Patrick Mevzek.<a href="#section-7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <section id="section-8">
@@ -1771,7 +1771,7 @@ the parent may see different CDS/CDNSKEY RRsets depending on the
 nameserver contacted. This may cause old and new DS RRsets to be
 deployed in an alternating fashion. The zone maintainer, having detected
 that the DS deployment was successful, may then confidently remove the
-old DNSKEY from the zonefile, only to find out later that the DS RRset
+old DNSKEY from the zone, only to find out later that the DS RRset
 has been turned back, breaking the delegation's DNSSEC chain of trust.<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
 <p id="appendix-A.1-2">Checking for consistency minimizes this risk. In case the parent reports
 consistency errors downstream, it can also help detect the replication
@@ -1787,8 +1787,7 @@ issue on the child side.<a href="#appendix-A.1-2" class="pilcrow">¶</a></p>
 a typo or when the nameserver's domain registration has expired.
 (Re-)registering such a non-resolvable nameserver domain allows a third
 party to run authoritative DNS service for all domains delegated to that
-NS hostname, serving responses different from those in the legitimate
-zonefile.<a href="#appendix-A.2-1" class="pilcrow">¶</a></p>
+NS hostname, serving responses different from the legitimate ones.<a href="#appendix-A.2-1" class="pilcrow">¶</a></p>
 <p id="appendix-A.2-2">This strategy for hijacking (at least part of the) DNS traffic and
 spoofing responses is not new, but surprisingly common <span>[<a href="#LAME1" class="cite xref">LAME1</a>]</span><span>[<a href="#LAME2" class="cite xref">LAME2</a>]</span>.
 It is also known that DNSSEC reduces the impact of such an attack,
@@ -1897,7 +1896,8 @@ DNSSEC validation fails for all answers served by the old provider.<a href="#app
 </li>
       </ul>
 <blockquote id="appendix-B-2">
-        <p id="appendix-B-2.1">Add Implementation Status<a href="#appendix-B-2.1" class="pilcrow">¶</a></p>
+        <p id="appendix-B-2.1">Editorial changes from Dnsdir early review<a href="#appendix-B-2.1" class="pilcrow">¶</a></p>
+<p id="appendix-B-2.2">Add Implementation Status<a href="#appendix-B-2.2" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="compact">
 <li class="compact" id="appendix-B-3.1">draft-ietf-dnsop-cds-consistency-05<a href="#appendix-B-3.1" class="pilcrow">¶</a>
