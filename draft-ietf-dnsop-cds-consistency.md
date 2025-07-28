@@ -501,6 +501,8 @@ DNSSEC validation fails for all answers served by the old provider.
 
 # Change History (to be removed before publication)
 
+* draft-ietf-dnsop-cds-consistency-08
+
 * draft-ietf-dnsop-cds-consistency-07
 
 > Clarify that "all nameservers" means fetching all delegation NS IPs
