@@ -4,9 +4,9 @@
 
 DNSOP Working Group                                         P. Thomassen
 Internet-Draft                     SSE - Secure Systems Engineering GmbH
-Updates: 7344, 7477 (if approved)                           28 July 2025
+Updates: 7344, 7477 (if approved)                          1 August 2025
 Intended status: Standards Track                                        
-Expires: 29 January 2026
+Expires: 2 February 2026
 
 
           Clarifications on CDS/CDNSKEY and CSYNC Consistency
@@ -45,7 +45,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 January 2026.
+   This Internet-Draft will expire on 2 February 2026.
 
 
 
@@ -53,9 +53,9 @@ Status of This Memo
 
 
 
-Thomassen                Expires 29 January 2026                [Page 1]
+Thomassen                Expires 2 February 2026                [Page 1]
 
-Internet-Draft               cds-consistency                   July 2025
+Internet-Draft               cds-consistency                 August 2025
 
 
 Copyright Notice
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Thomassen                Expires 29 January 2026                [Page 2]
+Thomassen                Expires 2 February 2026                [Page 2]
 
-Internet-Draft               cds-consistency                   July 2025
+Internet-Draft               cds-consistency                 August 2025
 
 
    delegation.
@@ -165,9 +165,9 @@ Internet-Draft               cds-consistency                   July 2025
 
 
 
-Thomassen                Expires 29 January 2026                [Page 3]
+Thomassen                Expires 2 February 2026                [Page 3]
 
-Internet-Draft               cds-consistency                   July 2025
+Internet-Draft               cds-consistency                 August 2025
 
 
 1.1.  Requirements Notation
@@ -221,9 +221,9 @@ Internet-Draft               cds-consistency                   July 2025
 
 
 
-Thomassen                Expires 29 January 2026                [Page 4]
+Thomassen                Expires 2 February 2026                [Page 4]
 
-Internet-Draft               cds-consistency                   July 2025
+Internet-Draft               cds-consistency                 August 2025
 
 
    In all cases, consistency is REQUIRED across received responses only.
@@ -277,9 +277,9 @@ Internet-Draft               cds-consistency                   July 2025
 
 
 
-Thomassen                Expires 29 January 2026                [Page 5]
+Thomassen                Expires 2 February 2026                [Page 5]
 
-Internet-Draft               cds-consistency                   July 2025
+Internet-Draft               cds-consistency                 August 2025
 
 
    During initial DS provisioning (DNSSEC bootstrapping), conventional
@@ -333,9 +333,9 @@ Internet-Draft               cds-consistency                   July 2025
 
 
 
-Thomassen                Expires 29 January 2026                [Page 6]
+Thomassen                Expires 2 February 2026                [Page 6]
 
-Internet-Draft               cds-consistency                   July 2025
+Internet-Draft               cds-consistency                 August 2025
 
 
 4.  IANA Considerations
@@ -389,9 +389,9 @@ Internet-Draft               cds-consistency                   July 2025
 
 
 
-Thomassen                Expires 29 January 2026                [Page 7]
+Thomassen                Expires 2 February 2026                [Page 7]
 
-Internet-Draft               cds-consistency                   July 2025
+Internet-Draft               cds-consistency                 August 2025
 
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
@@ -445,9 +445,9 @@ Internet-Draft               cds-consistency                   July 2025
 
 
 
-Thomassen                Expires 29 January 2026                [Page 8]
+Thomassen                Expires 2 February 2026                [Page 8]
 
-Internet-Draft               cds-consistency                   July 2025
+Internet-Draft               cds-consistency                 August 2025
 
 
    [LAME1]    Akiwate, G., Jonker, M., Sommese, R., Foster, I., Voelker,
@@ -490,25 +490,27 @@ A.1.  DS Breakage due to Replication Lag
    If an authoritative nameserver is lagging behind during a key
    rollover, the parent may see different CDS/CDNSKEY RRsets depending
    on the nameserver contacted.  This may cause old and new DS RRsets to
-   be deployed in an alternating fashion.  The zone maintainer, having
-   detected that the DS deployment was successful, may then confidently
-   remove the old DNSKEY from the zone, only to find out later that the
-   DS RRset has been turned back, breaking the delegation's DNSSEC chain
-   of trust.
+   be deployed in an alternating fashion and without the awareness of
+   the zone maintainer, who may then inadvertently break the chain of
+   trust by prematurely removing a DNSKEY still referenced by a (stale)
+   CDS/CDNSKEY RRset.
 
 
 
 
 
 
-Thomassen                Expires 29 January 2026                [Page 9]
+
+Thomassen                Expires 2 February 2026                [Page 9]
 
-Internet-Draft               cds-consistency                   July 2025
+Internet-Draft               cds-consistency                 August 2025
 
 
-   Checking for consistency minimizes this risk.  In case the parent
-   reports consistency errors downstream, it can also help detect the
-   replication issue on the child side.
+   While foreseen in [RFC7344] Section 6.2, the solution suggested there
+   requires parents to keep state on CDS/CDNSKEY RRsets.  This document
+   achieves the same without this burden, and in case the parent reports
+   consistency errors downstream, can also help detection of the child-
+   side replication issue by the operator.
 
 A.2.  Escalation of Lame Delegation Takeover
 
@@ -555,11 +557,9 @@ A.3.  Multi-Provider (Permanent Multi-Signer)
 
 
 
-
-
-Thomassen                Expires 29 January 2026               [Page 10]
+Thomassen                Expires 2 February 2026               [Page 10]
 
-Internet-Draft               cds-consistency                   July 2025
+Internet-Draft               cds-consistency                 August 2025
 
 
 A.3.1.  DS Breakage
@@ -613,9 +613,9 @@ A.4.  Bogus Provider Change (Temporary Multi-Signer)
 
 
 
-Thomassen                Expires 29 January 2026               [Page 11]
+Thomassen                Expires 2 February 2026               [Page 11]
 
-Internet-Draft               cds-consistency                   July 2025
+Internet-Draft               cds-consistency                 August 2025
 
 
    However, an even worse consequence can occur when the parent performs
@@ -630,6 +630,9 @@ Internet-Draft               cds-consistency                   July 2025
 Appendix B.  Change History (to be removed before publication)
 
    *  draft-ietf-dnsop-cds-consistency-08
+
+   |  Take into account RFC 7344 Section 6.2 for Appendix A.1
+   |  considerations
 
    *  draft-ietf-dnsop-cds-consistency-07
 
@@ -663,16 +666,17 @@ Appendix B.  Change History (to be removed before publication)
    |  
    |  Editorial changes
 
+
+
+
+Thomassen                Expires 2 February 2026               [Page 12]
+
+Internet-Draft               cds-consistency                 August 2025
+
+
    *  draft-ietf-dnsop-cds-consistency-02
 
    |  Retry before assuming a nameserver is permanently unreachable
-
-
-
-Thomassen                Expires 29 January 2026               [Page 12]
-
-Internet-Draft               cds-consistency                   July 2025
-
 
    *  draft-ietf-dnsop-cds-consistency-01
 
@@ -718,17 +722,17 @@ Internet-Draft               cds-consistency                   July 2025
    |  
    |  Define similar requirements for CSYNC.
    |  
+
+
+
+Thomassen                Expires 2 February 2026               [Page 13]
+
+Internet-Draft               cds-consistency                 August 2025
+
+
    |  Editorial changes.
 
    *  draft-thomassen-dnsop-cds-consistency-00
-
-
-
-
-Thomassen                Expires 29 January 2026               [Page 13]
-
-Internet-Draft               cds-consistency                   July 2025
-
 
    |  Initial public draft.
 
@@ -777,8 +781,4 @@ Author's Address
 
 
 
-
-
-
-
-Thomassen                Expires 29 January 2026               [Page 14]
+Thomassen                Expires 2 February 2026               [Page 14]

@@ -394,14 +394,16 @@ multi-provider configurations are intended to provide.
 If an authoritative nameserver is lagging behind during a key rollover,
 the parent may see different CDS/CDNSKEY RRsets depending on the
 nameserver contacted. This may cause old and new DS RRsets to be
-deployed in an alternating fashion. The zone maintainer, having detected
-that the DS deployment was successful, may then confidently remove the
-old DNSKEY from the zone, only to find out later that the DS RRset
-has been turned back, breaking the delegation's DNSSEC chain of trust.
+deployed in an alternating fashion and without the awareness of the zone
+maintainer, who may then inadvertently break the chain of trust by
+prematurely removing a DNSKEY still referenced by a (stale) CDS/CDNSKEY
+RRset.
 
-Checking for consistency minimizes this risk. In case the parent reports
-consistency errors downstream, it can also help detect the replication
-issue on the child side.
+While foreseen in [@!RFC7344] Section 6.2, the solution suggested there
+requires parents to keep state on CDS/CDNSKEY RRsets. This document
+achieves the same without this burden, and in case the parent reports
+consistency errors downstream, can also help detection of the child-side
+replication issue by the operator.
 
 
 ## Escalation of Lame Delegation Takeover
@@ -502,6 +504,8 @@ DNSSEC validation fails for all answers served by the old provider.
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-08
+
+> Take into account RFC 7344 Section 6.2 for Appendix A.1 considerations
 
 * draft-ietf-dnsop-cds-consistency-07
 

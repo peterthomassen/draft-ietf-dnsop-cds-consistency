@@ -1224,11 +1224,11 @@ li > p:last-of-type:only-child {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">cds-consistency</td>
-<td class="right">July 2025</td>
+<td class="right">August 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Thomassen</td>
-<td class="center">Expires 29 January 2026</td>
+<td class="center">Expires 2 February 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1244,12 +1244,12 @@ li > p:last-of-type:only-child {
 <a href="https://www.rfc-editor.org/rfc/rfc7344" class="eref">7344</a>, <a href="https://www.rfc-editor.org/rfc/rfc7477" class="eref">7477</a> (if approved)</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-07-28" class="published">28 July 2025</time>
+<time datetime="2025-08-01" class="published">1 August 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-01-29">29 January 2026</time></dd>
+<dd class="expires"><time datetime="2026-02-02">2 February 2026</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1296,7 +1296,7 @@ before taking any action based on these records.<a href="#section-abstract-2" cl
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 29 January 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 2 February 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1781,13 +1781,15 @@ multi-provider configurations are intended to provide.<a href="#appendix-A-2" cl
 <p id="appendix-A.1-1">If an authoritative nameserver is lagging behind during a key rollover,
 the parent may see different CDS/CDNSKEY RRsets depending on the
 nameserver contacted. This may cause old and new DS RRsets to be
-deployed in an alternating fashion. The zone maintainer, having detected
-that the DS deployment was successful, may then confidently remove the
-old DNSKEY from the zone, only to find out later that the DS RRset
-has been turned back, breaking the delegation's DNSSEC chain of trust.<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
-<p id="appendix-A.1-2">Checking for consistency minimizes this risk. In case the parent reports
-consistency errors downstream, it can also help detect the replication
-issue on the child side.<a href="#appendix-A.1-2" class="pilcrow">¶</a></p>
+deployed in an alternating fashion and without the awareness of the zone
+maintainer, who may then inadvertently break the chain of trust by
+prematurely removing a DNSKEY still referenced by a (stale) CDS/CDNSKEY
+RRset.<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.1-2">While foreseen in <span>[<a href="#RFC7344" class="cite xref">RFC7344</a>]</span> Section 6.2, the solution suggested there
+requires parents to keep state on CDS/CDNSKEY RRsets. This document
+achieves the same without this burden, and in case the parent reports
+consistency errors downstream, can also help detection of the child-side
+replication issue by the operator.<a href="#appendix-A.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="escalation-of-lame-delegation-takeover">
@@ -1903,111 +1905,114 @@ DNSSEC validation fails for all answers served by the old provider.<a href="#app
       <h2 id="name-change-history-to-be-remove">
 <a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-change-history-to-be-remove" class="section-name selfRef">Change History (to be removed before publication)</a>
       </h2>
-<ul class="normal">
-<li class="normal" id="appendix-B-1.1">
-          <p id="appendix-B-1.1.1">draft-ietf-dnsop-cds-consistency-08<a href="#appendix-B-1.1.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="appendix-B-1.2">
-          <p id="appendix-B-1.2.1">draft-ietf-dnsop-cds-consistency-07<a href="#appendix-B-1.2.1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="appendix-B-1.1">draft-ietf-dnsop-cds-consistency-08<a href="#appendix-B-1.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-2">
-        <p id="appendix-B-2.1">Clarify that "all nameservers" means fetching all delegation NS IPs<a href="#appendix-B-2.1" class="pilcrow">¶</a></p>
+        <p id="appendix-B-2.1">Take into account RFC 7344 Section 6.2 for Appendix A.1 considerations<a href="#appendix-B-2.1" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="compact">
-<li class="compact" id="appendix-B-3.1">draft-ietf-dnsop-cds-consistency-06<a href="#appendix-B-3.1" class="pilcrow">¶</a>
+<li class="compact" id="appendix-B-3.1">draft-ietf-dnsop-cds-consistency-07<a href="#appendix-B-3.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-4">
-        <p id="appendix-B-4.1">Editorial changes from Dnsdir early review<a href="#appendix-B-4.1" class="pilcrow">¶</a></p>
-<p id="appendix-B-4.2">Add Implementation Status<a href="#appendix-B-4.2" class="pilcrow">¶</a></p>
+        <p id="appendix-B-4.1">Clarify that "all nameservers" means fetching all delegation NS IPs<a href="#appendix-B-4.1" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="compact">
-<li class="compact" id="appendix-B-5.1">draft-ietf-dnsop-cds-consistency-05<a href="#appendix-B-5.1" class="pilcrow">¶</a>
+<li class="compact" id="appendix-B-5.1">draft-ietf-dnsop-cds-consistency-06<a href="#appendix-B-5.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-6">
-        <p id="appendix-B-6.1">Editorial overhaul<a href="#appendix-B-6.1" class="pilcrow">¶</a></p>
+        <p id="appendix-B-6.1">Editorial changes from Dnsdir early review<a href="#appendix-B-6.1" class="pilcrow">¶</a></p>
+<p id="appendix-B-6.2">Add Implementation Status<a href="#appendix-B-6.2" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="compact">
-<li class="compact" id="appendix-B-7.1">draft-ietf-dnsop-cds-consistency-04<a href="#appendix-B-7.1" class="pilcrow">¶</a>
+<li class="compact" id="appendix-B-7.1">draft-ietf-dnsop-cds-consistency-05<a href="#appendix-B-7.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-8">
-        <p id="appendix-B-8.1">Clarify that existing CSYNC NS and glue processing rules remain in place<a href="#appendix-B-8.1" class="pilcrow">¶</a></p>
-<p id="appendix-B-8.2">Editorial changes<a href="#appendix-B-8.2" class="pilcrow">¶</a></p>
-<p id="appendix-B-8.3">Clean up "multi-homing" and define "multi-provider"/"multi-signer"<a href="#appendix-B-8.3" class="pilcrow">¶</a></p>
+        <p id="appendix-B-8.1">Editorial overhaul<a href="#appendix-B-8.1" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="compact">
-<li class="compact" id="appendix-B-9.1">draft-ietf-dnsop-cds-consistency-03<a href="#appendix-B-9.1" class="pilcrow">¶</a>
+<li class="compact" id="appendix-B-9.1">draft-ietf-dnsop-cds-consistency-04<a href="#appendix-B-9.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-10">
-        <p id="appendix-B-10.1">Clarify that CSYNC updates should not break delegations<a href="#appendix-B-10.1" class="pilcrow">¶</a></p>
-<p id="appendix-B-10.2">Describe consistency requirements for CSYNC soaminimum<a href="#appendix-B-10.2" class="pilcrow">¶</a></p>
-<p id="appendix-B-10.3">Editorial changes<a href="#appendix-B-10.3" class="pilcrow">¶</a></p>
+        <p id="appendix-B-10.1">Clarify that existing CSYNC NS and glue processing rules remain in place<a href="#appendix-B-10.1" class="pilcrow">¶</a></p>
+<p id="appendix-B-10.2">Editorial changes<a href="#appendix-B-10.2" class="pilcrow">¶</a></p>
+<p id="appendix-B-10.3">Clean up "multi-homing" and define "multi-provider"/"multi-signer"<a href="#appendix-B-10.3" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="compact">
-<li class="compact" id="appendix-B-11.1">draft-ietf-dnsop-cds-consistency-02<a href="#appendix-B-11.1" class="pilcrow">¶</a>
+<li class="compact" id="appendix-B-11.1">draft-ietf-dnsop-cds-consistency-03<a href="#appendix-B-11.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-12">
-        <p id="appendix-B-12.1">Retry before assuming a nameserver is permanently unreachable<a href="#appendix-B-12.1" class="pilcrow">¶</a></p>
+        <p id="appendix-B-12.1">Clarify that CSYNC updates should not break delegations<a href="#appendix-B-12.1" class="pilcrow">¶</a></p>
+<p id="appendix-B-12.2">Describe consistency requirements for CSYNC soaminimum<a href="#appendix-B-12.2" class="pilcrow">¶</a></p>
+<p id="appendix-B-12.3">Editorial changes<a href="#appendix-B-12.3" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="compact">
-<li class="compact" id="appendix-B-13.1">draft-ietf-dnsop-cds-consistency-01<a href="#appendix-B-13.1" class="pilcrow">¶</a>
+<li class="compact" id="appendix-B-13.1">draft-ietf-dnsop-cds-consistency-02<a href="#appendix-B-13.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-14">
-        <p id="appendix-B-14.1">Make nits tool happy<a href="#appendix-B-14.1" class="pilcrow">¶</a></p>
-<p id="appendix-B-14.2">New failure mode: DS Breakage due to Replication Lag<a href="#appendix-B-14.2" class="pilcrow">¶</a></p>
-<p id="appendix-B-14.3">Point out zero overhead if nothing changed, and need for OOB interface<a href="#appendix-B-14.3" class="pilcrow">¶</a></p>
-<p id="appendix-B-14.4">Editorial changes<a href="#appendix-B-14.4" class="pilcrow">¶</a></p>
-<p id="appendix-B-14.5">Moved Failure Scenarios to appendix<a href="#appendix-B-14.5" class="pilcrow">¶</a></p>
+        <p id="appendix-B-14.1">Retry before assuming a nameserver is permanently unreachable<a href="#appendix-B-14.1" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="compact">
-<li class="compact" id="appendix-B-15.1">draft-ietf-dnsop-cds-consistency-00<a href="#appendix-B-15.1" class="pilcrow">¶</a>
+<li class="compact" id="appendix-B-15.1">draft-ietf-dnsop-cds-consistency-01<a href="#appendix-B-15.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-16">
-        <p id="appendix-B-16.1">Point out zero overhead if nothing changed, and need for OOB interface<a href="#appendix-B-16.1" class="pilcrow">¶</a></p>
-<p id="appendix-B-16.2">Editorial changes.<a href="#appendix-B-16.2" class="pilcrow">¶</a></p>
+        <p id="appendix-B-16.1">Make nits tool happy<a href="#appendix-B-16.1" class="pilcrow">¶</a></p>
+<p id="appendix-B-16.2">New failure mode: DS Breakage due to Replication Lag<a href="#appendix-B-16.2" class="pilcrow">¶</a></p>
+<p id="appendix-B-16.3">Point out zero overhead if nothing changed, and need for OOB interface<a href="#appendix-B-16.3" class="pilcrow">¶</a></p>
+<p id="appendix-B-16.4">Editorial changes<a href="#appendix-B-16.4" class="pilcrow">¶</a></p>
+<p id="appendix-B-16.5">Moved Failure Scenarios to appendix<a href="#appendix-B-16.5" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="compact">
-<li class="compact" id="appendix-B-17.1">draft-thomassen-dnsop-cds-consistency-03<a href="#appendix-B-17.1" class="pilcrow">¶</a>
+<li class="compact" id="appendix-B-17.1">draft-ietf-dnsop-cds-consistency-00<a href="#appendix-B-17.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-18">
-        <p id="appendix-B-18.1">Describe risk from lame delegations<a href="#appendix-B-18.1" class="pilcrow">¶</a></p>
-<p id="appendix-B-18.2">Acknowledgments<a href="#appendix-B-18.2" class="pilcrow">¶</a></p>
-<p id="appendix-B-18.3">Say what is being updated<a href="#appendix-B-18.3" class="pilcrow">¶</a></p>
-<p id="appendix-B-18.4">Editorial changes.<a href="#appendix-B-18.4" class="pilcrow">¶</a></p>
-<p id="appendix-B-18.5">Retry mechanism to resolve inconsistencies<a href="#appendix-B-18.5" class="pilcrow">¶</a></p>
+        <p id="appendix-B-18.1">Point out zero overhead if nothing changed, and need for OOB interface<a href="#appendix-B-18.1" class="pilcrow">¶</a></p>
+<p id="appendix-B-18.2">Editorial changes.<a href="#appendix-B-18.2" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="compact">
-<li class="compact" id="appendix-B-19.1">draft-thomassen-dnsop-cds-consistency-02<a href="#appendix-B-19.1" class="pilcrow">¶</a>
+<li class="compact" id="appendix-B-19.1">draft-thomassen-dnsop-cds-consistency-03<a href="#appendix-B-19.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-20">
-        <p id="appendix-B-20.1">Don't ignore DoE responses from individual nameservers (instead,
-  require consistency across all responses received)<a href="#appendix-B-20.1" class="pilcrow">¶</a></p>
+        <p id="appendix-B-20.1">Describe risk from lame delegations<a href="#appendix-B-20.1" class="pilcrow">¶</a></p>
+<p id="appendix-B-20.2">Acknowledgments<a href="#appendix-B-20.2" class="pilcrow">¶</a></p>
+<p id="appendix-B-20.3">Say what is being updated<a href="#appendix-B-20.3" class="pilcrow">¶</a></p>
+<p id="appendix-B-20.4">Editorial changes.<a href="#appendix-B-20.4" class="pilcrow">¶</a></p>
+<p id="appendix-B-20.5">Retry mechanism to resolve inconsistencies<a href="#appendix-B-20.5" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="compact">
-<li class="compact" id="appendix-B-21.1">draft-thomassen-dnsop-cds-consistency-01<a href="#appendix-B-21.1" class="pilcrow">¶</a>
+<li class="compact" id="appendix-B-21.1">draft-thomassen-dnsop-cds-consistency-02<a href="#appendix-B-21.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-22">
-        <p id="appendix-B-22.1">Allow for nameservers that don't respond or provide DoE (i.e. require
-  consistency only among the non-empty answers received)<a href="#appendix-B-22.1" class="pilcrow">¶</a></p>
-<p id="appendix-B-22.2">Define similar requirements for CSYNC.<a href="#appendix-B-22.2" class="pilcrow">¶</a></p>
-<p id="appendix-B-22.3">Editorial changes.<a href="#appendix-B-22.3" class="pilcrow">¶</a></p>
+        <p id="appendix-B-22.1">Don't ignore DoE responses from individual nameservers (instead,
+  require consistency across all responses received)<a href="#appendix-B-22.1" class="pilcrow">¶</a></p>
 </blockquote>
 <ul class="compact">
-<li class="compact" id="appendix-B-23.1">draft-thomassen-dnsop-cds-consistency-00<a href="#appendix-B-23.1" class="pilcrow">¶</a>
+<li class="compact" id="appendix-B-23.1">draft-thomassen-dnsop-cds-consistency-01<a href="#appendix-B-23.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <blockquote id="appendix-B-24">
-        <p id="appendix-B-24.1">Initial public draft.<a href="#appendix-B-24.1" class="pilcrow">¶</a></p>
+        <p id="appendix-B-24.1">Allow for nameservers that don't respond or provide DoE (i.e. require
+  consistency only among the non-empty answers received)<a href="#appendix-B-24.1" class="pilcrow">¶</a></p>
+<p id="appendix-B-24.2">Define similar requirements for CSYNC.<a href="#appendix-B-24.2" class="pilcrow">¶</a></p>
+<p id="appendix-B-24.3">Editorial changes.<a href="#appendix-B-24.3" class="pilcrow">¶</a></p>
+</blockquote>
+<ul class="compact">
+<li class="compact" id="appendix-B-25.1">draft-thomassen-dnsop-cds-consistency-00<a href="#appendix-B-25.1" class="pilcrow">¶</a>
+</li>
+      </ul>
+<blockquote id="appendix-B-26">
+        <p id="appendix-B-26.1">Initial public draft.<a href="#appendix-B-26.1" class="pilcrow">¶</a></p>
 </blockquote>
 </section>
 </div>
