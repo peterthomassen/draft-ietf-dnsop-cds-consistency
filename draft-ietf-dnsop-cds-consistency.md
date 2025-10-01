@@ -41,7 +41,7 @@ Similarly, "Child-to-Parent Synchronization in DNS" (RFC 7477) specifies CSYNC r
 of the delegation's NS (and glue) records.
 Parent-side entities (e.g., Registries and Registrars) can query these
 records from the child and, after validation, use them to update the
-parent-side Resource Record Set (RRsets) of the delegation.
+parent-side Resource Record Sets (RRsets) of the delegation.
 
 This document specifies that when performing such queries, parent-side
 entities has to ensure that updates triggered via CDS/CDNSKEY and CSYNC
