@@ -34,19 +34,21 @@ organization = "SSE - Secure Systems Engineering GmbH"
 
 Maintenance of DNS delegations requires occasional changes of the DS and
 NS record sets on the parent side of the delegation.
-For the case of DS records, RFC 7344 provides automation by allowing the
+For the case of DS records, "Automating DNSSEC Delegation Trust Maintenance" (RFC 7344) provides automation by allowing the
 child to publish CDS and/or CDNSKEY records holding the prospective DS
 parameters which the parent can ingest.
-Similarly, RFC 7477 specifies CSYNC records to indicate a desired update
+Similarly, "Child-to-Parent Synchronization in DNS" (RFC 7477) specifies CSYNC records to indicate a desired update
 of the delegation's NS (and glue) records.
-Parent-side entities (e.g. Registries, Registrars) can query these
+Parent-side entities (e.g., Registries and Registrars) can query these
 records from the child and, after validation, use them to update the
-parent-side RRsets of the delegation.
+parent-side Resource Record Sets (RRsets) of the delegation.
 
 This document specifies that when performing such queries, parent-side
-entities MUST ensure that updates triggered via CDS/CDNSKEY and CSYNC
+entities has to ensure that updates triggered via CDS/CDNSKEY and CSYNC
 records are consistent across the child's authoritative nameservers,
 before taking any action based on these records.
+
+This document updates RFC 7344 and RFC 7477.
 
 {mainmatter}
 
@@ -57,11 +59,11 @@ child publish CDS and/or CDNSKEY records which hold the prospective DS
 parameters.
 Similarly, [@!RFC7477] specifies CSYNC records indicating a desired
 update of the delegation's NS and associated glue records.
-Parent-side entities (e.g. Registries, Registrars) can use these records
+Parent-side entities (e.g., Registries and Registrars) can use these records
 to update the corresponding records of the delegation.
 
-For ingesting CSYNC records, [@!RFC7477] Section 3.1 advocates that
-Parental Agents limit queries to just one authoritative nameserver (as
+For ingesting CSYNC records, Section 3.1 of [@!RFC7477] advocates that
+Parental Agents limit queries to a single authoritative nameserver (as
 typically done in normal resolution).
 The corresponding Section 6.1 of [@!RFC7344] (CDS/CDNSKEY) contains no
 provision for how specifically queries for these records should be done.
@@ -71,7 +73,7 @@ directing queries towards a trusted validating resolver) works fine when
 all is in order.
 However, problems may arise if CDS/CDNSKEY/CSYNC record sets are
 inconsistent across authoritative nameservers, either because they are
-out of sync (e.g., during a KSK rollover), or because they are not
+out of sync (e.g., during a Key Signing Key (KSK) rollover), or because they are not
 controlled by the same entity (e.g., in a multi-signer setup
 [@?RFC8901]).
 
@@ -84,7 +86,7 @@ For example, a single provider in a multi-signer setup may (accidentally
 or maliciously) cause another provider's trust anchors and/or
 nameservers to be removed from the delegation.
 This can occur both when the multi-signer configuration is temporary
-(during a provider change) and when it is permanent (for redundancy).
+(e.g., during a provider change) and when it is permanent (e.g., for redundancy).
 In any case, a single provider should not be in the position to remove
 the other providers' records from the delegation.
 
@@ -97,8 +99,8 @@ For a CDS/CDNSKEY/CSYNC consumer, it is generally impossible to estimate
 the impact of a requested delegation update unless all of the child's
 authoritative nameservers are inspected.
 At the same time, applying an automated delegation update "MUST NOT
-break the current delegation" ([@!RFC7344], Section 4.1), i.e., it MUST
-NOT hamper availability or validatability of the Child's resolution.
+break the current delegation" ([@!RFC7344], Section 4.1), i.e., it must
+not hamper availability or validatability of the Child's resolution.
 
 This document therefore specifies that parent-side entities need to
 ensure that the updates indicated by CDS/CDNSKEY and CSYNC record sets
@@ -135,13 +137,13 @@ Multi-signer setup:
 Otherwise, the terminology in this document is as defined in [@!RFC7344].
 
 
-# Updates to RFCs
+# Updates to RFC 7344 and RFC 7477
 
-[@!RFC7344] Section 4.1 lists acceptance rules for CDS/CDNSKEY records.
+Section 4.1 of [@!RFC7344] lists acceptance rules for CDS/CDNSKEY records.
 This list is extended with the consistency requirements defined in this
-document.
+document. This document does not modify any other part of [@!RFC7344].
 
-[@!RFC7477] Sections 3.1 and 4.2 have logic for deciding from which
+Sections 3.1 and 4.2 of [@!RFC7477]  have logic for deciding from which
 nameserver to query CSYNC information. This logic is replaced with the
 CSYNC consistency requirements defined in this document.
 
@@ -169,8 +171,8 @@ When a response cannot be obtained from a given nameserver, the Parental
 Agent SHOULD attempt to obtain it at a later time, before concluding
 that the nameserver is permanently unreachable and removing it from
 consideration.
-A retry schedule with exponential back-off is RECOMMENDED (such as after
-5, 10, 20, 40, ... minutes).
+A retry schedule with exponential back-off is RECOMMENDED (e.g., after
+5, 10, 20, or 40 minutes).
 To sidestep localized routing issues, the Parental Agent MAY also
 attempt contacting the nameserver from another vantage point.
 
@@ -180,7 +182,7 @@ Specifically, it MUST NOT delete or alter any existing RRset that would
 have been deleted or altered, and MUST NOT create any RRsets that would
 have been created, had the nameservers given consistent responses.
 
-To accommodate transient inconsistencies (e.g. replication delays), the
+To accommodate transient inconsistencies (e.g., replication delays), the
 Parental Agent MAY retry the full process, repeating all queries.
 A schedule with exponential back-off is RECOMMENDED.
 
@@ -206,7 +208,7 @@ its NS hostnames, MUST ascertain that queries are made against all
 Parent, and ensure that each key referenced in any of the received
 answers is also referenced in all other received responses.
 
-In other words, CDS/CDNSKEY records at the Child zone apex MUST be
+In other words, CDS/CDNSKEY records at the Child zone apex must be
 fetched directly from each (reachable) authoritative server as
 determined by the delegation's NS record set.
 When a key is referenced in a CDS record set but not the CDNSKEY record
@@ -249,17 +251,17 @@ that all queries are made against all (reachable) nameservers listed in
 the delegation, and ensure that all return responses with equal rdata
 sets (including all empty).
 
-Other CSYNC processing rules from [@!RFC7477] Section 3 remain in place without
+Other CSYNC processing rules from Section 3 of [@!RFC7477]  remain in place without
 modification. For example, when the NS type flag is present, associated NS
 processing has to occur before potential glue updates to ensure that glue
 addresses match the right set of nameservers.
 Also, when the type bitmap contains the A/AAAA flags, corresponding address
 queries are only to be sent for NS hostnames "that are in bailiwick", while
 out-of-bailiwick NS records are ignored.
-For details, see [@!RFC7477] Sections 3.2.2 and Section 4.3.
+Refer to Sections 3.2.2 and Section 4.3 [@!RFC7477] for more details.
 
 CSYNC-based updates may cause validation or even insecure resolution to break
-(e.g. by changing the delegation to a set of nameservers that do not
+(e.g., by changing the delegation to a set of nameservers that do not
 serve required DNSKEY records or do not know the zone at all).
 Parental Agents SHOULD check that CSYNC-based updates, if applied, do not
 break the delegation.
@@ -399,7 +401,7 @@ maintainer, who may then inadvertently break the chain of trust by
 prematurely removing a DNSKEY still referenced by a (stale) CDS/CDNSKEY
 RRset.
 
-While foreseen in [@!RFC7344] Section 6.2, the solution suggested there
+While foreseen in Section 6.2 of [@!RFC7344], the solution specified there
 requires parents to keep state on CDS/CDNSKEY RRsets. This document
 achieves the same without this burden, and in case the parent reports
 consistency errors downstream, can also help detection of the child-side
@@ -439,7 +441,7 @@ nameservers from the delegation at will (and potentially add new ones
 under their control), or change glue records to point to the attacker's
 nameservers.
 This enables the attacker to position themself as the only party
-providing authoritiative DNS service for the victim domain,
+providing authoritative DNS service for the victim domain,
 significantly augmenting the attack's impact.
 
 
@@ -481,8 +483,8 @@ old provider, the delegation's DS record set is updated.
 Then, after waiting for cache expiration, the new provider's NS
 hostnames can be added to the zone's NS record set, so that queries
 start balancing across both providers.
-(To conclude the hand-over, the old provider is removed by inverting
-these steps with swapped roles.)
+To conclude the hand-over, the old provider is removed by inverting
+these steps with swapped roles.
 
 The multi-signer phase of this process breaks when the new provider,
 perhaps unaware of the situation and its intricacies, fails to include
