@@ -21,7 +21,7 @@ surname = "Thomassen"
 fullname = "Peter Thomassen"
 organization = "SSE - Secure Systems Engineering GmbH"
 [author.address]
- email = "peter.thomassen@securesystems.de"
+ email = "pth@systemsecurity.com"
 [author.address.postal]
  street = "Hauptstraße 3"
  city = "Berlin"
@@ -157,12 +157,12 @@ separate subsections.
 In order to determine plausible consistency of CDS/CDNSKEY or CSYNC
 RRsets across the child's nameservers, the Parental Agent MUST fetch all
 IP addresses for each nameserver hostname as listed in the Child's
-delegation from the Parent, using a validating resolver at one vantage
-point, and including glue records if available. Before acting on any
-CDS/CDNSKEY or CSYNC record for the child, the Parental Agent MUST have
-established plausible consistency by querying all of these IP addresses
-for the record set(s) in question, as per the guidelines spelled in the
-following subsections.
+delegation from the Parent using a validating resolver, and including
+glue records if available. Before acting on any CDS/CDNSKEY or CSYNC
+record for the child, the Parental Agent MUST have established plausible
+consistency by querying all of these IP addresses for the record set(s)
+in question, as per the guidelines spelled out in the following
+subsections.
 
 In all cases, consistency is REQUIRED across received responses only.
 (A NODATA response is a received response.)
@@ -172,7 +172,7 @@ Agent SHOULD attempt to obtain it at a later time, before concluding
 that the nameserver is permanently unreachable and removing it from
 consideration.
 A retry schedule with exponential back-off is RECOMMENDED (e.g., after
-5, 10, 20, or 40 minutes).
+5, 10, 20, 40, ... minutes).
 To sidestep localized routing issues, the Parental Agent MAY also
 attempt contacting the nameserver from another vantage point.
 
@@ -206,7 +206,9 @@ maintenance, the Parental Agent, knowing both the Child zone name and
 its NS hostnames, MUST ascertain that queries are made against all
 (reachable) nameservers listed in the Child's delegation from the
 Parent, and ensure that each key referenced in any of the received
-answers is also referenced in all other received responses.
+answers is also referenced in all other received responses, or that
+responses consistently indicate a request for removal of the entire
+DS RRset ([@!RFC8078], Section 6).
 
 In other words, CDS/CDNSKEY records at the Child zone apex must be
 fetched directly from each (reachable) authoritative server as
@@ -215,6 +217,9 @@ When a key is referenced in a CDS record set but not the CDNSKEY record
 set (or vice versa), or returned by one nameserver but is missing from
 at least one other nameserver's answer, the CDS/CDNSKEY state MUST be
 considered inconsistent.
+Similarly, the state MUST be considered inconsistent if there is a CDS
+or CDNSKEY response that indicates a removal request for the DS RRset
+whereas another response indicates no change (NODATA) or a DS update.
 
 During initial DS provisioning (DNSSEC bootstrapping), conventional
 DNSSEC validation for CDS/CDNSKEY responses is not (yet) available; in
@@ -313,7 +318,7 @@ This draft has been implemented by
 
 In order of first contribution or review: Viktor Dukhovni, Wes Hardaker,
 Libor Peltan, Oli Schacher, David Blacka, Charlie Kaufman, Michael Bauland,
-Patrick Mevzek, Joe Abley, Ondřej Caletka.
+Patrick Mevzek, Joe Abley, Ondřej Caletka, Ondřej Surý, Mohamed Boucadair.
 
 
 {backmatter}
@@ -321,7 +326,7 @@ Patrick Mevzek, Joe Abley, Ondřej Caletka.
 
 <reference anchor="LAME1" target="http://dx.doi.org/10.1145/3419394.3423623">
   <front>
-    <title>Unresolved Issues</title>
+    <title>Unresolved Issues: Prevalence, Persistence, and Perils of Lame Delegations</title>
     <author fullname="Gautam Akiwate" surname="Akiwate">
       <organization>UC San Diego</organization>
     </author>
@@ -353,7 +358,7 @@ Patrick Mevzek, Joe Abley, Ondřej Caletka.
 </reference>
 <reference anchor="LAME2" target="http://dx.doi.org/10.1145/3487552.3487816">
   <front>
-    <title>Risky BIZness</title>
+    <title>Risky BIZness: risks derived from registrar name management</title>
     <author fullname="Gautam Akiwate" surname="Akiwate">
       <organization>UC San Diego</organization>
     </author>
@@ -506,6 +511,8 @@ DNSSEC validation fails for all answers served by the old provider.
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-09
+
+> Editorial changes
 
 > Nits from Mohamed Boucadair
 

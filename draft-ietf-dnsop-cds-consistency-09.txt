@@ -96,7 +96,7 @@ Table of Contents
        A.3.2.  NS Breakage . . . . . . . . . . . . . . . . . . . . .  12
      A.4.  Bogus Provider Change (Temporary Multi-Signer)  . . . . .  12
    Appendix B.  Change History (to be removed before publication)  .  12
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  14
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  15
 
 1.  Introduction
 
@@ -229,12 +229,12 @@ Internet-Draft               cds-consistency                October 2025
    In order to determine plausible consistency of CDS/CDNSKEY or CSYNC
    RRsets across the child's nameservers, the Parental Agent MUST fetch
    all IP addresses for each nameserver hostname as listed in the
-   Child's delegation from the Parent, using a validating resolver at
-   one vantage point, and including glue records if available.  Before
-   acting on any CDS/CDNSKEY or CSYNC record for the child, the Parental
-   Agent MUST have established plausible consistency by querying all of
-   these IP addresses for the record set(s) in question, as per the
-   guidelines spelled in the following subsections.
+   Child's delegation from the Parent using a validating resolver, and
+   including glue records if available.  Before acting on any CDS/
+   CDNSKEY or CSYNC record for the child, the Parental Agent MUST have
+   established plausible consistency by querying all of these IP
+   addresses for the record set(s) in question, as per the guidelines
+   spelled out in the following subsections.
 
    In all cases, consistency is REQUIRED across received responses only.
    (A NODATA response is a received response.)
@@ -243,7 +243,7 @@ Internet-Draft               cds-consistency                October 2025
    Parental Agent SHOULD attempt to obtain it at a later time, before
    concluding that the nameserver is permanently unreachable and
    removing it from consideration.  A retry schedule with exponential
-   back-off is RECOMMENDED (e.g., after 5, 10, 20, or 40 minutes).  To
+   back-off is RECOMMENDED (e.g., after 5, 10, 20, 40, ... minutes).  To
    sidestep localized routing issues, the Parental Agent MAY also
    attempt contacting the nameserver from another vantage point.
 
@@ -289,7 +289,9 @@ Internet-Draft               cds-consistency                October 2025
    its NS hostnames, MUST ascertain that queries are made against all
    (reachable) nameservers listed in the Child's delegation from the
    Parent, and ensure that each key referenced in any of the received
-   answers is also referenced in all other received responses.
+   answers is also referenced in all other received responses, or that
+   responses consistently indicate a request for removal of the entire
+   DS RRset ([RFC8078], Section 6).
 
    In other words, CDS/CDNSKEY records at the Child zone apex must be
    fetched directly from each (reachable) authoritative server as
@@ -297,7 +299,10 @@ Internet-Draft               cds-consistency                October 2025
    referenced in a CDS record set but not the CDNSKEY record set (or
    vice versa), or returned by one nameserver but is missing from at
    least one other nameserver's answer, the CDS/CDNSKEY state MUST be
-   considered inconsistent.
+   considered inconsistent.  Similarly, the state MUST be considered
+   inconsistent if there is a CDS or CDNSKEY response that indicates a
+   removal request for the DS RRset whereas another response indicates
+   no change (NODATA) or a DS update.
 
    During initial DS provisioning (DNSSEC bootstrapping), conventional
    DNSSEC validation for CDS/CDNSKEY responses is not (yet) available;
@@ -325,11 +330,6 @@ Internet-Draft               cds-consistency                October 2025
    the resulting per-nameserver assessments of whether the update is
    permissible do not all agree, the CSYNC state MUST be considered
    inconsistent.
-
-
-
-
-
 
 
 
@@ -418,7 +418,8 @@ Internet-Draft               cds-consistency                October 2025
 
    In order of first contribution or review: Viktor Dukhovni, Wes
    Hardaker, Libor Peltan, Oli Schacher, David Blacka, Charlie Kaufman,
-   Michael Bauland, Patrick Mevzek, Joe Abley, Ondřej Caletka.
+   Michael Bauland, Patrick Mevzek, Joe Abley, Ondřej Caletka, Ondřej
+   Surý, Mohamed Boucadair.
 
 8.  References
 
@@ -438,7 +439,6 @@ Internet-Draft               cds-consistency                October 2025
               Rose, "Resource Records for the DNS Security Extensions",
               RFC 4034, DOI 10.17487/RFC4034, March 2005,
               <https://www.rfc-editor.org/info/rfc4034>.
-
 
 
 
@@ -468,6 +468,11 @@ Internet-Draft               cds-consistency                October 2025
               RFC 7477, DOI 10.17487/RFC7477, March 2015,
               <https://www.rfc-editor.org/info/rfc7477>.
 
+   [RFC8078]  Gudmundsson, O. and P. Wouters, "Managing DS Records from
+              the Parent via CDS/CDNSKEY", RFC 8078,
+              DOI 10.17487/RFC8078, March 2017,
+              <https://www.rfc-editor.org/info/rfc8078>.
+
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
@@ -481,22 +486,17 @@ Internet-Draft               cds-consistency                October 2025
 
    [LAME1]    Akiwate, G., Jonker, M., Sommese, R., Foster, I., Voelker,
               G. M., Savage, S., Claffy, K., and ACM, "Unresolved
-              Issues", Proceedings of the ACM Internet Measurement
+              Issues: Prevalence, Persistence, and Perils of Lame
+              Delegations", Proceedings of the ACM Internet Measurement
               Conference, DOI 10.1145/3419394.3423623, 27 October 2020,
               <http://dx.doi.org/10.1145/3419394.3423623>.
 
    [LAME2]    Akiwate, G., Savage, S., Voelker, G. M., Claffy, K. C.,
-              and ACM, "Risky BIZness", Proceedings of the 21st ACM
-              Internet Measurement Conference,
-              DOI 10.1145/3487552.3487816, 2 November 2021,
+              and ACM, "Risky BIZness: risks derived from registrar name
+              management", Proceedings of the 21st ACM Internet
+              Measurement Conference, DOI 10.1145/3487552.3487816, 2
+              November 2021,
               <http://dx.doi.org/10.1145/3487552.3487816>.
-
-   [RFC6781]  Kolkman, O., Mekking, W., and R. Gieben, "DNSSEC
-              Operational Practices, Version 2", RFC 6781,
-              DOI 10.17487/RFC6781, December 2012,
-              <https://www.rfc-editor.org/info/rfc6781>.
-
-
 
 
 
@@ -505,6 +505,11 @@ Thomassen                 Expires 17 April 2026                 [Page 9]
 
 Internet-Draft               cds-consistency                October 2025
 
+
+   [RFC6781]  Kolkman, O., Mekking, W., and R. Gieben, "DNSSEC
+              Operational Practices, Version 2", RFC 6781,
+              DOI 10.17487/RFC6781, December 2012,
+              <https://www.rfc-editor.org/info/rfc6781>.
 
    [RFC8901]  Huque, S., Aras, P., Dickinson, J., Vcelak, J., and D.
               Blacka, "Multi-Signer DNSSEC Models", RFC 8901,
@@ -548,11 +553,6 @@ A.2.  Escalation of Lame Delegation Takeover
    third party to run authoritative DNS service for all domains
    delegated to that NS hostname, serving responses different from the
    legitimate ones.
-
-
-
-
-
 
 
 
@@ -674,6 +674,8 @@ Thomassen                 Expires 17 April 2026                [Page 12]
 Internet-Draft               cds-consistency                October 2025
 
 
+   |  Editorial changes
+   |  
    |  Nits from Mohamed Boucadair
 
    *  draft-ietf-dnsop-cds-consistency-08
@@ -720,8 +722,6 @@ Internet-Draft               cds-consistency                October 2025
    *  draft-ietf-dnsop-cds-consistency-01
 
    |  Make nits tool happy
-   |  
-   |  New failure mode: DS Breakage due to Replication Lag
 
 
 
@@ -730,6 +730,8 @@ Thomassen                 Expires 17 April 2026                [Page 13]
 Internet-Draft               cds-consistency                October 2025
 
 
+   |  
+   |  New failure mode: DS Breakage due to Replication Lag
    |  
    |  Point out zero overhead if nothing changed, and need for OOB
    |  interface
@@ -775,8 +777,6 @@ Internet-Draft               cds-consistency                October 2025
 
    |  Initial public draft.
 
-Author's Address
-
 
 
 
@@ -786,14 +786,14 @@ Thomassen                 Expires 17 April 2026                [Page 14]
 Internet-Draft               cds-consistency                October 2025
 
 
+Author's Address
+
    Peter Thomassen
    SSE - Secure Systems Engineering GmbH
    Hauptstraße 3
    10827 Berlin
    Germany
-   Email: peter.thomassen@securesystems.de
-
-
+   Email: pth@systemsecurity.com
 
 
 
