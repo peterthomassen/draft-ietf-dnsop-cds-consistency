@@ -505,6 +505,10 @@ DNSSEC validation fails for all answers served by the old provider.
 
 # Change History (to be removed before publication)
 
+* draft-ietf-dnsop-cds-consistency-09
+
+> Nits from Mohamed Boucadair
+
 * draft-ietf-dnsop-cds-consistency-08
 
 > Take into account RFC 7344 Section 6.2 for Appendix A.1 considerations
