@@ -263,7 +263,7 @@ addresses match the right set of nameservers.
 Also, when the type bitmap contains the A/AAAA flags, corresponding address
 queries are only to be sent for NS hostnames "that are in bailiwick", while
 out-of-bailiwick NS records are ignored.
-Refer to Sections 3.2.2 and Section 4.3 [@!RFC7477] for more details.
+Refer to Sections 3.2.2 and 4.3 [@!RFC7477] for more details.
 
 CSYNC-based updates may cause validation or even insecure resolution to break
 (e.g., by changing the delegation to a set of nameservers that do not
