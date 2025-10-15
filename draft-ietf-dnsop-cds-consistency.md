@@ -108,8 +108,9 @@ are plausibly consistent across the child's nameservers, before taking
 any action based on these records.
 
 Readers are expected to be familiar with DNSSEC, including [@!RFC4033],
-[@!RFC4034], [@!RFC4035], [@?RFC6781], [@!RFC7344], [@!RFC7477], and
-[@?RFC8901].
+[@!RFC4034], [@!RFC4035], [@!RFC7344], and [@!RFC7477], and may refer
+to [@?RFC6781] and [@?RFC8901] for an overview of DNSSEC operational
+practices.
 
 
 ## Requirements Notation
@@ -143,7 +144,7 @@ Section 4.1 of [@!RFC7344] lists acceptance rules for CDS/CDNSKEY records.
 This list is extended with the consistency requirements defined in this
 document. This document does not modify any other part of [@!RFC7344].
 
-Sections 3.1 and 4.2 of [@!RFC7477]  have logic for deciding from which
+Sections 3.1 and 4.2 of [@!RFC7477] have logic for deciding from which
 nameserver to query CSYNC information. This logic is replaced with the
 CSYNC consistency requirements defined in this document.
 
@@ -171,8 +172,8 @@ When a response cannot be obtained from a given nameserver, the Parental
 Agent SHOULD attempt to obtain it at a later time, before concluding
 that the nameserver is permanently unreachable and removing it from
 consideration.
-A retry schedule with exponential back-off is RECOMMENDED (e.g., after
-5, 10, 20, 40, ... minutes).
+A configurable retry schedule with exponential back-off is RECOMMENDED
+(e.g., after 5, 10, 20, 40, ... minutes).
 To sidestep localized routing issues, the Parental Agent MAY also
 attempt contacting the nameserver from another vantage point.
 
@@ -182,8 +183,9 @@ Specifically, it MUST NOT delete or alter any existing RRset that would
 have been deleted or altered, and MUST NOT create any RRsets that would
 have been created, had the nameservers given consistent responses.
 
-To accommodate transient inconsistencies (e.g., replication delays), the
-Parental Agent MAY retry the full process, repeating all queries.
+To accommodate transient inconsistencies (e.g., replication delays),
+implementations MAY be configurable to undertake a retry of the full
+process, repeating all queries (suggested default: enabled).
 A schedule with exponential back-off is RECOMMENDED.
 
 Any pending queries can immediately be dequeued when encountering a
@@ -256,7 +258,7 @@ that all queries are made against all (reachable) nameservers listed in
 the delegation, and ensure that all return responses with equal rdata
 sets (including all empty).
 
-Other CSYNC processing rules from Section 3 of [@!RFC7477]  remain in place without
+Other CSYNC processing rules from Section 3 of [@!RFC7477] remain in place without
 modification. For example, when the NS type flag is present, associated NS
 processing has to occur before potential glue updates to ensure that glue
 addresses match the right set of nameservers.

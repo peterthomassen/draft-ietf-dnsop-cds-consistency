@@ -4,9 +4,9 @@
 
 DNSOP Working Group                                         P. Thomassen
 Internet-Draft                     SSE - Secure Systems Engineering GmbH
-Updates: 7344, 7477 (if approved)                        14 October 2025
+Updates: 7344, 7477 (if approved)                        15 October 2025
 Intended status: Standards Track                                        
-Expires: 17 April 2026
+Expires: 18 April 2026
 
 
           Clarifications on CDS/CDNSKEY and CSYNC Consistency
@@ -48,12 +48,12 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 17 April 2026.
+   This Internet-Draft will expire on 18 April 2026.
 
 
 
 
-Thomassen                 Expires 17 April 2026                 [Page 1]
+Thomassen                 Expires 18 April 2026                 [Page 1]
 
 Internet-Draft               cds-consistency                October 2025
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Thomassen                 Expires 17 April 2026                 [Page 2]
+Thomassen                 Expires 18 April 2026                 [Page 2]
 
 Internet-Draft               cds-consistency                October 2025
 
@@ -160,15 +160,20 @@ Internet-Draft               cds-consistency                October 2025
    sets are plausibly consistent across the child's nameservers, before
    taking any action based on these records.
 
-   Readers are expected to be familiar with DNSSEC, including [RFC4033],
-   [RFC4034], [RFC4035], [RFC6781], [RFC7344], [RFC7477], and [RFC8901].
 
 
 
-Thomassen                 Expires 17 April 2026                 [Page 3]
+
+
+Thomassen                 Expires 18 April 2026                 [Page 3]
 
 Internet-Draft               cds-consistency                October 2025
 
+
+   Readers are expected to be familiar with DNSSEC, including [RFC4033],
+   [RFC4034], [RFC4035], [RFC7344], and [RFC7477], and may refer to
+   [RFC6781] and [RFC8901] for an overview of DNSSEC operational
+   practices.
 
 1.1.  Requirements Notation
 
@@ -210,25 +215,17 @@ Internet-Draft               cds-consistency                October 2025
    are listed first; type-specific consistency criteria are described in
    separate subsections.
 
+   In order to determine plausible consistency of CDS/CDNSKEY or CSYNC
+   RRsets across the child's nameservers, the Parental Agent MUST fetch
+   all IP addresses for each nameserver hostname as listed in the
 
 
 
-
-
-
-
-
-
-
-
-Thomassen                 Expires 17 April 2026                 [Page 4]
+Thomassen                 Expires 18 April 2026                 [Page 4]
 
 Internet-Draft               cds-consistency                October 2025
 
 
-   In order to determine plausible consistency of CDS/CDNSKEY or CSYNC
-   RRsets across the child's nameservers, the Parental Agent MUST fetch
-   all IP addresses for each nameserver hostname as listed in the
    Child's delegation from the Parent using a validating resolver, and
    including glue records if available.  Before acting on any CDS/
    CDNSKEY or CSYNC record for the child, the Parental Agent MUST have
@@ -242,10 +239,11 @@ Internet-Draft               cds-consistency                October 2025
    When a response cannot be obtained from a given nameserver, the
    Parental Agent SHOULD attempt to obtain it at a later time, before
    concluding that the nameserver is permanently unreachable and
-   removing it from consideration.  A retry schedule with exponential
-   back-off is RECOMMENDED (e.g., after 5, 10, 20, 40, ... minutes).  To
-   sidestep localized routing issues, the Parental Agent MAY also
-   attempt contacting the nameserver from another vantage point.
+   removing it from consideration.  A configurable retry schedule with
+   exponential back-off is RECOMMENDED (e.g., after 5, 10, 20, 40, ...
+   minutes).  To sidestep localized routing issues, the Parental Agent
+   MAY also attempt contacting the nameserver from another vantage
+   point.
 
    If an inconsistent state is encountered, the Parental Agent MUST
    abort the operation.  Specifically, it MUST NOT delete or alter any
@@ -254,8 +252,9 @@ Internet-Draft               cds-consistency                October 2025
    given consistent responses.
 
    To accommodate transient inconsistencies (e.g., replication delays),
-   the Parental Agent MAY retry the full process, repeating all queries.
-   A schedule with exponential back-off is RECOMMENDED.
+   implementations MAY be configurable to undertake a retry of the full
+   process, repeating all queries (suggested default: enabled).  A
+   schedule with exponential back-off is RECOMMENDED.
 
    Any pending queries can immediately be dequeued when encountering a
    response that confirms the status quo, either implicitly (NODATA) or
@@ -277,7 +276,8 @@ Internet-Draft               cds-consistency                October 2025
 
 
 
-Thomassen                 Expires 17 April 2026                 [Page 5]
+
+Thomassen                 Expires 18 April 2026                 [Page 5]
 
 Internet-Draft               cds-consistency                October 2025
 
@@ -333,7 +333,7 @@ Internet-Draft               cds-consistency                October 2025
 
 
 
-Thomassen                 Expires 17 April 2026                 [Page 6]
+Thomassen                 Expires 18 April 2026                 [Page 6]
 
 Internet-Draft               cds-consistency                October 2025
 
@@ -351,8 +351,7 @@ Internet-Draft               cds-consistency                October 2025
    nameservers.  Also, when the type bitmap contains the A/AAAA flags,
    corresponding address queries are only to be sent for NS hostnames
    "that are in bailiwick", while out-of-bailiwick NS records are
-   ignored.  Refer to Sections 3.2.2 and Section 4.3 [RFC7477] for more
-   details.
+   ignored.  Refer to Sections 3.2.2 and 4.3 [RFC7477] for more details.
 
    CSYNC-based updates may cause validation or even insecure resolution
    to break (e.g., by changing the delegation to a set of nameservers
@@ -389,7 +388,8 @@ Internet-Draft               cds-consistency                October 2025
 
 
 
-Thomassen                 Expires 17 April 2026                 [Page 7]
+
+Thomassen                 Expires 18 April 2026                 [Page 7]
 
 Internet-Draft               cds-consistency                October 2025
 
@@ -445,7 +445,7 @@ Internet-Draft               cds-consistency                October 2025
 
 
 
-Thomassen                 Expires 17 April 2026                 [Page 8]
+Thomassen                 Expires 18 April 2026                 [Page 8]
 
 Internet-Draft               cds-consistency                October 2025
 
@@ -501,7 +501,7 @@ Internet-Draft               cds-consistency                October 2025
 
 
 
-Thomassen                 Expires 17 April 2026                 [Page 9]
+Thomassen                 Expires 18 April 2026                 [Page 9]
 
 Internet-Draft               cds-consistency                October 2025
 
@@ -557,7 +557,7 @@ A.2.  Escalation of Lame Delegation Takeover
 
 
 
-Thomassen                 Expires 17 April 2026                [Page 10]
+Thomassen                 Expires 18 April 2026                [Page 10]
 
 Internet-Draft               cds-consistency                October 2025
 
@@ -613,7 +613,7 @@ A.3.1.  DS Breakage
 
 
 
-Thomassen                 Expires 17 April 2026                [Page 11]
+Thomassen                 Expires 18 April 2026                [Page 11]
 
 Internet-Draft               cds-consistency                October 2025
 
@@ -669,7 +669,7 @@ Appendix B.  Change History (to be removed before publication)
 
 
 
-Thomassen                 Expires 17 April 2026                [Page 12]
+Thomassen                 Expires 18 April 2026                [Page 12]
 
 Internet-Draft               cds-consistency                October 2025
 
@@ -725,7 +725,7 @@ Internet-Draft               cds-consistency                October 2025
 
 
 
-Thomassen                 Expires 17 April 2026                [Page 13]
+Thomassen                 Expires 18 April 2026                [Page 13]
 
 Internet-Draft               cds-consistency                October 2025
 
@@ -781,7 +781,7 @@ Internet-Draft               cds-consistency                October 2025
 
 
 
-Thomassen                 Expires 17 April 2026                [Page 14]
+Thomassen                 Expires 18 April 2026                [Page 14]
 
 Internet-Draft               cds-consistency                October 2025
 
@@ -837,4 +837,4 @@ Author's Address
 
 
 
-Thomassen                 Expires 17 April 2026                [Page 15]
+Thomassen                 Expires 18 April 2026                [Page 15]
