@@ -44,8 +44,8 @@ records from the child and, after validation, use them to update the
 parent-side Resource Record Sets (RRsets) of the delegation.
 
 This document specifies that when performing such queries, parent-side
-entities has to ensure that updates triggered via CDS/CDNSKEY and CSYNC
-records are consistent across the child's authoritative nameservers,
+entities have to ensure that updates triggered via CDS/CDNSKEY and CSYNC
+records are consistent across the child's authoritative nameservers
 before taking any action based on these records.
 
 This document updates RFC 7344 and RFC 7477.
@@ -69,8 +69,8 @@ The corresponding Section 6.1 of [@!RFC7344] (CDS/CDNSKEY) contains no
 provision for how specifically queries for these records should be done.
 
 Retrieving records from just one authoritative server (e.g., by
-directing queries towards a trusted validating resolver) works fine when
-all is in order.
+directing queries towards a trusted validating resolver) works well
+under ideal operating scenarios.
 However, problems may arise if CDS/CDNSKEY/CSYNC record sets are
 inconsistent across authoritative nameservers, either because they are
 out of sync (e.g., during a Key Signing Key (KSK) rollover), or because they are not
@@ -320,7 +320,8 @@ This draft has been implemented by
 
 In order of first contribution or review: Viktor Dukhovni, Wes Hardaker,
 Libor Peltan, Oli Schacher, David Blacka, Charlie Kaufman, Michael Bauland,
-Patrick Mevzek, Joe Abley, Ondřej Caletka, Ondřej Surý, Mohamed Boucadair.
+Patrick Mevzek, Joe Abley, Ondřej Caletka, Ondřej Surý, Mohamed Boucadair,
+Vijay Gurbani.
 
 
 {backmatter}
@@ -513,6 +514,8 @@ DNSSEC validation fails for all answers served by the old provider.
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-10
+
+> Editorial nits from Vijay Gurbani
 
 * draft-ietf-dnsop-cds-consistency-09
 

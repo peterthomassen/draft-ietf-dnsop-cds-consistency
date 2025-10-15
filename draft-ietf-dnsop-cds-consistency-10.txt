@@ -27,9 +27,9 @@ Abstract
    side Resource Record Sets (RRsets) of the delegation.
 
    This document specifies that when performing such queries, parent-
-   side entities has to ensure that updates triggered via CDS/CDNSKEY
+   side entities have to ensure that updates triggered via CDS/CDNSKEY
    and CSYNC records are consistent across the child's authoritative
-   nameservers, before taking any action based on these records.
+   nameservers before taking any action based on these records.
 
    This document updates RFC 7344 and RFC 7477.
 
@@ -123,12 +123,12 @@ Internet-Draft               cds-consistency                October 2025
    specifically queries for these records should be done.
 
    Retrieving records from just one authoritative server (e.g., by
-   directing queries towards a trusted validating resolver) works fine
-   when all is in order.  However, problems may arise if CDS/CDNSKEY/
-   CSYNC record sets are inconsistent across authoritative nameservers,
-   either because they are out of sync (e.g., during a Key Signing Key
-   (KSK) rollover), or because they are not controlled by the same
-   entity (e.g., in a multi-signer setup [RFC8901]).
+   directing queries towards a trusted validating resolver) works well
+   under ideal operating scenarios.  However, problems may arise if
+   CDS/CDNSKEY/CSYNC record sets are inconsistent across authoritative
+   nameservers, either because they are out of sync (e.g., during a Key
+   Signing Key (KSK) rollover), or because they are not controlled by
+   the same entity (e.g., in a multi-signer setup [RFC8901]).
 
    In such cases, if CDS/CDNSKEY/CSYNC records are retrieved from one
    nameserver only ("naively", without a consistency check), each
@@ -419,7 +419,7 @@ Internet-Draft               cds-consistency                October 2025
    In order of first contribution or review: Viktor Dukhovni, Wes
    Hardaker, Libor Peltan, Oli Schacher, David Blacka, Charlie Kaufman,
    Michael Bauland, Patrick Mevzek, Joe Abley, Ondřej Caletka, Ondřej
-   Surý, Mohamed Boucadair.
+   Surý, Mohamed Boucadair, Vijay Gurbani.
 
 8.  References
 
@@ -674,6 +674,8 @@ Thomassen                 Expires 18 April 2026                [Page 12]
 Internet-Draft               cds-consistency                October 2025
 
 
+   |  Editorial nits from Vijay Gurbani
+
    *  draft-ietf-dnsop-cds-consistency-09
 
    |  Editorial changes
@@ -721,14 +723,14 @@ Internet-Draft               cds-consistency                October 2025
 
    |  Retry before assuming a nameserver is permanently unreachable
 
-   *  draft-ietf-dnsop-cds-consistency-01
-
 
 
 Thomassen                 Expires 18 April 2026                [Page 13]
 
 Internet-Draft               cds-consistency                October 2025
 
+
+   *  draft-ietf-dnsop-cds-consistency-01
 
    |  Make nits tool happy
    |  
@@ -776,8 +778,6 @@ Internet-Draft               cds-consistency                October 2025
 
    *  draft-thomassen-dnsop-cds-consistency-00
 
-   |  Initial public draft.
-
 
 
 
@@ -785,6 +785,8 @@ Thomassen                 Expires 18 April 2026                [Page 14]
 
 Internet-Draft               cds-consistency                October 2025
 
+
+   |  Initial public draft.
 
 Author's Address
 
@@ -794,8 +796,6 @@ Author's Address
    10827 Berlin
    Germany
    Email: pth@systemsecurity.com
-
-
 
 
 
