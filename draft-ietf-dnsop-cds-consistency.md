@@ -107,10 +107,11 @@ ensure that the updates indicated by CDS/CDNSKEY and CSYNC record sets
 are plausibly consistent across the child's nameservers, before taking
 any action based on these records.
 
-Readers are expected to be familiar with DNSSEC, including [@!RFC4033],
-[@!RFC4034], [@!RFC4035], [@!RFC7344], and [@!RFC7477], and may refer
-to [@?RFC6781] and [@?RFC8901] for an overview of DNSSEC operational
-practices.
+Readers are expected to be familiar with DNSSEC [@!RFC9364], in
+particular [@!RFC4033], [@!RFC4034], [@!RFC4035], [@!RFC7344], and
+[@!RFC7477].
+For an overview of related operational practices, refer to [@?RFC6781]
+and [@?RFC8901].
 
 
 ## Requirements Notation
@@ -321,7 +322,7 @@ This draft has been implemented by
 In order of first contribution or review: Viktor Dukhovni, Wes Hardaker,
 Libor Peltan, Oli Schacher, David Blacka, Charlie Kaufman, Michael Bauland,
 Patrick Mevzek, Joe Abley, Ondřej Caletka, Ondřej Surý, Mohamed Boucadair,
-Vijay Gurbani.
+Vijay Gurbani, Gorry Fairhurst, Paul Wouters.
 
 
 {backmatter}
@@ -385,9 +386,9 @@ Vijay Gurbani.
 
 
 {#scenarios}
-# Failure Scenarios
+# Failure Scenarios due to Inconsistencies
 
-The following scenarios are examples of how things can go wrong when
+The following scenarios are informative examples of how things can go wrong when
 consistency is not enforced by the parent during CDS/CDNSKEY/CSYNC
 processing.
 Other scenarios that cause similar (or perhaps even more) harm may
@@ -514,6 +515,8 @@ DNSSEC validation fails for all answers served by the old provider.
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-10
+
+> Editorial nits from IESG (Gorry Fairhurst, Paul Wouters)
 
 > Editorial nits from Vijay Gurbani
 
