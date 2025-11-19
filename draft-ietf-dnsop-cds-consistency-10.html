@@ -1539,8 +1539,10 @@ subsections.<a href="#section-3-2" class="pilcrow">¶</a></p>
 Agent SHOULD attempt to obtain it at a later time, before concluding
 that the nameserver is permanently unreachable and removing it from
 consideration.
-A configurable retry schedule with exponential back-off is RECOMMENDED
-(e.g., after 5, 10, 20, 40, ... minutes).
+A configurable retry schedule is RECOMMENDED to increase the likelihood
+of collecting data from all nameservers. An exponential back-off
+schedule (e.g., 5, 10, 20, 40, ... minutes) provides a balance between
+faster task completion while accommodating transient unreachability.
 To sidestep localized routing issues, the Parental Agent MAY also
 attempt contacting the nameserver from another network vantage point.<a href="#section-3-4" class="pilcrow">¶</a></p>
 <p id="section-3-5">If an inconsistent state is encountered, the Parental Agent MUST abort
@@ -1550,8 +1552,8 @@ have been deleted or altered, and MUST NOT create any RRsets that would
 have been created, had the nameservers given consistent responses.<a href="#section-3-5" class="pilcrow">¶</a></p>
 <p id="section-3-6">To accommodate transient inconsistencies (e.g., replication delays),
 implementations MAY be configurable to undertake a retry of the full
-process, repeating all queries (suggested default: enabled).
-A schedule with exponential back-off is RECOMMENDED.<a href="#section-3-6" class="pilcrow">¶</a></p>
+process, repeating all queries (suggested default: enabled with
+exponential back-off).<a href="#section-3-6" class="pilcrow">¶</a></p>
 <p id="section-3-7">Any pending queries can immediately be dequeued when encountering a
 response that confirms the status quo, either implicitly (NODATA) or
 explicitly.

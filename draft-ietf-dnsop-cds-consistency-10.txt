@@ -239,11 +239,13 @@ Internet-Draft               cds-consistency               November 2025
    When a response cannot be obtained from a given nameserver, the
    Parental Agent SHOULD attempt to obtain it at a later time, before
    concluding that the nameserver is permanently unreachable and
-   removing it from consideration.  A configurable retry schedule with
-   exponential back-off is RECOMMENDED (e.g., after 5, 10, 20, 40, ...
-   minutes).  To sidestep localized routing issues, the Parental Agent
-   MAY also attempt contacting the nameserver from another network
-   vantage point.
+   removing it from consideration.  A configurable retry schedule is
+   RECOMMENDED to increase the likelihood of collecting data from all
+   nameservers.  An exponential back-off schedule (e.g., 5, 10, 20, 40,
+   ... minutes) provides a balance between faster task completion while
+   accommodating transient unreachability.  To sidestep localized
+   routing issues, the Parental Agent MAY also attempt contacting the
+   nameserver from another network vantage point.
 
    If an inconsistent state is encountered, the Parental Agent MUST
    abort the operation.  Specifically, it MUST NOT delete or alter any
@@ -253,8 +255,8 @@ Internet-Draft               cds-consistency               November 2025
 
    To accommodate transient inconsistencies (e.g., replication delays),
    implementations MAY be configurable to undertake a retry of the full
-   process, repeating all queries (suggested default: enabled).  A
-   schedule with exponential back-off is RECOMMENDED.
+   process, repeating all queries (suggested default: enabled with
+   exponential back-off).
 
    Any pending queries can immediately be dequeued when encountering a
    response that confirms the status quo, either implicitly (NODATA) or
@@ -266,8 +268,6 @@ Internet-Draft               cds-consistency               November 2025
    Existing requirements for ensuring integrity remain in effect.  In
    particular, DNSSEC signatures MUST be requested and validated for all
    queries unless otherwise noted.
-
-
 
 
 
