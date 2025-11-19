@@ -4,9 +4,9 @@
 
 DNSOP Working Group                                         P. Thomassen
 Internet-Draft                     SSE - Secure Systems Engineering GmbH
-Updates: 7344, 7477 (if approved)                       18 November 2025
+Updates: 7344, 7477 (if approved)                       19 November 2025
 Intended status: Standards Track                                        
-Expires: 22 May 2026
+Expires: 23 May 2026
 
 
           Clarifications on CDS/CDNSKEY and CSYNC Consistency
@@ -48,12 +48,12 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 22 May 2026.
+   This Internet-Draft will expire on 23 May 2026.
 
 
 
 
-Thomassen                  Expires 22 May 2026                  [Page 1]
+Thomassen                  Expires 23 May 2026                  [Page 1]
 
 Internet-Draft               cds-consistency               November 2025
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Thomassen                  Expires 22 May 2026                  [Page 2]
+Thomassen                  Expires 23 May 2026                  [Page 2]
 
 Internet-Draft               cds-consistency               November 2025
 
@@ -165,7 +165,7 @@ Internet-Draft               cds-consistency               November 2025
 
 
 
-Thomassen                  Expires 22 May 2026                  [Page 3]
+Thomassen                  Expires 23 May 2026                  [Page 3]
 
 Internet-Draft               cds-consistency               November 2025
 
@@ -221,7 +221,7 @@ Internet-Draft               cds-consistency               November 2025
 
 
 
-Thomassen                  Expires 22 May 2026                  [Page 4]
+Thomassen                  Expires 23 May 2026                  [Page 4]
 
 Internet-Draft               cds-consistency               November 2025
 
@@ -242,8 +242,8 @@ Internet-Draft               cds-consistency               November 2025
    removing it from consideration.  A configurable retry schedule with
    exponential back-off is RECOMMENDED (e.g., after 5, 10, 20, 40, ...
    minutes).  To sidestep localized routing issues, the Parental Agent
-   MAY also attempt contacting the nameserver from another vantage
-   point.
+   MAY also attempt contacting the nameserver from another network
+   vantage point.
 
    If an inconsistent state is encountered, the Parental Agent MUST
    abort the operation.  Specifically, it MUST NOT delete or alter any
@@ -260,7 +260,7 @@ Internet-Draft               cds-consistency               November 2025
    response that confirms the status quo, either implicitly (NODATA) or
    explicitly.  This is because any subsequent responses could only
    confirm that nothing needs to happen, or give an inconsistent result
-   in which case nothing needs to happen.  Queries MAY be continued
+   in which case nothing needs to happen.  Queries may be continued
    across all nameservers for reporting purposes.
 
    Existing requirements for ensuring integrity remain in effect.  In
@@ -277,7 +277,7 @@ Internet-Draft               cds-consistency               November 2025
 
 
 
-Thomassen                  Expires 22 May 2026                  [Page 5]
+Thomassen                  Expires 23 May 2026                  [Page 5]
 
 Internet-Draft               cds-consistency               November 2025
 
@@ -287,14 +287,14 @@ Internet-Draft               cds-consistency               November 2025
    To retrieve a Child's CDS/CDNSKEY RRset for DNSSEC delegation trust
    maintenance, the Parental Agent, knowing both the Child zone name and
    its NS hostnames, MUST ascertain that queries are made against all
-   (reachable) nameservers listed in the Child's delegation from the
-   Parent, and ensure that each key referenced in any of the received
-   answers is also referenced in all other received responses, or that
-   responses consistently indicate a request for removal of the entire
-   DS RRset ([RFC8078], Section 6).
+   nameservers listed in the Child's delegation from the Parent, and
+   ensure that each key referenced in any of the received answers is
+   also referenced in all other received responses, or that responses
+   consistently indicate a request for removal of the entire DS RRset
+   ([RFC8078], Section 6).
 
    In other words, CDS/CDNSKEY records at the Child zone apex must be
-   fetched directly from each (reachable) authoritative server as
+   fetched directly from each reachable authoritative server as
    determined by the delegation's NS record set.  When a key is
    referenced in a CDS record set but not the CDNSKEY record set (or
    vice versa), or returned by one nameserver but is missing from at
@@ -318,9 +318,9 @@ Internet-Draft               cds-consistency               November 2025
    be considered inconsistent.
 
    When querying the CSYNC record, the Parental Agent MUST ascertain
-   that queries are made against all (reachable) nameservers listed in
-   the Child's delegation from the Parent, and ensure that the record's
-   immediate flag and type bitmap are equal across received responses.
+   that queries are made against all nameservers listed in the Child's
+   delegation from the Parent, and ensure that the record's immediate
+   flag and type bitmap are equal across received responses.
 
    The CSYNC record's SOA serial field and soaminimum flag might
    legitimately differ across nameservers (such as in multi-provider
@@ -333,15 +333,15 @@ Internet-Draft               cds-consistency               November 2025
 
 
 
-Thomassen                  Expires 22 May 2026                  [Page 6]
+Thomassen                  Expires 23 May 2026                  [Page 6]
 
 Internet-Draft               cds-consistency               November 2025
 
 
    Further, when retrieving the data record sets as indicated in the
    CSYNC record (such as NS or A/AAAA records), the Parental Agent MUST
-   ascertain that all queries are made against all (reachable)
-   nameservers listed in the delegation, and ensure that all return
+   ascertain that all queries are made against all nameservers from
+   which a CSYNC record was received, and ensure that all return
    responses with equal rdata sets (including all empty).
 
    Other CSYNC processing rules from Section 3 of [RFC7477] remain in
@@ -389,7 +389,7 @@ Internet-Draft               cds-consistency               November 2025
 
 
 
-Thomassen                  Expires 22 May 2026                  [Page 7]
+Thomassen                  Expires 23 May 2026                  [Page 7]
 
 Internet-Draft               cds-consistency               November 2025
 
@@ -420,7 +420,7 @@ Internet-Draft               cds-consistency               November 2025
    Hardaker, Libor Peltan, Oli Schacher, David Blacka, Charlie Kaufman,
    Michael Bauland, Patrick Mevzek, Joe Abley, Ondřej Caletka, Ondřej
    Surý, Mohamed Boucadair, Vijay Gurbani, Gorry Fairhurst, Paul
-   Wouters.
+   Wouters, Andy Newton.
 
 8.  References
 
@@ -445,7 +445,7 @@ Internet-Draft               cds-consistency               November 2025
 
 
 
-Thomassen                  Expires 22 May 2026                  [Page 8]
+Thomassen                  Expires 23 May 2026                  [Page 8]
 
 Internet-Draft               cds-consistency               November 2025
 
@@ -501,7 +501,7 @@ Internet-Draft               cds-consistency               November 2025
 
 
 
-Thomassen                  Expires 22 May 2026                  [Page 9]
+Thomassen                  Expires 23 May 2026                  [Page 9]
 
 Internet-Draft               cds-consistency               November 2025
 
@@ -557,7 +557,7 @@ A.1.  DS Breakage due to Replication Lag
 
 
 
-Thomassen                  Expires 22 May 2026                 [Page 10]
+Thomassen                  Expires 23 May 2026                 [Page 10]
 
 Internet-Draft               cds-consistency               November 2025
 
@@ -613,7 +613,7 @@ A.3.1.  DS Breakage
 
 
 
-Thomassen                  Expires 22 May 2026                 [Page 11]
+Thomassen                  Expires 23 May 2026                 [Page 11]
 
 Internet-Draft               cds-consistency               November 2025
 
@@ -669,7 +669,7 @@ A.4.  Bogus Provider Change (Temporary Multi-Signer)
 
 
 
-Thomassen                  Expires 22 May 2026                 [Page 12]
+Thomassen                  Expires 23 May 2026                 [Page 12]
 
 Internet-Draft               cds-consistency               November 2025
 
@@ -678,6 +678,8 @@ Appendix B.  Change History (to be removed before publication)
 
    *  draft-ietf-dnsop-cds-consistency-10
 
+   |  Language precision from IESG (Andy Newton)
+   |  
    |  Editorial nits from IESG (Gorry Fairhurst, Paul Wouters)
    |  
    |  Editorial nits from Vijay Gurbani
@@ -720,16 +722,16 @@ Appendix B.  Change History (to be removed before publication)
    *  draft-ietf-dnsop-cds-consistency-03
 
    |  Clarify that CSYNC updates should not break delegations
-   |  
-   |  Describe consistency requirements for CSYNC soaminimum
 
 
 
-Thomassen                  Expires 22 May 2026                 [Page 13]
+Thomassen                  Expires 23 May 2026                 [Page 13]
 
 Internet-Draft               cds-consistency               November 2025
 
 
+   |  
+   |  Describe consistency requirements for CSYNC soaminimum
    |  
    |  Editorial changes
 
@@ -776,16 +778,16 @@ Internet-Draft               cds-consistency               November 2025
 
    *  draft-thomassen-dnsop-cds-consistency-01
 
-   |  Allow for nameservers that don't respond or provide DoE (i.e.
-   |  require consistency only among the non-empty answers received)
 
 
 
-Thomassen                  Expires 22 May 2026                 [Page 14]
+Thomassen                  Expires 23 May 2026                 [Page 14]
 
 Internet-Draft               cds-consistency               November 2025
 
 
+   |  Allow for nameservers that don't respond or provide DoE (i.e.
+   |  require consistency only among the non-empty answers received)
    |  
    |  Define similar requirements for CSYNC.
    |  
@@ -835,6 +837,4 @@ Author's Address
 
 
 
-
-
-Thomassen                  Expires 22 May 2026                 [Page 15]
+Thomassen                  Expires 23 May 2026                 [Page 15]

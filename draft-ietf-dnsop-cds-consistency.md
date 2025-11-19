@@ -176,7 +176,7 @@ consideration.
 A configurable retry schedule with exponential back-off is RECOMMENDED
 (e.g., after 5, 10, 20, 40, ... minutes).
 To sidestep localized routing issues, the Parental Agent MAY also
-attempt contacting the nameserver from another vantage point.
+attempt contacting the nameserver from another network vantage point.
 
 If an inconsistent state is encountered, the Parental Agent MUST abort
 the operation.
@@ -195,7 +195,7 @@ explicitly.
 This is because any subsequent responses could only confirm that nothing
 needs to happen, or give an inconsistent result in which case nothing
 needs to happen.
-Queries MAY be continued across all nameservers for reporting purposes.
+Queries may be continued across all nameservers for reporting purposes.
 
 Existing requirements for ensuring integrity remain in effect.
 In particular, DNSSEC signatures MUST be requested and validated for all
@@ -207,14 +207,14 @@ queries unless otherwise noted.
 To retrieve a Child's CDS/CDNSKEY RRset for DNSSEC delegation trust
 maintenance, the Parental Agent, knowing both the Child zone name and
 its NS hostnames, MUST ascertain that queries are made against all
-(reachable) nameservers listed in the Child's delegation from the
+nameservers listed in the Child's delegation from the
 Parent, and ensure that each key referenced in any of the received
 answers is also referenced in all other received responses, or that
 responses consistently indicate a request for removal of the entire
 DS RRset ([@!RFC8078], Section 6).
 
 In other words, CDS/CDNSKEY records at the Child zone apex must be
-fetched directly from each (reachable) authoritative server as
+fetched directly from each reachable authoritative server as
 determined by the delegation's NS record set.
 When a key is referenced in a CDS record set but not the CDNSKEY record
 set (or vice versa), or returned by one nameserver but is missing from
@@ -239,7 +239,7 @@ If the below conditions are not met during these steps, the CSYNC state
 MUST be considered inconsistent.
 
 When querying the CSYNC record, the Parental Agent MUST ascertain that
-queries are made against all (reachable) nameservers listed in the
+queries are made against all nameservers listed in the
 Child's delegation from the Parent, and ensure that the record's
 immediate flag and type bitmap are equal across received responses.
 
@@ -255,8 +255,8 @@ inconsistent.
 
 Further, when retrieving the data record sets as indicated in the CSYNC
 record (such as NS or A/AAAA records), the Parental Agent MUST ascertain
-that all queries are made against all (reachable) nameservers listed in
-the delegation, and ensure that all return responses with equal rdata
+that all queries are made against all nameservers from which a CSYNC
+record was received, and ensure that all return responses with equal rdata
 sets (including all empty).
 
 Other CSYNC processing rules from Section 3 of [@!RFC7477] remain in place without
@@ -322,7 +322,7 @@ This draft has been implemented by
 In order of first contribution or review: Viktor Dukhovni, Wes Hardaker,
 Libor Peltan, Oli Schacher, David Blacka, Charlie Kaufman, Michael Bauland,
 Patrick Mevzek, Joe Abley, Ondřej Caletka, Ondřej Surý, Mohamed Boucadair,
-Vijay Gurbani, Gorry Fairhurst, Paul Wouters.
+Vijay Gurbani, Gorry Fairhurst, Paul Wouters, Andy Newton.
 
 
 {backmatter}
@@ -515,6 +515,8 @@ DNSSEC validation fails for all answers served by the old provider.
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-10
+
+> Language precision from IESG (Andy Newton)
 
 > Editorial nits from IESG (Gorry Fairhurst, Paul Wouters)
 
