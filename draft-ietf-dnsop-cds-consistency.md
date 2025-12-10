@@ -101,6 +101,9 @@ authoritative nameservers are inspected.
 At the same time, applying an automated delegation update "MUST NOT
 break the current delegation" ([@!RFC7344], Section 4.1), i.e., it must
 not hamper availability or validatability of the Child's resolution.
+As part of a more holistic treatment of the problem space,
+[@?I-D.ietf-dnsop-ds-automation] provides more specific guidance on
+such safety checks.
 
 This document therefore specifies that parent-side entities need to
 ensure that the updates indicated by CDS/CDNSKEY and CSYNC record sets
@@ -324,7 +327,7 @@ This draft has been implemented by
 In order of first contribution or review: Viktor Dukhovni, Wes Hardaker,
 Libor Peltan, Oli Schacher, David Blacka, Charlie Kaufman, Michael Bauland,
 Patrick Mevzek, Joe Abley, Ondřej Caletka, Ondřej Surý, Mohamed Boucadair,
-Vijay Gurbani, Gorry Fairhurst, Paul Wouters, Andy Newton.
+Vijay Gurbani, Gorry Fairhurst, Paul Wouters, Andy Newton, Mike Bishop.
 
 
 {backmatter}
@@ -517,6 +520,8 @@ DNSSEC validation fails for all answers served by the old provider.
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-10
+
+> Additional reference from IESG (Mike Bishop)
 
 > Language precision from IESG (Andy Newton)
 
