@@ -43,10 +43,11 @@ Parent-side entities (e.g., Registries and Registrars) can query these
 records from the child and, after validation, use them to update the
 parent-side Resource Record Sets (RRsets) of the delegation.
 
-This document specifies that when performing such queries, parent-side
-entities have to ensure that updates triggered via CDS/CDNSKEY and CSYNC
-records are consistent across the child's authoritative nameservers
-before taking any action based on these records.
+This document specifies under which conditions the target states expressed
+via CDS/CDNSKEY and CSYNC records are considered "consistent". Parent-side
+entities accepting such records from the child have to ensure that update
+requests retrieved from different authoritative nameservers satisfy these
+consistency requirements before taking any action based on them.
 
 This document updates RFC 7344 and RFC 7477.
 
@@ -55,7 +56,7 @@ This document updates RFC 7344 and RFC 7477.
 # Introduction
 
 [@!RFC7344] automates DNSSEC delegation trust maintenance by having the
-child publish CDS and/or CDNSKEY records which hold the prospective DS
+child publish CDS and/or CDNSKEY records which describe the prospective DS
 parameters.
 Similarly, [@!RFC7477] specifies CSYNC records indicating a desired
 update of the delegation's NS and associated glue records.
@@ -200,7 +201,11 @@ explicitly.
 This is because any subsequent responses could only confirm that nothing
 needs to happen, or give an inconsistent result in which case nothing
 needs to happen.
-Queries may be continued across all nameservers for reporting purposes.
+The parent may apply local policy in determining whether the requested
+update is consistent or not with the status quo, as illustrated in the
+type-specific sections below.
+In any case, queries may be continued across all nameservers for
+reporting purposes.
 
 Existing requirements for ensuring integrity remain in effect.
 In particular, DNSSEC signatures MUST be requested and validated for all
@@ -228,6 +233,12 @@ considered inconsistent.
 Similarly, the state MUST be considered inconsistent if there is a CDS
 or CDNSKEY response that indicates a removal request for the DS RRset
 whereas another response indicates no change (NODATA) or a DS update.
+
+As an example of local policy, the parent may restrict the choice of
+hash digest types used when publishing a DS RRset (notwithstanding the
+requirements specified in [@!DS-IANA]). (The set of keys referenced in
+the DS RRset is not up to local policy. Only if all keys from the
+CDS/CDNSKEY RRsets are included, the DS RRset is considered consistent.)
 
 During initial DS provisioning (DNSSEC bootstrapping), conventional
 DNSSEC validation for CDS/CDNSKEY responses is not (yet) available; in
@@ -263,6 +274,9 @@ record (such as NS or A/AAAA records), the Parental Agent MUST ascertain
 that all queries are made against all nameservers from which a CSYNC
 record was received, and ensure that all return responses with equal rdata
 sets (including all empty).
+
+As an example of local policy, the parent may choose to accept glue
+records only for in-domain or sibling NS hostnames [@?RFC9499].
 
 Other CSYNC processing rules from Section 3 of [@!RFC7477] remain in place without
 modification. For example, when the NS type flag is present, associated NS
@@ -327,12 +341,19 @@ This draft has been implemented by
 In order of first contribution or review: Viktor Dukhovni, Wes Hardaker,
 Libor Peltan, Oli Schacher, David Blacka, Charlie Kaufman, Michael Bauland,
 Patrick Mevzek, Joe Abley, Ondřej Caletka, Ondřej Surý, Mohamed Boucadair,
-Vijay Gurbani, Gorry Fairhurst, Paul Wouters, Andy Newton, Mike Bishop.
+Vijay Gurbani, Gorry Fairhurst, Paul Wouters, Andy Newton, Mike Bishop,
+Warren Kumari.
 
 
 {backmatter}
 
 
+<reference anchor="DS-IANA" target="http://www.iana.org/assignments/ds-rr-types">
+  <front>
+    <title>Delegation Signer (DS) Resource Record (RR) Type Digest Algorithms</title>
+    <author fullname="IANA"></author>
+  </front>
+</reference>
 <reference anchor="LAME1" target="http://dx.doi.org/10.1145/3419394.3423623">
   <front>
     <title>Unresolved Issues: Prevalence, Persistence, and Perils of Lame Delegations</title>
@@ -520,6 +541,8 @@ DNSSEC validation fails for all answers served by the old provider.
 # Change History (to be removed before publication)
 
 * draft-ietf-dnsop-cds-consistency-10
+
+> Clarify that parents may have local policy
 
 > Additional reference from IESG (Mike Bishop)
 

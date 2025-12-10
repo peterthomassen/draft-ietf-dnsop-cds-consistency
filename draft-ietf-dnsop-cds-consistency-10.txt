@@ -26,10 +26,12 @@ Abstract
    from the child and, after validation, use them to update the parent-
    side Resource Record Sets (RRsets) of the delegation.
 
-   This document specifies that when performing such queries, parent-
-   side entities have to ensure that updates triggered via CDS/CDNSKEY
-   and CSYNC records are consistent across the child's authoritative
-   nameservers before taking any action based on these records.
+   This document specifies under which conditions the target states
+   expressed via CDS/CDNSKEY and CSYNC records are considered
+   "consistent".  Parent-side entities accepting such records from the
+   child have to ensure that update requests retrieved from different
+   authoritative nameservers satisfy these consistency requirements
+   before taking any action based on them.
 
    This document updates RFC 7344 and RFC 7477.
 
@@ -48,8 +50,6 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 13 June 2026.
-
 
 
 
@@ -57,6 +57,8 @@ Thomassen                 Expires 13 June 2026                  [Page 1]
 
 Internet-Draft               cds-consistency               December 2025
 
+
+   This Internet-Draft will expire on 13 June 2026.
 
 Copyright Notice
 
@@ -74,38 +76,36 @@ Copyright Notice
 
 Table of Contents
 
-   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
      1.1.  Requirements Notation . . . . . . . . . . . . . . . . . .   4
      1.2.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   4
    2.  Updates to RFC 7344 and RFC 7477  . . . . . . . . . . . . . .   4
-   3.  Processing Requirements . . . . . . . . . . . . . . . . . . .   4
+   3.  Processing Requirements . . . . . . . . . . . . . . . . . . .   5
      3.1.  CDS and CDNSKEY . . . . . . . . . . . . . . . . . . . . .   6
-     3.2.  CSYNC . . . . . . . . . . . . . . . . . . . . . . . . . .   6
-   4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
-   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
+     3.2.  CSYNC . . . . . . . . . . . . . . . . . . . . . . . . . .   7
+   4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
+   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   8
    6.  Implementation Status . . . . . . . . . . . . . . . . . . . .   8
    7.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   8
    8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   8
-     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   8
-     8.2.  Informative References  . . . . . . . . . . . . . . . . .   9
-   Appendix A.  Failure Scenarios due to Inconsistencies . . . . . .  10
-     A.1.  DS Breakage due to Replication Lag  . . . . . . . . . . .  10
+     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
+     8.2.  Informative References  . . . . . . . . . . . . . . . . .  10
+   Appendix A.  Failure Scenarios due to Inconsistencies . . . . . .  11
+     A.1.  DS Breakage due to Replication Lag  . . . . . . . . . . .  11
      A.2.  Escalation of Lame Delegation Takeover  . . . . . . . . .  11
-     A.3.  Multi-Provider (Permanent Multi-Signer) . . . . . . . . .  11
+     A.3.  Multi-Provider (Permanent Multi-Signer) . . . . . . . . .  12
        A.3.1.  DS Breakage . . . . . . . . . . . . . . . . . . . . .  12
        A.3.2.  NS Breakage . . . . . . . . . . . . . . . . . . . . .  12
-     A.4.  Bogus Provider Change (Temporary Multi-Signer)  . . . . .  12
+     A.4.  Bogus Provider Change (Temporary Multi-Signer)  . . . . .  13
    Appendix B.  Change History (to be removed before publication)  .  13
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  15
 
-1.  Introduction
 
-   [RFC7344] automates DNSSEC delegation trust maintenance by having the
-   child publish CDS and/or CDNSKEY records which hold the prospective
-   DS parameters.  Similarly, [RFC7477] specifies CSYNC records
-   indicating a desired update of the delegation's NS and associated
-   glue records.  Parent-side entities (e.g., Registries and Registrars)
-   can use these records to update the corresponding records of the
+
+
+
+
+
 
 
 
@@ -114,7 +114,15 @@ Thomassen                 Expires 13 June 2026                  [Page 2]
 Internet-Draft               cds-consistency               December 2025
 
 
-   delegation.
+1.  Introduction
+
+   [RFC7344] automates DNSSEC delegation trust maintenance by having the
+   child publish CDS and/or CDNSKEY records which describe the
+   prospective DS parameters.  Similarly, [RFC7477] specifies CSYNC
+   records indicating a desired update of the delegation's NS and
+   associated glue records.  Parent-side entities (e.g., Registries and
+   Registrars) can use these records to update the corresponding records
+   of the delegation.
 
    For ingesting CSYNC records, Section 3.1 of [RFC7477] advocates that
    Parental Agents limit queries to a single authoritative nameserver
@@ -154,6 +162,14 @@ Internet-Draft               cds-consistency               December 2025
    time, applying an automated delegation update "MUST NOT break the
    current delegation" ([RFC7344], Section 4.1), i.e., it must not
    hamper availability or validatability of the Child's resolution.  As
+
+
+
+Thomassen                 Expires 13 June 2026                  [Page 3]
+
+Internet-Draft               cds-consistency               December 2025
+
+
    part of a more holistic treatment of the problem space,
    [I-D.ietf-dnsop-ds-automation] provides more specific guidance on
    such safety checks.
@@ -162,13 +178,6 @@ Internet-Draft               cds-consistency               December 2025
    ensure that the updates indicated by CDS/CDNSKEY and CSYNC record
    sets are plausibly consistent across the child's nameservers, before
    taking any action based on these records.
-
-
-
-Thomassen                 Expires 13 June 2026                  [Page 3]
-
-Internet-Draft               cds-consistency               December 2025
-
 
    Readers are expected to be familiar with DNSSEC [RFC9364], in
    particular [RFC4033], [RFC4034], [RFC4035], [RFC7344], and [RFC7477].
@@ -209,6 +218,14 @@ Internet-Draft               cds-consistency               December 2025
    nameserver to query CSYNC information.  This logic is replaced with
    the CSYNC consistency requirements defined in this document.
 
+
+
+
+Thomassen                 Expires 13 June 2026                  [Page 4]
+
+Internet-Draft               cds-consistency               December 2025
+
+
 3.  Processing Requirements
 
    Consistency requirements that apply equally to CDS/CDNSKEY and CSYNC
@@ -218,14 +235,6 @@ Internet-Draft               cds-consistency               December 2025
    In order to determine plausible consistency of CDS/CDNSKEY or CSYNC
    RRsets across the child's nameservers, the Parental Agent MUST fetch
    all IP addresses for each nameserver hostname as listed in the
-
-
-
-Thomassen                 Expires 13 June 2026                  [Page 4]
-
-Internet-Draft               cds-consistency               December 2025
-
-
    Child's delegation from the Parent using a validating resolver, and
    including glue records if available.  Before acting on any CDS/
    CDNSKEY or CSYNC record for the child, the Parental Agent MUST have
@@ -258,16 +267,7 @@ Internet-Draft               cds-consistency               December 2025
    process, repeating all queries (suggested default: enabled with
    exponential back-off).
 
-   Any pending queries can immediately be dequeued when encountering a
-   response that confirms the status quo, either implicitly (NODATA) or
-   explicitly.  This is because any subsequent responses could only
-   confirm that nothing needs to happen, or give an inconsistent result
-   in which case nothing needs to happen.  Queries may be continued
-   across all nameservers for reporting purposes.
 
-   Existing requirements for ensuring integrity remain in effect.  In
-   particular, DNSSEC signatures MUST be requested and validated for all
-   queries unless otherwise noted.
 
 
 
@@ -281,6 +281,20 @@ Thomassen                 Expires 13 June 2026                  [Page 5]
 
 Internet-Draft               cds-consistency               December 2025
 
+
+   Any pending queries can immediately be dequeued when encountering a
+   response that confirms the status quo, either implicitly (NODATA) or
+   explicitly.  This is because any subsequent responses could only
+   confirm that nothing needs to happen, or give an inconsistent result
+   in which case nothing needs to happen.  The parent may apply local
+   policy in determining whether the requested update is consistent or
+   not with the status quo, as illustrated in the type-specific sections
+   below.  In any case, queries may be continued across all nameservers
+   for reporting purposes.
+
+   Existing requirements for ensuring integrity remain in effect.  In
+   particular, DNSSEC signatures MUST be requested and validated for all
+   queries unless otherwise noted.
 
 3.1.  CDS and CDNSKEY
 
@@ -304,9 +318,25 @@ Internet-Draft               cds-consistency               December 2025
    removal request for the DS RRset whereas another response indicates
    no change (NODATA) or a DS update.
 
+   As an example of local policy, the parent may restrict the choice of
+   hash digest types used when publishing a DS RRset (notwithstanding
+   the requirements specified in [DS-IANA]).  (The set of keys
+   referenced in the DS RRset is not up to local policy.  Only if all
+   keys from the CDS/CDNSKEY RRsets are included, the DS RRset is
+   considered consistent.)
+
    During initial DS provisioning (DNSSEC bootstrapping), conventional
    DNSSEC validation for CDS/CDNSKEY responses is not (yet) available;
    in this case, authenticated bootstrapping ([RFC9615]) should be used.
+
+
+
+
+
+Thomassen                 Expires 13 June 2026                  [Page 6]
+
+Internet-Draft               cds-consistency               December 2025
+
 
 3.2.  CSYNC
 
@@ -331,18 +361,14 @@ Internet-Draft               cds-consistency               December 2025
    permissible do not all agree, the CSYNC state MUST be considered
    inconsistent.
 
-
-
-Thomassen                 Expires 13 June 2026                  [Page 6]
-
-Internet-Draft               cds-consistency               December 2025
-
-
    Further, when retrieving the data record sets as indicated in the
    CSYNC record (such as NS or A/AAAA records), the Parental Agent MUST
    ascertain that all queries are made against all nameservers from
    which a CSYNC record was received, and ensure that all return
    responses with equal rdata sets (including all empty).
+
+   As an example of local policy, the parent may choose to accept glue
+   records only for in-domain or sibling NS hostnames [RFC9499].
 
    Other CSYNC processing rules from Section 3 of [RFC7477] remain in
    place without modification.  For example, when the NS type flag is
@@ -358,6 +384,15 @@ Internet-Draft               cds-consistency               December 2025
    that do not serve required DNSKEY records or do not know the zone at
    all).  Parental Agents SHOULD check that CSYNC-based updates, if
    applied, do not break the delegation.
+
+
+
+
+
+Thomassen                 Expires 13 June 2026                  [Page 7]
+
+Internet-Draft               cds-consistency               December 2025
+
 
 4.  IANA Considerations
 
@@ -377,22 +412,6 @@ Internet-Draft               cds-consistency               December 2025
    zones are synchronized across operators, unanimously reflecting the
    domain owner's intentions.  Both availability and integrity of the
    domain's DNS service benefit from this policy.
-
-
-
-
-
-
-
-
-
-
-
-
-Thomassen                 Expires 13 June 2026                  [Page 7]
-
-Internet-Draft               cds-consistency               December 2025
-
 
    In order to resolve situations in which consensus about child zone
    contents cannot be reached (e.g. because one of the nameserver
@@ -420,11 +439,22 @@ Internet-Draft               cds-consistency               December 2025
    Hardaker, Libor Peltan, Oli Schacher, David Blacka, Charlie Kaufman,
    Michael Bauland, Patrick Mevzek, Joe Abley, Ondřej Caletka, Ondřej
    Surý, Mohamed Boucadair, Vijay Gurbani, Gorry Fairhurst, Paul
-   Wouters, Andy Newton, Mike Bishop.
+   Wouters, Andy Newton, Mike Bishop, Warren Kumari.
 
 8.  References
 
+
+
+Thomassen                 Expires 13 June 2026                  [Page 8]
+
+Internet-Draft               cds-consistency               December 2025
+
+
 8.1.  Normative References
+
+   [DS-IANA]  IANA, "Delegation Signer (DS) Resource Record (RR) Type
+              Digest Algorithms",
+              <http://www.iana.org/assignments/ds-rr-types>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -440,15 +470,6 @@ Internet-Draft               cds-consistency               December 2025
               Rose, "Resource Records for the DNS Security Extensions",
               RFC 4034, DOI 10.17487/RFC4034, March 2005,
               <https://www.rfc-editor.org/info/rfc4034>.
-
-
-
-
-
-Thomassen                 Expires 13 June 2026                  [Page 8]
-
-Internet-Draft               cds-consistency               December 2025
-
 
    [RFC4035]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
               Rose, "Protocol Modifications for the DNS Security
@@ -477,6 +498,14 @@ Internet-Draft               cds-consistency               December 2025
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
 
+
+
+
+Thomassen                 Expires 13 June 2026                  [Page 9]
+
+Internet-Draft               cds-consistency               December 2025
+
+
    [RFC9364]  Hoffman, P., "DNS Security Extensions (DNSSEC)", BCP 237,
               RFC 9364, DOI 10.17487/RFC9364, February 2023,
               <https://www.rfc-editor.org/info/rfc9364>.
@@ -498,14 +527,6 @@ Internet-Draft               cds-consistency               December 2025
    [LAME1]    Akiwate, G., Jonker, M., Sommese, R., Foster, I., Voelker,
               G. M., Savage, S., Claffy, K., and ACM, "Unresolved
               Issues: Prevalence, Persistence, and Perils of Lame
-
-
-
-Thomassen                 Expires 13 June 2026                  [Page 9]
-
-Internet-Draft               cds-consistency               December 2025
-
-
               Delegations", Proceedings of the ACM Internet Measurement
               Conference, DOI 10.1145/3419394.3423623, 27 October 2020,
               <http://dx.doi.org/10.1145/3419394.3423623>.
@@ -526,6 +547,20 @@ Internet-Draft               cds-consistency               December 2025
               Blacka, "Multi-Signer DNSSEC Models", RFC 8901,
               DOI 10.17487/RFC8901, September 2020,
               <https://www.rfc-editor.org/info/rfc8901>.
+
+   [RFC9499]  Hoffman, P. and K. Fujiwara, "DNS Terminology", BCP 219,
+              RFC 9499, DOI 10.17487/RFC9499, March 2024,
+              <https://www.rfc-editor.org/info/rfc9499>.
+
+
+
+
+
+
+Thomassen                 Expires 13 June 2026                 [Page 10]
+
+Internet-Draft               cds-consistency               December 2025
+
 
 Appendix A.  Failure Scenarios due to Inconsistencies
 
@@ -550,18 +585,6 @@ A.1.  DS Breakage due to Replication Lag
    trust by prematurely removing a DNSKEY still referenced by a (stale)
    CDS/CDNSKEY RRset.
 
-
-
-
-
-
-
-
-Thomassen                 Expires 13 June 2026                 [Page 10]
-
-Internet-Draft               cds-consistency               December 2025
-
-
    While foreseen in Section 6.2 of [RFC7344], the solution specified
    there requires parents to keep state on CDS/CDNSKEY RRsets.  This
    document achieves the same without this burden, and in case the
@@ -583,6 +606,17 @@ A.2.  Escalation of Lame Delegation Takeover
    such an attack, as validating resolvers will reject illegitimate
    responses due to lack of signatures consistent with the delegation's
    DS records.
+
+
+
+
+
+
+
+Thomassen                 Expires 13 June 2026                 [Page 11]
+
+Internet-Draft               cds-consistency               December 2025
+
 
    On the other hand, if the delegation is not protected by DNSSEC, the
    rogue nameserver is not only able to serve unauthorized responses
@@ -608,16 +642,6 @@ A.2.  Escalation of Lame Delegation Takeover
 
 A.3.  Multi-Provider (Permanent Multi-Signer)
 
-
-
-
-
-
-Thomassen                 Expires 13 June 2026                 [Page 11]
-
-Internet-Draft               cds-consistency               December 2025
-
-
 A.3.1.  DS Breakage
 
    While performing a key rollover and adjusting the corresponding CDS/
@@ -642,6 +666,14 @@ A.3.2.  NS Breakage
    delegation may be updated in a way that breaks resolution or silently
    reduces the multi-provider setup to a single-provider setup.
 
+
+
+
+Thomassen                 Expires 13 June 2026                 [Page 12]
+
+Internet-Draft               cds-consistency               December 2025
+
+
 A.4.  Bogus Provider Change (Temporary Multi-Signer)
 
    Transferring DNS service for a domain name from one (signing) DNS
@@ -664,16 +696,6 @@ A.4.  Bogus Provider Change (Temporary Multi-Signer)
    provider, the old provider's RRSIGs do no longer validate, causing
    SERVFAIL to be returned.
 
-
-
-
-
-
-Thomassen                 Expires 13 June 2026                 [Page 12]
-
-Internet-Draft               cds-consistency               December 2025
-
-
    However, an even worse consequence can occur when the parent performs
    their next CDS/CDNSKEY scan: It may then happen that the incorrect
    CDS/CDNSKEY record set is fetched from the new provider and used to
@@ -687,6 +709,8 @@ Appendix B.  Change History (to be removed before publication)
 
    *  draft-ietf-dnsop-cds-consistency-10
 
+   |  Clarify that parents may have local policy
+   |  
    |  Additional reference from IESG (Mike Bishop)
    |  
    |  Language precision from IESG (Andy Newton)
@@ -698,6 +722,14 @@ Appendix B.  Change History (to be removed before publication)
    *  draft-ietf-dnsop-cds-consistency-09
 
    |  Editorial changes
+
+
+
+Thomassen                 Expires 13 June 2026                 [Page 13]
+
+Internet-Draft               cds-consistency               December 2025
+
+
    |  
    |  Nits from Mohamed Boucadair
 
@@ -723,13 +755,6 @@ Appendix B.  Change History (to be removed before publication)
 
    *  draft-ietf-dnsop-cds-consistency-04
 
-
-
-Thomassen                 Expires 13 June 2026                 [Page 13]
-
-Internet-Draft               cds-consistency               December 2025
-
-
    |  Clarify that existing CSYNC NS and glue processing rules remain in
    |  place
    |  
@@ -753,6 +778,14 @@ Internet-Draft               cds-consistency               December 2025
 
    |  Make nits tool happy
    |  
+
+
+
+Thomassen                 Expires 13 June 2026                 [Page 14]
+
+Internet-Draft               cds-consistency               December 2025
+
+
    |  New failure mode: DS Breakage due to Replication Lag
    |  
    |  Point out zero overhead if nothing changed, and need for OOB
@@ -778,14 +811,6 @@ Internet-Draft               cds-consistency               December 2025
    |  Say what is being updated
    |  
    |  Editorial changes.
-
-
-
-Thomassen                 Expires 13 June 2026                 [Page 14]
-
-Internet-Draft               cds-consistency               December 2025
-
-
    |  
    |  Retry mechanism to resolve inconsistencies
 
@@ -808,6 +833,14 @@ Internet-Draft               cds-consistency               December 2025
    |  Initial public draft.
 
 Author's Address
+
+
+
+
+Thomassen                 Expires 13 June 2026                 [Page 15]
+
+Internet-Draft               cds-consistency               December 2025
+
 
    Peter Thomassen
    SSE - Secure Systems Engineering GmbH
@@ -837,4 +870,27 @@ Author's Address
 
 
 
-Thomassen                 Expires 13 June 2026                 [Page 15]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Thomassen                 Expires 13 June 2026                 [Page 16]
