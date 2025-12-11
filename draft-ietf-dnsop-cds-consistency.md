@@ -236,7 +236,7 @@ whereas another response indicates no change (NODATA) or a DS update.
 
 As an example of local policy, the parent may restrict the choice of
 hash digest types used when publishing a DS RRset (notwithstanding the
-requirements specified in [@!DS-IANA]). (The set of keys referenced in
+requirements specified in [@?DS-IANA]). (The set of keys referenced in
 the DS RRset is not up to local policy. Only if all keys from the
 CDS/CDNSKEY RRsets are included, the DS RRset is considered consistent.)
 
@@ -539,6 +539,10 @@ DNSSEC validation fails for all answers served by the old provider.
 
 
 # Change History (to be removed before publication)
+
+* draft-ietf-dnsop-cds-consistency-11
+
+> Editorial nits
 
 * draft-ietf-dnsop-cds-consistency-10
 
